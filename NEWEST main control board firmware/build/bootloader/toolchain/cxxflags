@@ -1,0 +1,6 @@
+"-specs=D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader/specs/picolibc.specs"
+-mlongcalls
+-fno-builtin-memcpy
+-fno-builtin-memset
+-fno-builtin-bzero
+-fno-rtti

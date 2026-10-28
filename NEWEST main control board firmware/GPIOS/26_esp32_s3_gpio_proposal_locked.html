@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ESP32-S3 GPIO Allocation — REII Lock-In Proposal</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif'],mono:['JetBrains Mono','monospace']}}}}</script>
+<style>body{font-family:'Inter',system-ui,sans-serif;}.font-mono{font-family:'JetBrains Mono',monospace;}.custom-scroll::-webkit-scrollbar{width:6px;height:6px;}.custom-scroll::-webkit-scrollbar-track{background:rgba(15,23,42,0.4);}.custom-scroll::-webkit-scrollbar-thumb{background:rgba(100,116,139,0.5);border-radius:3px;}</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-cyan-300 font-mono font-bold text-sm">S3</div>
+<div>
+<h1 class="text-base sm:text-lg font-bold tracking-tight text-white">ESP32-S3 GPIO Allocation — REII Lock-In Proposal</h1>
+<p class="text-xs text-slate-400">REII GPIO lock-in based on Group Report v3 + docs/26 + docs/27 • Evidence Date: <span class="font-mono text-slate-300">2026-10-21</span></p>
+</div>
+</div>
+<div class="flex items-center gap-2 flex-wrap text-xs">
+<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono">LOCKED</span>
+<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30 font-mono">MEASURED</span>
+<span class="px-2 py-0.5 rounded bg-violet-500/10 text-violet-300 border border-violet-500/30 font-mono">VERIFIED</span>
+<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 font-mono">PROPOSED</span>
+<span class="px-2 py-0.5 rounded bg-slate-600/30 text-slate-400 border border-slate-600 font-mono">FREE</span>
+<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700 font-mono">NC/UNUSABLE</span>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+<div class="text-xs text-slate-400 font-mono mb-1">REII Locked GPIOs</div>
+<div class="text-2xl font-bold text-emerald-400 font-mono" id="kpiLocked">5</div>
+</div>
+<div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+<div class="text-xs text-slate-400 font-mono mb-1">REII Proposed (fallback)</div>
+<div class="text-2xl font-bold text-amber-400 font-mono" id="kpiProposed">1</div>
+</div>
+<div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+<div class="text-xs text-slate-400 font-mono mb-1">Freed (IRQ disconnected)</div>
+<div class="text-2xl font-bold text-slate-400 font-mono" id="kpiFreed">1</div>
+</div>
+</div>
+<div class="rounded-xl bg-slate-900/50 border border-slate-800/50 p-6">
+<h2 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Lock-In Summary (per Group Report v3)</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+<div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+<div class="text-xs text-slate-400 font-mono mb-1">Already Locked / Verified</div>
+<ul class="text-xs text-slate-300 space-y-1 font-mono list-disc list-inside">
+<li>GPIO 11 — SPI2 MOSI (shared nRF)</li>
+<li>GPIO 12 — SPI2 SCK (shared nRF)</li>
+<li>GPIO 13 — SPI2 MISO (shared nRF)</li>
+<li>GPIO 47 — +3.3VP power gate (critical)</li>
+</ul>
+</div>
+<div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+<div class="text-xs text-slate-400 font-mono mb-1">Locked Now (was PROPOSED)</div>
+<ul class="text-xs text-slate-300 space-y-1 font-mono list-disc list-inside">
+<li>GPIO 17 — nRF CSN (J1.1)</li>
+<li>GPIO 10 — nRF CE (J7.10)</li>
+</ul>
+</div>
+<div class="p-3 rounded-lg bg-slate-950 border border-slate-800">
+<div class="text-xs text-slate-400 font-mono mb-1">Freed / Released</div>
+<ul class="text-xs text-slate-300 space-y-1 font-mono list-disc list-inside">
+<li>GPIO 18 — IRQ disconnected</li>
+<li>(polled STATUS frees pin)</li>
+</ul>
+</div>
+</div>
+<div class="mt-4 p-3 rounded-lg bg-amber-900/30 border border-amber-500/30 text-xs text-amber-200">
+<strong>⚠ Fallback retained:</strong> GPIO 16 remains PROPOSED as nRF CE fallback only if GPIO 10 cannot be used.
+</div>
+</div>
+<div class="rounded-xl bg-slate-900 border border-slate-800 overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+<h2 class="text-sm font-semibold text-white">All GPIO Pins — Lock-In Status</h2>
+<div class="text-xs text-slate-400 font-mono">36 pins • 5 locked • 1 freed • 1 proposed-fallback</div>
+</div>
+<div class="overflow-x-auto custom-scroll">
+<table class="w-full text-left">
+<thead class="bg-slate-950/50 border-b border-slate-800">
+<tr>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">GPIO</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">WROOM Pin</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">Net</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">Goes To / Connector</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">Conn Group</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">Package(s)</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">Role</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">Lock-In Status</th>
+<th class="px-4 py-2 text-xs font-mono text-slate-400">Detail / Evidence</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-800/50" id="gpioTableBody"></tbody>
+</table>
+</div>
+</div>
+<div class="rounded-xl bg-slate-900 border border-slate-800 overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-800">
+<h2 class="text-sm font-semibold text-white">REII Lock-In Rationale (from Group Report v3)</h2>
+</div>
+<div class="px-6 py-4 space-y-4">
+<div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+<h3 class="text-xs font-bold text-emerald-400 font-mono mb-2">1. SPI2 Shared Bus — Already Locked (MEASURED + SHARED)</h3>
+<ul class="text-xs text-slate-300 space-y-1 font-mono list-disc list-inside">
+<li><strong>GPIO 11</strong> — SPI2 MOSI → J1.2 → nRF24L01+ MOSI — Measured in boot log, shared SPI2</li>
+<li><strong>GPIO 12</strong> — SPI2 SCK → J1.3 → nRF24L01+ SCK — Measured in boot log, shared SPI2</li>
+<li><strong>GPIO 13</strong> — SPI2 MISO → J1.4 → nRF24L01+ MISO — Measured in boot log, shared SPI2</li>
+</ul>
+</div>
+
+<div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+<h3 class="text-xs font-bold text-emerald-400 font-mono mb-2">2. nRF CSN — Locked Now (was PROPOSED)</h3>
+<p class="text-xs text-slate-300 mb-2"><strong>GPIO 17</strong> → J1.1 → nRF24L01+ CSN</p>
+<p class="text-xs text-slate-400 mb-1">Evidence: Group Report v3 Table 43 confirms "pull all SPI2 chip-select pins HIGH (GPIO17 nRF24...)"</p>
+<p class="text-xs text-amber-300 mb-0">⚠ GPIO17 floats in starter firmware — drive HIGH at boot before first SPI transaction.</p>
+</div>
+
+<div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+<h3 class="text-xs font-bold text-emerald-400 font-mono mb-2">3. nRF CE — Locked Now (J7.10)</h3>
+<p class="text-xs text-slate-300 mb-2"><strong>GPIO 10</strong> → J7.10 → nRF24L01+ CE</p>
+<p class="text-xs text-slate-400 mb-1">Evidence: Group Report v3 Table 43 references "Header J1 & J7.10" for crane SPI2 bus. docs/27 §3 Option B: CE=GPIO10, IRQ=none (poll STATUS). Resolves CONTEST with MC2.</p>
+</div>
+
+<div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+<h3 class="text-xs font-bold text-slate-400 font-mono mb-2">4. IRQ — Disconnected / Freed (was CONTESTED)</h3>
+<p class="text-xs text-slate-300 mb-2"><strong>GPIO 18</strong> → J7.9 → was nRF IRQ / MC2</p>
+<p class="text-xs text-slate-400 mb-1">Evidence: Group Report v3 Table 43: "Poll SPI STATUS ... so J7.9 (GPIO18) stays free for MCTR 1". IRQ disconnected; pin released from REII.</p>
+</div>
+
+<div class="p-4 rounded-lg bg-slate-950 border border-slate-800">
+<h3 class="text-xs font-bold text-violet-400 font-mono mb-2">5. +3.3VP Power Gate — Already Locked (VERIFIED + CRITICAL)</h3>
+<p class="text-xs text-slate-300 mb-2"><strong>GPIO 47</strong> → +3.3VP rail enable → J1.8 → nRF VCC</p>
+<p class="text-xs text-slate-400 mb-1">Evidence: Measured + verified. GPIO47 must be HIGH before any nRF SPI init. Back-power path on I2C pull-ups — keep HIGH when peripherals active.</p>
+</div>
+
+<div class="p-4 rounded-lg bg-amber-900/30 border border-amber-500/30">
+<h3 class="text-xs font-bold text-amber-400 font-mono mb-2">6. Fallback — PROPOSED (not locked)</h3>
+<p class="text-xs text-slate-300 mb-2"><strong>GPIO 16</strong> → nRF CE fallback candidate</p>
+<p class="text-xs text-slate-400 mb-0">Kept as PROPOSED fallback only. Activate only if GPIO 10 proves unusable.</p>
+</div>
+</div>
+</div>
+<div class="rounded-xl bg-slate-900 border border-slate-800 p-6">
+<h2 class="text-sm font-semibold text-white mb-4">Sources &amp; Evidence Chain</h2>
+<ul class="text-xs text-slate-400 space-y-1 font-mono list-disc list-inside">
+<li>Group report: <em>Engineering Design Group report newest v3</em> (DOCX) — Table 43 Interface Stage 3, Table 44 Milestone 3</li>
+<li><em>docs/26_controller_gpio_map.md</em> — verified GPIO→net→connector→package map (schematic visual read 2026-10-15)</li>
+<li><em>docs/27_reii_nrf_wiring_and_config.md</em> — REII nRF24L01+ wiring diagram &amp; configuration plan (§1–§5)</li>
+<li><em>23_progress_and_milestones.md</em> — project progress record</li>
+<li>Status labels: MEASURED (observed in logs), VERIFIED (schematic/firmware), LOCKED (agreed), PROPOSED (not yet agreed), FREE (released), NC/UNUSABLE (strapping/PSRAM)</li>
+</ul>
+</div>
+
+</main>
+
+<script>
+const GPIO_DATA = [
+  { gpio: "0",  wroom: "27", net: "ESP_BOOT", goesTo: "SW2 Boot, R14 10k↑, C8", connGroup: "ONBOARD", pkg: ["NC"], role: "Boot Strapping", status: "RESERVED", badge: "RESERVED", detail: "Boot strapping — reserved, do not repurpose.", anomaly: false },
+  { gpio: "1",  wroom: "39", net: "IO6", goesTo: "J7.3", connGroup: "J7", pkg: ["EE1", "EXP"], role: "EE1 Gate/PWM 6 or Expansion", status: "PROPOSED", badge: "PROPOSED ⚠", detail: "Free. ⚠ Net-name anomaly: net IO6 sits on GPIO1 (while GPIO6 = PX_INTB). Confirm with board owner before use. PROPOSED candidate (EE1/expansion).", anomaly: true },
+  { gpio: "2",  wroom: "41", net: "SD_CS", goesTo: "microSD slot CS", connGroup: "ONBOARD", pkg: ["NC"], role: "microSD Chip-Select", status: "MEASURED", badge: "MEASURED + SHARED", detail: "Shared SPI2 CS with ADS1220 (GPIO14) and nRF (GPIO17). Must be HIGH before SPI2 init.", anomaly: false },
+  { gpio: "3",  wroom: "43", net: "JTAG", goesTo: "Strapping JTAG", connGroup: "ONBOARD", pkg: ["NC"], role: "Strapping — JTAG", status: "NC", badge: "UNUSABLE", detail: "Strapping pin — do not repurpose.", anomaly: false },
+  { gpio: "4",  wroom: "5",  net: "MC2_TROLLEY", goesTo: "J7.11", connGroup: "J7", pkg: ["MC2"], role: "MC2 Trolley Control", status: "PROPOSED", badge: "PROPOSED", detail: "MC2 trolley motor control candidate. Shared SPI2 bus awareness needed.", anomaly: false },
+  { gpio: "5",  wroom: "6",  net: "EXP_RST", goesTo: "MCP23017 Reset (J3/J4)", connGroup: "ONBOARD, EXP", pkg: ["EXP"], role: "Expander Reset", status: "VERIFIED", badge: "VERIFIED", detail: "MCP23017 expander reset line. On-board I2C expander control.", anomaly: false },
+  { gpio: "6",  wroom: "7",  net: "PX_INTB", goesTo: "MCP23017 INTB (J3/J4)", connGroup: "ONBOARD, EXP", pkg: ["EXP"], role: "Expander Interrupt B", status: "VERIFIED", badge: "AVAILABLE (IN)", detail: "MCP23017 Port B interrupt. Verified + measured. Input — available for expander use.", anomaly: false },
+  { gpio: "7",  wroom: "10", net: "PX_INTA", goesTo: "MCP23017 INTA (J3/J4)", connGroup: "ONBOARD, EXP", pkg: ["EXP"], role: "Expander Interrupt A", status: "VERIFIED", badge: "AVAILABLE (IN)", detail: "MCP23017 Port A interrupt. Verified + measured. Input — available for expander use.", anomaly: false },
+  { gpio: "8",  wroom: "11", net: "I2C_SDA", goesTo: "I2C bus: 0x20, 0x38, 0x51, J8, J1.9", connGroup: "ONBOARD, EXP, J1", pkg: ["I2C"], role: "I2C Data Bus", status: "MEASURED", badge: "VERIFIED + MEASURED", detail: "I2C data bus — MCP23017, AHT20, RTCC, OLED. On-board + expander.", anomaly: false },
+  { gpio: "9",  wroom: "12", net: "I2C_SCL", goesTo: "I2C bus; J1.10 (R9 3.3k↑)", connGroup: "ONBOARD, EXP, J1", pkg: ["I2C"], role: "I2C Clock Bus", status: "MEASURED", badge: "VERIFIED + MEASURED", detail: "I2C clock bus — MCP23017, AHT20, RTCC, OLED. On-board + expander.", anomaly: false },
+  { gpio: "10", wroom: "13", net: "IO_B / CE", goesTo: "J7.10 → nRF24L01+ CE", connGroup: "J7", pkg: ["REII"], role: "nRF CE (Chip Enable)", status: "LOCKED", badge: "LOCKED → REII", detail: "LOCKED to REII as nRF CE per Group Report v3 Table 43 (J7.10 on SPI2 bus header). Resolves CONTEST with MC2. Docs/27 §3 Option B.", anomaly: false },
+  { gpio: "11", wroom: "14", net: "SPI2_MOSI", goesTo: "J1.2 → nRF MOSI / shared SPI2", connGroup: "ONBOARD, REII, J1", pkg: ["REII"], role: "SPI2 MOSI (Shared)", status: "MEASURED", badge: "MEASURED + SHARED → REII", detail: "Shared SPI2 MOSI — nRF24L01+, ADS1220, microSD. Measured in boot log.", anomaly: false },
+  { gpio: "12", wroom: "16", net: "SPI2_SCK", goesTo: "J1.3 → nRF SCK / shared SPI2", connGroup: "ONBOARD, REII, J1", pkg: ["REII"], role: "SPI2 SCK (Shared)", status: "MEASURED", badge: "MEASURED + SHARED → REII", detail: "Shared SPI2 clock — nRF24L01+, ADS1220, microSD. Measured in boot log.", anomaly: false },
+  { gpio: "13", wroom: "17", net: "SPI2_MISO", goesTo: "J1.4 → nRF MISO / shared SPI2", connGroup: "ONBOARD, REII, J1", pkg: ["REII"], role: "SPI2 MISO (Shared)", status: "MEASURED", badge: "MEASURED + SHARED → REII", detail: "Shared SPI2 MISO — nRF24L01+, ADS1220, microSD. Measured in boot log.", anomaly: false },
+  { gpio: "14", wroom: "18", net: "ADS_CS", goesTo: "ADS1220 CS", connGroup: "ONBOARD", pkg: ["EE1", "EE2", "MC2"], role: "ADS1220 Chip-Select", status: "MEASURED", badge: "MEASURED", detail: "ADS1220 ADC chip-select. Shared SPI2 CS (with GPIO2 microSD, GPIO17 nRF).", anomaly: false },
+  { gpio: "15", wroom: "34", net: "ADS_DRDY", goesTo: "ADS1220 Data-Ready", connGroup: "ONBOARD", pkg: ["NC"], role: "ADS1220 Data-Ready", status: "VERIFIED", badge: "VERIFIED", detail: "ADS1220 data-ready interrupt. Verified.", anomaly: false },
+  { gpio: "16", wroom: "35", net: "RTC_ALARM / CE_FB", goesTo: "J7.8 (nRF CE fallback)", connGroup: "J7", pkg: ["REII"], role: "nRF CE Fallback / RTC Alarm", status: "PROPOSED", badge: "PROPOSED (fallback)", detail: "PROPOSED fallback for nRF CE if GPIO10 unusable. Also candidate for RTC alarm. Not locked — requires re-opening decision.", anomaly: false },
+  { gpio: "17", wroom: "36", net: "SPI_xCS / CSN", goesTo: "J1.1 → nRF CSN", connGroup: "ONBOARD, REII, J1", pkg: ["REII"], role: "nRF CSN (Chip Select Not)", status: "LOCKED", badge: "LOCKED → REII", detail: "LOCKED to REII as nRF CSN per Group Report v3 Table 43. ⚠ Floats in starter firmware — drive HIGH at boot before first SPI transaction.", anomaly: false },
+  { gpio: "18", wroom: "37", net: "IO_A / IRQ", goesTo: "J7.9 → Freed (IRQ disconnected)", connGroup: "J7", pkg: ["MCTR"], role: "Freed — was nRF IRQ / MC2", status: "FREE", badge: "FREED → MCTR 1", detail: "IRQ disconnected — polled STATUS used instead (Group Report v3 Table 43). Pin freed for MCTR 1 real-time control. Released from REII.", anomaly: false },
+  { gpio: "19", wroom: "23", net: "USB_D-", goesTo: "Native USB D-", connGroup: "ONBOARD", pkg: ["NC"], role: "Native USB D-", status: "RESERVED", badge: "RESERVED", detail: "Native USB D- — flashing + serial monitor. Reserved.", anomaly: false },
+  { gpio: "20", wroom: "24", net: "USB_D+", goesTo: "Native USB D+", connGroup: "ONBOARD", pkg: ["NC"], role: "Native USB D+", status: "RESERVED", badge: "RESERVED", detail: "Native USB D+ — flashing + serial monitor. Reserved.", anomaly: false },
+  { gpio: "21", wroom: "38", net: "MC2_TROLLEY2", goesTo: "J7.12", connGroup: "J7", pkg: ["MC2", "EXP"], role: "MC2 Trolley / Expansion", status: "PROPOSED", badge: "PROPOSED", detail: "MC2 trolley control or expansion candidate. Shared with EXP on J7.", anomaly: false },
+  { gpio: "35", wroom: "NC", net: "PSRAM", goesTo: "PSRAM bracket", connGroup: "ONBOARD", pkg: ["NC"], role: "PSRAM Bracket", status: "NC", badge: "UNUSABLE", detail: "PSRAM bracket pin — unusable as GPIO.", anomaly: false },
+  { gpio: "36", wroom: "NC", net: "PSRAM", goesTo: "PSRAM bracket", connGroup: "ONBOARD", pkg: ["NC"], role: "PSRAM Bracket", status: "NC", badge: "UNUSABLE", detail: "PSRAM bracket pin — unusable as GPIO.", anomaly: false },
+  { gpio: "37", wroom: "NC", net: "PSRAM", goesTo: "PSRAM bracket", connGroup: "ONBOARD", pkg: ["NC"], role: "PSRAM Bracket", status: "NC", badge: "UNUSABLE", detail: "PSRAM bracket pin — unusable as GPIO.", anomaly: false },
+  { gpio: "38", wroom: "2",  net: "SPWM_A", goesTo: "J7.8 → EE1 VFD Phase A", connGroup: "J7", pkg: ["EE1"], role: "MCPWM SPWM Phase A", status: "MEASURED", badge: "MEASURED", detail: "EE1 3-phase VFD Phase A — measured running 20 kHz / 50 Hz. Dedicated to EE1.", anomaly: false },
+  { gpio: "39", wroom: "3",  net: "SPWM_B", goesTo: "J7.7 → EE1 VFD Phase B", connGroup: "J7", pkg: ["EE1"], role: "MCPWM SPWM Phase B", status: "MEASURED", badge: "MEASURED", detail: "EE1 3-phase VFD Phase B — measured running 20 kHz / 50 Hz. Dedicated to EE1.", anomaly: false },
+  { gpio: "40", wroom: "4",  net: "SPWM_C", goesTo: "J7.6 → EE1 VFD Phase C", connGroup: "J7", pkg: ["EE1"], role: "MCPWM SPWM Phase C", status: "MEASURED", badge: "MEASURED", detail: "EE1 3-phase VFD Phase C — measured running 20 kHz / 50 Hz. Dedicated to EE1.", anomaly: false },
+  { gpio: "41", wroom: "45", net: "EE1_L4", goesTo: "J7.5 → EE1 Line 4 / EE2 Magnet?", connGroup: "J7", pkg: ["EE1", "EE2"], role: "EE1 Line 4 / EE2 Magnet", status: "PROPOSED", badge: "PROPOSED", detail: "EE1 4th gate/PWM reserve or EE2 magnet control. Proposed — not yet agreed.", anomaly: false },
+  { gpio: "42", wroom: "46", net: "EE1_L5", goesTo: "J7.4 → EE1 Line 5 / EE2 Magnet?", connGroup: "J7", pkg: ["EE1", "EE2"], role: "EE1 Line 5 / EE2 Magnet", status: "PROPOSED", badge: "PROPOSED", detail: "EE1 5th gate/PWM reserve or EE2 magnet control. Proposed — not yet agreed.", anomaly: false },
+  { gpio: "43", wroom: "48", net: "UART0_TX", goesTo: "J7.1 → Console UART0 TX", connGroup: "ONBOARD, J7", pkg: ["NC"], role: "Console UART0 TX", status: "UNVERIFIED", badge: "UNVERIFIED TRAFFIC", detail: "Console UART0 TX on J7.1 — boot log claims console here but output arrived on native USB COM12. Verify before touching.", anomaly: true },
+  { gpio: "44", wroom: "49", net: "UART0_RX", goesTo: "J7.2 → Console UART0 RX", connGroup: "ONBOARD, J7", pkg: ["NC"], role: "Console UART0 RX", status: "UNVERIFIED", badge: "UNVERIFIED TRAFFIC", detail: "Console UART0 RX on J7.2 — same caveat as GPIO43 (verify before touching).", anomaly: true },
+  { gpio: "45", wroom: "NC", net: "NC", goesTo: "No connect", connGroup: "ONBOARD", pkg: ["NC"], role: "No Connect", status: "NC", badge: "UNUSABLE", detail: "No connect — unusable.", anomaly: false },
+  { gpio: "46", wroom: "NC", net: "NC", goesTo: "No connect", connGroup: "ONBOARD", pkg: ["NC"], role: "No Connect", status: "NC", badge: "UNUSABLE", detail: "No connect — unusable.", anomaly: false },
+  { gpio: "47", wroom: "1",  net: "3V3VP_EN", goesTo: "+3.3VP power gate", connGroup: "ONBOARD, REII, EXP", pkg: ["REII"], role: "+3.3VP Peripheral Power Gate", status: "MEASURED", badge: "VERIFIED + CRITICAL → REII", detail: "LOCKED to REII. Gates +3.3VP rail (J1.8 → nRF VCC). Must be HIGH before any peripheral/radio use. Back-power path on I2C pull-ups — keep HIGH when peripherals active.", anomaly: false },
+  { gpio: "48", wroom: "NC", net: "STAT_LED", goesTo: "WS2812B status LED", connGroup: "ONBOARD", pkg: ["NC"], role: "Status LED", status: "MEASURED", badge: "VERIFIED + RESOLVED", detail: "RGB status LED (WS2812B). Confirmed by schematic — closes starter's STATUS_LED TODO.", anomaly: false },
+  { gpio: "EN", wroom: "EN", net: "EN", goesTo: "Module Reset", connGroup: "ONBOARD", pkg: ["NC"], role: "Module Reset", status: "RESERVED", badge: "RESERVED", detail: "Module reset pin — reserved.", anomaly: false }
+];
+const STATUS_CLASSES = {
+  "LOCKED": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40",
+  "MEASURED": "bg-blue-500/20 text-blue-300 border border-blue-500/40",
+  "VERIFIED": "bg-violet-500/20 text-violet-300 border border-violet-500/40",
+  "PROPOSED": "bg-amber-500/20 text-amber-300 border border-amber-500/40",
+  "FREE": "bg-slate-600/20 text-slate-400 border border-slate-600/40",
+  "RESERVED": "bg-slate-800 text-slate-500 border border-slate-700",
+  "NC": "bg-slate-900 text-slate-600 border border-slate-800",
+  "UNVERIFIED": "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+};
+function renderTable() {
+  const tbody = document.getElementById("gpioTableBody");
+  let lockedCount = 0, proposedCount = 0, freedCount = 0;
+  tbody.innerHTML = GPIO_DATA.map(item => {
+    const cls = STATUS_CLASSES[item.status] || STATUS_CLASSES["RESERVED"];
+    let rowClass = "";
+    if (item.status === "LOCKED") rowClass = "bg-emerald-500/5";
+    if (item.status === "FREE") rowClass = "bg-slate-900/30";
+    if (item.anomaly) rowClass += " border-l-2 border-l-amber-500";
+    if (item.status === "LOCKED") lockedCount++;
+    if (item.status === "PROPOSED" && item.pkg.includes("REII")) proposedCount++;
+    if (item.status === "FREE") freedCount++;
+    return `<tr class="${rowClass} hover:bg-slate-800/30 transition group">
+      <td class="px-4 py-2 text-xs font-mono font-bold text-white">${item.gpio}</td>
+      <td class="px-4 py-2 text-xs font-mono text-slate-400">${item.wroom}</td>
+      <td class="px-4 py-2 text-xs font-mono text-cyan-300 truncate">${item.net}</td>
+      <td class="px-4 py-2 text-xs font-mono text-slate-300 truncate">${item.goesTo}</td>
+      <td class="px-4 py-2 text-xs font-mono text-slate-500 truncate">${item.connGroup}</td>
+      <td class="px-4 py-2 text-xs font-mono">${item.pkg.map(p => `<span class="px-1 py-0.5 rounded text-[9px] border">${p}</span>`).join(" ")}</td>
+      <td class="px-4 py-2 text-xs font-mono text-slate-300 truncate">${item.role}</td>
+      <td class="px-4 py-2 text-xs font-mono"><span class="px-1.5 py-0.5 rounded ${cls}">${item.badge}</span></td>
+      <td class="px-4 py-2 text-xs font-mono text-slate-400 truncate max-w-xs" title="${item.detail}">${item.detail}</td>
+    </tr>`;
+  }).join("");
+  document.getElementById("kpiLocked").textContent = lockedCount;
+  document.getElementById("kpiProposed").textContent = proposedCount;
+  document.getElementById("kpiFreed").textContent = freedCount;
+}
+renderTable();
+</script>
+</body>
+</html>

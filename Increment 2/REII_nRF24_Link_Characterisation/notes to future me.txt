@@ -1,0 +1,1 @@
+Receiver Saturation at High Power: When you ran the --pa HIGH test at 5 meters, the packet error rate jumped to 5.5% and 11%. This proves that at short distances, higher transmit power actually degrades the link by overdriving the receiver's Low Noise Amplifier (LNA)

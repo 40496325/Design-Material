@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REII Dashboard — Crane Telemetry & Control</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>REII Dashboard</h1>
+    <div class="status-bar" id="statusBar">
+      <span class="indicator offline" id="connIndicator">●</span>
+      <span id="connText">Disconnected</span>
+    </div>
+  </header>
+
+  <section class="panel telemetry">
+    <h2>Telemetry (uplink via ACK-payload)</h2>
+    <div class="grid">
+      <div class="tile"><div class="label">Trolley Pos</div><div class="value" id="trolleyPos">--</div><div class="unit">m</div></div>
+      <div class="tile"><div class="label">Hoist Pos</div><div class="value" id="hoistPos">--</div><div class="unit">m</div></div>
+      <div class="tile"><div class="label">Trolley Vel</div><div class="value" id="trolleyVel">--</div><div class="unit">m/s</div></div>
+      <div class="tile"><div class="label">Hoist Vel</div><div class="value" id="hoistVel">--</div><div class="unit">m/s</div></div>
+      <div class="tile"><div class="label">Load</div><div class="value" id="load">--</div><div class="unit">kg</div></div>
+      <div class="tile"><div class="label">VFD Current</div><div class="value" id="vfdCurrent">--</div><div class="unit">A</div></div>
+      <div class="tile"><div class="label">Temp</div><div class="value" id="temp">--</div><div class="unit">°C</div></div>
+      <div class="tile"><div class="label">Seq Ack</div><div class="value" id="seqAck">--</div><div class="unit">#</div></div>
+    </div>
+    <div class="status-row">
+      <div class="tile"><div class="label">Magnet</div><div class="value" id="magnetStat">--</div><div class="unit"></div></div>
+      <div class="tile"><div class="label">Error Code</div><div class="value" id="errorCode">--</div><div class="unit"></div></div>
+      <div class="tile"><div class="label">Fault Flags</div><div class="value" id="faultFlags">--</div><div class="unit"></div></div>
+      <div class="tile"><div class="label">Sys Health</div><div class="value" id="sysHealth">--</div><div class="unit"></div></div>
+      <div class="tile"><div class="label">Last Update</div><div class="value" id="lastUpdate">--</div><div class="unit">ago</div></div>
+    </div>
+  </section>
+
+  <section class="panel commands">
+    <h2>Command (downlink → crane)</h2>
+    <div class="cmd-grid">
+      <div class="cmd-group">
+        <label>Mode</label>
+        <div class="toggle-row">
+          <button class="btn toggle active" id="btnManual">Manual</button>
+          <button class="btn toggle" id="btnAuto">Auto</button>
+        </div>
+      </div>
+      <div class="cmd-group">
+        <label>Trolley Speed (%)</label>
+        <input type="range" id="trolleyCtrl" min="-100" max="100" value="0">
+        <span id="trolleyVal">0</span>
+      </div>
+      <div class="cmd-group">
+        <label>Hoist Speed (%)</label>
+        <input type="range" id="hoistCtrl" min="-100" max="100" value="0">
+        <span id="hoistVal">0</span>
+      </div>
+      <div class="cmd-group">
+        <label>Magnet</label>
+        <button class="btn toggle" id="btnMagnet">Off</button>
+      </div>
+      <div class="cmd-group">
+        <label>Safety</label>
+        <button class="btn danger" id="btnEstop">E-STOP</button>
+        <button class="btn warning" id="btnReset">RESET</button>
+      </div>
+    </div>
+    <div class="cmd-sent" id="cmdSent">Last command: none</div>
+  </section>
+
+  <section class="panel log">
+    <h2>Event Log</h2>
+    <div id="logContainer" class="log-container"></div>
+  </section>
+</div>
+
+<!-- Socket.IO client (vendored locally so the dashboard works offline) -->
+<script src="/static/socket.io.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+# REII — nRF24L01 Link Bring-Up & Characterisation
+
+Small individual sub-project of the REII *Remote Control Dashboard* work package.
+Its job is to **prove the nRF24L01 radio is reliable before the STM32F411 dongle build and the
+application protocol are committed to**.
+
+Checkpoint task (from the REII checkpoint slide):
+
+| # | Goal | Where it is covered |
+|---|------|---------------------|
+| 1 | Bring up a live nRF24L01 link on an existing dev board / breadboard (not the from-scratch STM32F411 dongle yet) | `docs/01_hardware_selection.md`, `docs/02_wiring.md`, `firmware/` |
+| 2 | Characterise the link systematically: packet loss vs. distance, at ≥ 2 data rates | `docs/03_test_procedure.md`, `firmware/` (`tx` / `rx` roles), `tools/run_test.py`, `tools/plot_packet_loss.py` |
+| 3 | Identify the best channel for the lab (WiFi + other groups' links) | `docs/04_channel_selection.md`, `firmware/` (`scanner` role), `tools/channel_analysis.py` |
+| 4 | Deliver a recommended nRF24 configuration (channel, data rate, power, retries) | `docs/05_recommended_config.md` (filled in from measured data) |
+
+"Bring this" deliverables → `results/` (plots + `RECOMMENDED_CONFIG` table).
+
+**Where we are:** see `docs/06_progress_summary.md` — goal-by-goal status with the measured bring-up
+evidence (both boards up, control link `PONG,1,3`, 1 m smoke test PER 0–0.5 % at 250k/1M/2M).
+
+---
+
+## 1. What we have and what we use
+
+Datasheets in `../datasheets/`:
+
+| Part | Datasheet | Role in this sub-project |
+|------|-----------|--------------------------|
+| NodeMCU-32S (ESP32-WROOM-32) | `nodemcu-32s_product_specification.pdf`, `esp32-wroom-32_datasheet_en.pdf` | **RX / ground-station stand-in**, USB-tethered to the PC. Also runs the **channel scanner**. |
+| ESP32-C3 dev board | `esp32-c3_datasheet_en.pdf` | **TX / mobile node**, powered from a USB power bank so it can be walked away from the PC. |
+| Arduino Nano (ATmega328P) | `ARDUINONANO.PDF` | Fallback TX if the C3 board gives trouble. **Its 3V3 pin (from the USB-serial chip) cannot power a PA+LNA module** — see `docs/01_hardware_selection.md`. |
+| 2 × nRF24L01+ **PA+LNA** (big module, external SMA antenna) | `NRF24L01.PDF` | The radios. |
+
+Important datasheet caveat: `NRF24L01.PDF` is the **original nRF24L01 (rev 2.0)** datasheet — 1 Mbps / 2 Mbps only, "CD" carrier-detect bit.
+Every PA+LNA module sold today is an **nRF24L01+** (adds 250 kbps and the "RPD" bit, same register map).
+The firmware checks `radio.isPVariant()` at boot and prints it; if it is `false` the 250 kbps rate is skipped automatically and the report is done with 1 Mbps + 2 Mbps (still satisfies "≥ 2 data rates").
+
+## 2. Architecture of the test software
+
+```
+                 PC (Python, tools/)                                mobile node (power bank)
+        ┌──────────────────────────────┐                           ┌───────────────────────┐
+        │ run_test.py  ── serial ──▶   │                           │  ESP32-C3  + nRF24    │
+        │ plot_packet_loss.py          │        control link       │  role = TX            │
+        │ channel_analysis.py          │  ◀── (250k/1M, fixed ch) ─┤  - waits for TEST cmd │
+        └──────────────┬───────────────┘        test bursts        │  - blasts N packets   │
+                       │ USB                  ──(rate,ch,pa)──▶    │  - reports ACK stats  │
+              ┌────────▼───────────┐                               └───────────────────────┘
+              │ NodeMCU-32S + nRF24│
+              │ role = RX          │  ◀────────────────────────────
+              │ - test controller  │
+              │ - counts packets   │
+              │ - channel scanner  │
+              └────────────────────┘
+```
+
+* **One code base, three roles** (`firmware/src/main.cpp` + `firmware/lib/linktest/`), selected at build time with `-DROLE_RX`, `-DROLE_TX`, `-DROLE_SCANNER`. Board pins are selected with `-DBOARD_*` in `platformio.ini`.
+* **RX is the master.** The PC only ever talks to the RX board (it is the stand-in for the future STM32 dongle). The RX sends a `TEST` command to the TX over a *control configuration* (most robust rate, `CTRL_CHANNEL`), both sides switch to the *test configuration* (rate / channel / PA), the TX sends `N` numbered packets, both drop back to the control configuration and the TX reports its own view of the burst (ACK successes, failures, retransmit count).
+  This mirrors the real product: dongle → gantry commands, gantry → dongle telemetry.
+* **Two measurements per configuration**
+  1. `NOACK` burst — auto-ack off, raw physical-layer PER = 1 − (unique seq received)/N. Best for the *packet-loss vs. distance* curves.
+  2. `ACK` burst — auto-ack on, `ARC`/`ARD` set, TX counts delivered/failed and total retransmits from `OBSERVE_TX`. This is the *effective* reliability the dashboard will see and is what justifies the retry setting.
+* **Everything is logged as CSV** (`results/*.csv`) by `tools/run_test.py`; plots are generated by `tools/plot_packet_loss.py`.
+* **Channel survey** = nRF24 carrier-detect scan over all 126 channels (`scanner` role) **+** ESP32 WiFi AP scan (same board, WiFi enabled only in scanner role). `tools/channel_analysis.py` overlays both and scores channels.
+
+## 3. Work plan (in order)
+
+| Step | What | Done when |
+|------|------|-----------|
+| 0 | Read `docs/01`, `docs/02`. Solder/clip 10 µF + 100 nF on both module supplies. Wire both boards. | Continuity checked, 3V3 measured at module pins. |
+| 1 | Flash `rx_nodemcu32s` and `tx_esp32c3`. Open serial monitor on each. | Both print `nRF24 OK, isPVariant=1, RF_SETUP=…`. `radio.printPrettyDetails()` shows the written config read back correctly (SPI is good). |
+| 2 | Smoke test at 1 m, PA_LOW: `python tools/run_test.py --port /dev/ttyUSB0 --distance 1 --rates 1000 --pa LOW --n 200`. | PER < 1 %, ACK success ~100 %. |
+| 3 | Channel survey (`scanner` build on the NodeMCU): `python tools/channel_analysis.py --port … --sweeps 200`. Do it twice: quiet lab, and while other groups' links are running. | `results/channel_survey_*.csv/png`, top-3 channel recommendation. |
+| 4 | Distance sweep (`docs/03`): 1, 2, 5, 10, 15, 20, 30, 50 m LOS + a few NLOS points, rates 250k/1M/2M, PA_MAX (and PA_LOW at 1–5 m). | `results/packet_loss_*.csv`, `results/packet_loss_vs_distance.png`. |
+| 5 | Fill `docs/05_recommended_config.md` from the data. | Table has channel, rate, PA, ARC/ARD, CRC, address width, payload, and one-line justification per row. |
+
+Estimated effort: one lab session for steps 0–2, one for steps 3–5.
+
+## 4. Folder layout
+
+```
+REII_nRF24_Link_Characterisation/
+├── README.md                     ← this file (the plan)
+├── docs/
+│   ├── 01_hardware_selection.md  ← which micro does what, power budget, PA+LNA pitfalls
+│   ├── 02_wiring.md              ← pin maps for all three boards
+│   ├── wiring/                   ← draw.io wiring diagrams (TX / RX separately) + PNG exports
+│   ├── 03_test_procedure.md      ← distance sweep protocol, controls, CSV schema
+│   ├── 04_channel_selection.md   ← survey method, WiFi ↔ nRF channel mapping, scoring
+│   ├── 05_recommended_config.md  ← deliverable template (fill from results)
+│   ├── 06_progress_summary.md    ← checkpoint status report: goals vs. what was built / measured
+│   └── evidence/                 ← verbatim serial-monitor logs of the bring-up + annotated proof
+├── firmware/                     ← PlatformIO project (Arduino framework + RF24 library)
+│   ├── platformio.ini            ← envs: rx_nodemcu32s, scanner_nodemcu32s, tx_esp32c3, tx_nano
+│   ├── src/main.cpp              ← role dispatch
+│   └── lib/linktest/             ← protocol, radio config, roles, board pin maps
+├── tools/
+│   ├── requirements.txt
+│   ├── run_test.py               ← drives RX over serial, appends CSV rows
+│   ├── plot_packet_loss.py       ← PER vs distance per data rate (+ ACK retries plot)
+│   ├── channel_analysis.py       ← reads scanner output, scores channels, plots occupancy
+│   ├── gen_wiring_drawio.py      ← regenerates docs/wiring/*.drawio from the pin maps
+│   └── make_synthetic_data.py    ← fake data to dry-run the two scripts above (never commit its output)
+└── results/                      ← CSV + PNG outputs (committed once measured)
+```
+
+## 5. Build / flash quick reference
+
+```bash
+cd REII_nRF24_Link_Characterisation/firmware
+pio run -e rx_nodemcu32s -t upload         # ground-station stand-in
+pio run -e tx_esp32c3    -t upload         # mobile transmitter
+pio run -e scanner_nodemcu32s -t upload    # (re-flash the NodeMCU for the channel survey)
+pio run -e tx_nano       -t upload         # fallback transmitter
+pio device monitor -b 115200
+```
+
+VS Code route (no CLI): install the *PlatformIO IDE* extension, **File → Open Folder…** on
+`REII_nRF24_Link_Characterisation/firmware` (the folder that holds `platformio.ini`), wait for
+"PlatformIO: Project initialised", then in the blue status bar click the env name (defaults to
+`rx_nodemcu32s`) to pick an environment, and use the → (Upload) and 🔌 (Serial Monitor) buttons.
+Upload auto-detects the port when only one board is plugged in; with both boards connected add
+`upload_port = COMx` / `/dev/ttyUSBx` to the env in `platformio.ini` or unplug the other board.
+The monitor echoes what you type and sends the line on Enter (`monitor_echo` / `send_on_enter`),
+so commands like `INFO`, `PING`, `LISTEN 1000 76 LOW` can be typed directly; press Enter (any
+line) to stop a `LISTEN` / `BEACON`.
+
+Python side:
+
+```bash
+pip install -r tools/requirements.txt
+python tools/run_test.py --help
+
+# dry-run the analysis pipeline without hardware
+python tools/make_synthetic_data.py --out results/synthetic
+python tools/plot_packet_loss.py results/synthetic/packet_loss_synthetic.csv
+python tools/channel_analysis.py --infile results/synthetic/channel_survey_synthetic.raw --out results/synthetic
+```
+
+All six firmware environments compile (`pio run -e rx_nodemcu32s -e scanner_nodemcu32s -e tx_nodemcu32s -e tx_esp32c3 -e tx_esp32c3_uart -e tx_nano`);
+nothing here has been run on hardware yet — steps 0–5 above are the lab work.

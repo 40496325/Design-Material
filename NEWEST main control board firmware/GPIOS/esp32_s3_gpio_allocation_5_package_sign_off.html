@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESP32-S3 GPIO Allocation &amp; 5-Package Sign-Off</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .pin-chip { transition: all 0.14s ease; }
+    .pin-chip:hover { transform: translateY(-1px); }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.5); border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- Top Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-cyan-300 font-mono font-bold text-sm">
+          S3
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">ESP32-S3 GPIO Allocation &amp; Team Sign-Off Matrix</h1>
+          <p class="text-xs text-slate-400">
+            5-Package Pin Claim, Collision Detector &amp; Sign-Off Tracker • REII • EERI (Magnet) • EERI (Motor Driver) • MCTR (Lateral) • MCTR (Gearbox)
+          </p>
+        </div>
+      </div>
+
+      <!-- Search & Repo Sync Actions -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <div class="relative">
+          <input id="globalSearchInput" type="text" placeholder="Search GPIO, net, J7, role..."
+            class="w-48 sm:w-56 bg-slate-900 border border-slate-700/80 rounded-lg pl-8 pr-7 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500" />
+          <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <button id="clearSearchBtn" title="Clear search" class="hidden absolute right-2 top-1.5 text-slate-400 hover:text-white text-xs font-bold">✕</button>
+        </div>
+
+        <button id="loadDefaultsBtn" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 transition">
+          Load Default Proposals
+        </button>
+        <button id="resetAllBtn" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-rose-950/60 text-slate-300 hover:text-rose-200 border border-slate-700 hover:border-rose-500/40 transition">
+          Clear Claims
+        </button>
+        <button id="openSyncModalBtn" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 border border-cyan-500/40 transition">
+          Export / Import JSON
+        </button>
+        <button id="copyCsvBtn" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 border border-emerald-500/40 transition">
+          Copy CSV
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Banner -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900/95 border border-cyan-500/50 text-cyan-200 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium items-center gap-2">
+    <span id="toastText">Updated!</span>
+  </div>
+
+  <!-- JSON Export / Import Modal for GitHub Repo Sharing -->
+  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-sm font-bold text-white">Team GitHub State Sync (JSON)</h3>
+          <p class="text-xs text-slate-400">Copy this JSON to share your claims &amp; sign-offs with teammates, or paste a teammate's JSON below to load it.</p>
+        </div>
+        <button id="closeSyncModalBtn" class="text-slate-400 hover:text-white text-sm font-bold px-2 py-1">✕</button>
+      </div>
+      <textarea id="syncJsonTextarea" rows="8" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-cyan-500"></textarea>
+      <div class="flex items-center justify-end gap-2">
+        <button id="copyJsonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">
+          Copy JSON
+        </button>
+        <button id="applyJsonBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-500/40">
+          Load JSON State
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-6">
+
+    <!-- Live Allocation & Sign-Off KPI Strip -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <button data-status-filter="SIGNED_OFF" class="kpi-filter-btn text-left p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-400">Signed Off (5/5)</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+        </div>
+        <div id="kpiSignedOffCount" class="text-2xl font-bold font-mono text-emerald-300 mt-1">0</div>
+        <div id="kpiSignedOffList" class="text-[11px] font-mono text-slate-400 mt-0.5 truncate">None locked yet</div>
+      </button>
+
+      <button data-status-filter="REVIEW" class="kpi-filter-btn text-left p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-400">Up for Review</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+        </div>
+        <div id="kpiReviewCount" class="text-2xl font-bold font-mono text-amber-300 mt-1">0</div>
+        <div id="kpiReviewList" class="text-[11px] font-mono text-slate-400 mt-0.5 truncate">Awaiting 5/5 sign-off</div>
+      </button>
+
+      <button data-status-filter="COLLISION" class="kpi-filter-btn text-left p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-400">Active Collisions</span>
+          <span id="collisionPulseDot" class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+        </div>
+        <div id="kpiCollisionCount" class="text-2xl font-bold font-mono text-rose-300 mt-1">0</div>
+        <div id="kpiCollisionList" class="text-[11px] font-mono text-slate-400 mt-0.5 truncate">2+ packages claiming pin</div>
+      </button>
+
+      <button data-status-filter="FREE" class="kpi-filter-btn text-left p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-400">Free Assignable GPIOs</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+        </div>
+        <div id="kpiFreeCount" class="text-2xl font-bold font-mono text-cyan-300 mt-1">0</div>
+        <div id="kpiFreeList" class="text-[11px] font-mono text-slate-400 mt-0.5 truncate">Unclaimed header pins</div>
+      </button>
+
+      <button data-status-filter="LOCKED" class="kpi-filter-btn text-left p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-600 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-400">System / Off-Limits / NC</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+        </div>
+        <div id="kpiLockedCount" class="text-2xl font-bold font-mono text-slate-300 mt-1">16</div>
+        <div class="text-[11px] font-mono text-slate-400 mt-0.5 truncate">On-board fixed, USB, NC</div>
+      </button>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 1: BIG ALL-GPIO MATRIX + 5-PACKAGE CLAIM & SIGN-OFF PANEL   -->
+    <!-- =================================================================== -->
+    <section class="space-y-4">
+
+      <!-- Package & Status Filter Bar -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-xs text-slate-400 mr-1 font-medium">Filter Matrix:</span>
+          <button data-filter="ALL" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-500/20 text-cyan-200 border border-cyan-500/50">All GPIOs (36)</button>
+          <button data-filter="REII" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-sky-300 border border-sky-500/30 hover:bg-sky-500/15">REII (RF link &amp; groundstation)</button>
+          <button data-filter="EERI_MAG" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/15">EERI (magnet)</button>
+          <button data-filter="EERI_DRV" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-orange-300 border border-orange-500/30 hover:bg-orange-500/15">EERI (motor driver)</button>
+          <button data-filter="MCTR_LAT" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-purple-300 border border-purple-500/30 hover:bg-purple-500/15">MCTR (Lateral)</button>
+          <button data-filter="MCTR_GBX" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-pink-300 border border-pink-500/30 hover:bg-pink-500/15">MCTR (Gearbox)</button>
+          <button data-filter="FREE" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/15">Free</button>
+          <button data-filter="REVIEW" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-amber-300 border border-amber-500/30 hover:bg-amber-500/15">Up for Review</button>
+          <button data-filter="SIGNED_OFF" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/15">Signed Off (5/5)</button>
+          <button data-filter="COLLISION" class="matrix-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/90 text-rose-300 border border-rose-500/30 hover:bg-rose-500/15">Collisions</button>
+        </div>
+        <span id="matrixFilterSummary" class="text-xs font-mono text-slate-400">Showing 36 pins</span>
+      </div>
+
+      <!-- Main Grid + Inspector Split -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- Left 7 cols: Big All-GPIO Matrix -->
+        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h2 class="text-sm font-bold text-white uppercase tracking-wider">All-GPIO Matrix (Click Any Pin to Claim or Sign Off)</h2>
+              <p class="text-xs text-slate-400">Each card shows schematic net, connector pin, claiming package(s), and 5-package sign-off progress (0/5 → 5/5)</p>
+            </div>
+          </div>
+
+          <div id="gpioMatrixGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Right 5 cols: Sticky GPIO Allocation & 5-Package Sign-Off Inspector -->
+        <div class="lg:col-span-5 lg:sticky lg:top-20 space-y-4">
+          <div id="gpioInspectorPanel" class="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl p-4 shadow-xl space-y-4">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 2: PACKAGE OPTIONS OVERVIEW & LIVE COLLISION / DISCREPANCY  -->
+    <!-- =================================================================== -->
+    <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-sm sm:text-base font-bold text-white uppercase tracking-wider">Package Options Overview &amp; Live Discrepancy / Collision Checker</h2>
+          <p class="text-xs text-slate-400">
+            Each package ticks the GPIOs it needs below (putting them up for review). Collisions and hardware discrepancies update immediately as pins are ticked.
+          </p>
+        </div>
+        <span id="discrepancyCountBadge" class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+          Checking collisions...
+        </span>
+      </div>
+
+      <!-- Live Collisions & Discrepancies Alert Box -->
+      <div id="discrepancyFeedBox" class="space-y-2">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- 5 Package Option Cards (Tick GPIOs directly per package) -->
+      <div id="packageOptionsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3.5">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Non-GPIO Shared Hardware Resources (ADC J6 & I2C Expander J3/J4) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-800/80 text-xs">
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-blue-300 font-mono">J6 Analog Front-End (ADS1220 — 4 Single-Ended Channels)</span>
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-blue-500/15 text-blue-300">SPI2: GPIO 11/12/13, CS 14, DRDY 15</span>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            Provides <span class="font-mono text-white">AIN0, AIN1, AIN2, AIN3</span> (J6.5–J6.8) + <span class="font-mono">+3.3VP</span> excitation (J6.1).
+            <span class="text-orange-300 font-medium">EERI (motor driver)</span> current sense (1× AIN) +
+            <span class="text-yellow-300 font-medium">EERI (magnet)</span> current sense (1× AIN) +
+            <span class="text-pink-300 font-medium">MCTR (Gearbox)</span> differential load cell (2× AIN) = <span class="font-mono font-bold text-amber-300">4 / 4 channels used</span> (using ADS1220 avoids needing 2 digital GPIOs for an HX711).
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-violet-300 font-mono">J3 / J4 I2C Expander (MCP23017 @ 0x20 — 15+1 Pins)</span>
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-violet-500/15 text-violet-300">I2C: GPIO 8 (SDA) / GPIO 9 (SCL)</span>
+          </div>
+          <p class="text-slate-300 leading-relaxed">
+            Provides <span class="font-mono text-white">GPA0–GPA7</span> (J3.3–10) and <span class="font-mono text-white">GPB1–GPB7</span> (J4.4–10, plus <span class="font-mono">GPB0</span> via solder jumper <span class="font-mono">JP4</span>). Ideal for slow digital signals (<span class="text-pink-300 font-medium">MCTR (Gearbox)</span> hoist brake, slow fault/enable lines, and 5-pin expansion) when J7 direct GPIOs are full. ⚠ Avoid Pin 2 (<span class="font-mono text-rose-300">+5V</span>).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 3: FULL GPIO ALLOCATION & SIGN-OFF TABLE                    -->
+    <!-- =================================================================== -->
+    <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Master GPIO Allocation &amp; 5-Package Sign-Off Table</h2>
+          <p class="text-xs text-slate-400">Click any row to open the pin in the inspector, or tick package sign-off boxes directly in the table.</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto custom-scroll border border-slate-800 rounded-xl">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 bg-slate-950 text-slate-400 font-mono text-[11px] uppercase">
+              <th class="py-2.5 px-3">GPIO</th>
+              <th class="py-2.5 px-2.5">Net → Header</th>
+              <th class="py-2.5 px-3">Claimed By (Up for Review)</th>
+              <th class="py-2.5 px-3">Assigned Signal / Note</th>
+              <th class="py-2.5 px-2 text-center" title="REII (RF link & groundstation)">REII</th>
+              <th class="py-2.5 px-2 text-center" title="EERI (magnet)">EERI-Mag</th>
+              <th class="py-2.5 px-2 text-center" title="EERI (motor driver)">EERI-Drv</th>
+              <th class="py-2.5 px-2 text-center" title="MCTR (Lateral)">MCTR-Lat</th>
+              <th class="py-2.5 px-2 text-center" title="MCTR (Gearbox)">MCTR-Gbx</th>
+              <th class="py-2.5 px-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="masterTableBody" class="divide-y divide-slate-800/70">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // The 5 Packages
+    const PACKAGES = [
+      {
+        id: "REII",
+        name: "REII (RF link & groundstation)",
+        short: "REII",
+        color: "sky",
+        badgeCls: "bg-sky-500/20 text-sky-300 border-sky-500/40",
+        btnActiveCls: "bg-sky-500/30 text-sky-100 border-sky-400",
+        needSummary: "Needs 3 shared SPI2 pins (11, 12, 13) + CSN (17) + CE (10 or 16) + optional IRQ (18) + 3.3VP (47)",
+        candidateGpios: ["17", "10", "16", "18", "11", "12", "13", "47"],
+        requiredFastCount: 2 // CSN + CE (IRQ can be polled or GPIO18)
+      },
+      {
+        id: "EERI_MAG",
+        name: "EERI (magnet)",
+        short: "EERI-Mag",
+        color: "yellow",
+        badgeCls: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40",
+        btnActiveCls: "bg-yellow-500/30 text-yellow-100 border-yellow-400",
+        needSummary: "Needs 1× isolated PWM GPIO (contested on J7: e.g. 41 or 42) + 1× ADC channel via ADS1220 (CS 14)",
+        candidateGpios: ["42", "41", "1", "14"],
+        requiredFastCount: 1
+      },
+      {
+        id: "EERI_DRV",
+        name: "EERI (motor driver)",
+        short: "EERI-Drv",
+        color: "orange",
+        badgeCls: "bg-orange-500/20 text-orange-300 border-orange-500/40",
+        btnActiveCls: "bg-orange-500/30 text-orange-100 border-orange-400",
+        needSummary: "Needs up to 6× gate/PWM lines on J7 (38, 39, 40 SPWM + 41, 42, 1) + 1× ADC current sense (CS 14)",
+        candidateGpios: ["38", "39", "40", "41", "42", "1", "14"],
+        requiredFastCount: 6
+      },
+      {
+        id: "MCTR_LAT",
+        name: "MCTR (Lateral)",
+        short: "MCTR-Lat",
+        color: "purple",
+        badgeCls: "bg-purple-500/20 text-purple-300 border-purple-500/40",
+        btnActiveCls: "bg-purple-500/30 text-purple-100 border-purple-400",
+        needSummary: "Needs 4× signals: Direction, PWM, Quadrature Encoder A & B on J7.9–J7.12 (18, 10, 4, 21)",
+        candidateGpios: ["18", "10", "4", "21"],
+        requiredFastCount: 4
+      },
+      {
+        id: "MCTR_GBX",
+        name: "MCTR (Gearbox)",
+        short: "MCTR-Gbx",
+        color: "pink",
+        badgeCls: "bg-pink-500/20 text-pink-300 border-pink-500/40",
+        btnActiveCls: "bg-pink-500/30 text-pink-100 border-pink-400",
+        needSummary: "Needs Hoist Brake (slow digital via I2C Expander 8/9 or J7) + Load Cell (ADS1220 diff CS 14, or 2 GPIOs for HX711)",
+        candidateGpios: ["8", "9", "14", "15", "21", "4"],
+        requiredFastCount: 1
+      }
+    ];
+
+    // Base Hardware Definition for all 36 U1 entries
+    // pinMode: "ASSIGNABLE" (exclusive header/internal signal pin), "SHARED_BUS" (SPI2/I2C/ADC/3.3VP where multiple packages share by design), "LOCKED" (Boot, USB, LED, NC)
+    const BASE_GPIOS = [
+      { gpio: "0", wroom: "27", net: "ESP_BOOT", header: "SW2 Boot", pinMode: "LOCKED", hwNote: "Boot strapping pin — reserved, do not repurpose.", warning: "Boot strapping pin: cannot be assigned to a work package.", defaultClaims: [], defaultRole: "Boot Strapping (Reserved)" },
+      { gpio: "1", wroom: "39", net: "IO6", header: "J7.3", pinMode: "ASSIGNABLE", hwNote: "Free header GPIO on J7.3. ⚠ Hardware net-name mismatch: net IO6 is wired to GPIO 1 (while GPIO 6 is PX_INTB).", warning: "Net-name anomaly on J7.3: net is labeled IO6 on board, but connects to GPIO 1 (not GPIO 6).", defaultClaims: ["EERI_DRV"], defaultRole: "Motor Driver Gate/Ctrl Line 6" },
+      { gpio: "2", wroom: "38", net: "MMC_CS", header: "uSD CD/DAT3", pinMode: "LOCKED", hwNote: "On-board microSD SPI2 chip-select (active in starter firmware).", warning: "", defaultClaims: [], defaultRole: "On-Board microSD CS" },
+      { gpio: "3", wroom: "15", net: "NC", header: "Not Routed", pinMode: "LOCKED", hwNote: "JTAG strapping pin — no copper trace on board.", warning: "Unusable pin (no copper routed).", defaultClaims: [], defaultRole: "Not Routed (NC)" },
+      { gpio: "4", wroom: "4", net: "IO_C", header: "J7.11", pinMode: "ASSIGNABLE", hwNote: "Free direct GPIO on J7.11.", warning: "", defaultClaims: ["MCTR_LAT"], defaultRole: "Lateral Trolley Encoder A / Dir" },
+      { gpio: "5", wroom: "5", net: "PX_RESET", header: "MCP23017 RST", pinMode: "SHARED_BUS", hwNote: "MCP23017 hardware reset (pulled high via 10k to 3.3VP).", warning: "", defaultClaims: [], defaultRole: "I2C Expander Reset (Idle High)" },
+      { gpio: "6", wroom: "6", net: "PX_INTB", header: "MCP23017 INTB", pinMode: "ASSIGNABLE", hwNote: "MCP23017 Port B interrupt input (on-board trace, pulled up to 3.3VP; not on J7).", warning: "On-board trace to MCP23017 INTB (not broken out to J7; J7.3 IO6 is GPIO 1).", defaultClaims: [], defaultRole: "Expander INTB Input" },
+      { gpio: "7", wroom: "7", net: "PX_INTA", header: "MCP23017 INTA", pinMode: "ASSIGNABLE", hwNote: "MCP23017 Port A interrupt input (on-board trace, pulled up to 3.3VP).", warning: "On-board trace to MCP23017 INTA (not broken out to J7).", defaultClaims: [], defaultRole: "Expander INTA Input" },
+      { gpio: "8", wroom: "12", net: "I2C_SDA", header: "J1.9 / I2C Bus", pinMode: "SHARED_BUS", hwNote: "Shared I2C SDA (3.3k pull-up to always-on 3.3V): MCP23017 (0x20 for J3/J4), AHT20 (0x38), PCF8563 (0x51), J8 OLED, J1.9.", warning: "", defaultClaims: ["MCTR_GBX"], defaultRole: "Shared I2C SDA (MCP23017 J3/J4 Brake & Sensors)" },
+      { gpio: "9", wroom: "17", net: "I2C_SCL", header: "J1.10 / I2C Bus", pinMode: "SHARED_BUS", hwNote: "Shared I2C SCL (3.3k pull-up to always-on 3.3V): MCP23017 (0x20 for J3/J4), AHT20 (0x38), PCF8563 (0x51), J8 OLED, J1.10.", warning: "", defaultClaims: ["MCTR_GBX"], defaultRole: "Shared I2C SCL (MCP23017 J3/J4 Brake & Sensors)" },
+      { gpio: "10", wroom: "18", net: "IO_B", header: "J7.10", pinMode: "ASSIGNABLE", hwNote: "Free direct GPIO on J7.10. Contested between MCTR (Lateral) and REII nRF24L01+ CE.", warning: "High-contention pin on J7.10: primary candidate for both MCTR (Lateral) PWM/Dir and REII nRF CE.", defaultClaims: ["REII", "MCTR_LAT"], defaultRole: "CONTESTED: REII nRF CE vs MCTR Lateral PWM" },
+      { gpio: "11", wroom: "19", net: "SPI_MOSI", header: "J1.2 / SPI2 Bus", pinMode: "SHARED_BUS", hwNote: "Shared SPI2 MOSI: routes to J1.2 (REII radio), on-board ADS1220 DIN, and microSD CMD.", warning: "", defaultClaims: ["REII"], defaultRole: "Shared SPI2 MOSI (J1.2 Radio + On-Board ADC/SD)" },
+      { gpio: "12", wroom: "20", net: "SPI_CLK", header: "J1.3 / SPI2 Bus", pinMode: "SHARED_BUS", hwNote: "Shared SPI2 SCK: routes to J1.3 (REII radio), on-board ADS1220 SCLK, and microSD CLK.", warning: "", defaultClaims: ["REII"], defaultRole: "Shared SPI2 SCK (J1.3 Radio + On-Board ADC/SD)" },
+      { gpio: "13", wroom: "21", net: "SPI_MISO", header: "J1.4 / SPI2 Bus", pinMode: "SHARED_BUS", hwNote: "Shared SPI2 MISO: routes to J1.4 (REII radio), on-board ADS1220 DOUT, and microSD DAT0.", warning: "", defaultClaims: ["REII"], defaultRole: "Shared SPI2 MISO (J1.4 Radio + On-Board ADC/SD)" },
+      { gpio: "14", wroom: "22", net: "ADC_CS", header: "ADS1220 CS (J6)", pinMode: "SHARED_BUS", hwNote: "On-board ADS1220 SPI2 chip-select (serves all 4 analog channels AIN0–AIN3 on J6).", warning: "", defaultClaims: ["EERI_MAG", "EERI_DRV", "MCTR_GBX"], defaultRole: "Shared ADS1220 CS (J6 Current Sense & Load Cell)" },
+      { gpio: "15", wroom: "8", net: "ADC_DRDY", header: "ADS1220 DRDY", pinMode: "SHARED_BUS", hwNote: "On-board ADS1220 data-ready input.", warning: "", defaultClaims: ["MCTR_GBX"], defaultRole: "Shared ADS1220 Data-Ready Input" },
+      { gpio: "16", wroom: "9", net: "RTCC_INT", header: "PCF8563 INT (R40)", pinMode: "ASSIGNABLE", hwNote: "Connected to PCF8563 open-drain interrupt via R40 0Ω (10k pull-up to 3.3VP). Candidate fallback for REII nRF CE if wired.", warning: "Shares open-drain RTC alarm line via R40 0Ω; requires fly-wire if used as REII nRF CE fallback.", defaultClaims: [], defaultRole: "Unclaimed (Candidate REII nRF CE Fallback)" },
+      { gpio: "17", wroom: "10", net: "SPI_xCS", header: "J1.1", pinMode: "ASSIGNABLE", hwNote: "Dedicated spare SPI2 chip-select on J1.1. ⚠ Floats at boot until configured output-high.", warning: "Floats in default firmware: must be driven output-high before SPI2 bus initialization. Watch J1.7 (+5V) next to J1.8 (+3.3VP)!", defaultClaims: ["REII"], defaultRole: "REII nRF24L01+ CSN (J1.1)" },
+      { gpio: "18", wroom: "11", net: "IO_A", header: "J7.9", pinMode: "ASSIGNABLE", hwNote: "Free direct GPIO on J7.9. Contested between MCTR (Lateral) and REII nRF24L01+ IRQ.", warning: "High-contention pin on J7.9: candidate for both MCTR (Lateral) Direction and REII nRF IRQ.", defaultClaims: ["REII", "MCTR_LAT"], defaultRole: "CONTESTED: REII nRF IRQ vs MCTR Lateral Dir" },
+      { gpio: "19", wroom: "13", net: "USB_D-", header: "J5 USB-C", pinMode: "LOCKED", hwNote: "Native USB D- via USBLC6 ESD protection — flashing & serial monitor.", warning: "Off-limits: Native USB D- required for flashing and serial monitor.", defaultClaims: [], defaultRole: "Native USB D- (Locked)" },
+      { gpio: "20", wroom: "14", net: "USB_D+", header: "J5 USB-C", pinMode: "LOCKED", hwNote: "Native USB D+ via USBLC6 ESD protection — flashing & serial monitor.", warning: "Off-limits: Native USB D+ required for flashing and serial monitor.", defaultClaims: [], defaultRole: "Native USB D+ (Locked)" },
+      { gpio: "21", wroom: "23", net: "IO_D", header: "J7.12", pinMode: "ASSIGNABLE", hwNote: "Free direct GPIO on J7.12.", warning: "", defaultClaims: ["MCTR_LAT"], defaultRole: "Lateral Trolley Encoder B" },
+      { gpio: "35", wroom: "28", net: "NC", header: "Not Routed", pinMode: "LOCKED", hwNote: "PSRAM bracket pin — not routed on board.", warning: "Unusable pin (no copper routed).", defaultClaims: [], defaultRole: "Not Routed (NC)" },
+      { gpio: "36", wroom: "29", net: "NC", header: "Not Routed", pinMode: "LOCKED", hwNote: "PSRAM bracket pin — not routed on board.", warning: "Unusable pin (no copper routed).", defaultClaims: [], defaultRole: "Not Routed (NC)" },
+      { gpio: "37", wroom: "30", net: "NC", header: "Not Routed", pinMode: "LOCKED", hwNote: "PSRAM bracket pin — not routed on board.", warning: "Unusable pin (no copper routed).", defaultClaims: [], defaultRole: "Not Routed (NC)" },
+      { gpio: "38", wroom: "31", net: "IO1", header: "J7.8", pinMode: "ASSIGNABLE", hwNote: "MCPWM-capable direct GPIO on J7.8 (configured as 20 kHz SPWM Phase A in starter).", warning: "", defaultClaims: ["EERI_DRV"], defaultRole: "Motor Driver SPWM Phase A" },
+      { gpio: "39", wroom: "32", net: "IO2", header: "J7.7", pinMode: "ASSIGNABLE", hwNote: "MCPWM-capable direct GPIO on J7.7 (configured as 20 kHz SPWM Phase B in starter).", warning: "", defaultClaims: ["EERI_DRV"], defaultRole: "Motor Driver SPWM Phase B" },
+      { gpio: "40", wroom: "33", net: "IO3", header: "J7.6", pinMode: "ASSIGNABLE", hwNote: "MCPWM-capable direct GPIO on J7.6 (configured as 20 kHz SPWM Phase C in starter).", warning: "", defaultClaims: ["EERI_DRV"], defaultRole: "Motor Driver SPWM Phase C" },
+      { gpio: "41", wroom: "34", net: "IO4", header: "J7.5", pinMode: "ASSIGNABLE", hwNote: "Free MCPWM-capable direct GPIO on J7.5.", warning: "", defaultClaims: ["EERI_DRV"], defaultRole: "Motor Driver Gate/PWM Line 4" },
+      { gpio: "42", wroom: "35", net: "IO5", header: "J7.4", pinMode: "ASSIGNABLE", hwNote: "Free MCPWM-capable direct GPIO on J7.4. Contested if EERI (motor driver) takes 6 pins and EERI (magnet) needs 1 PWM pin.", warning: "Contested PWM pin on J7.4 between EERI (motor driver) Line 5 and EERI (magnet) PWM.", defaultClaims: ["EERI_DRV", "EERI_MAG"], defaultRole: "CONTESTED: Motor Driver Line 5 vs Magnet PWM" },
+      { gpio: "43", wroom: "37", net: "U0_TXD", header: "J7.1", pinMode: "ASSIGNABLE", hwNote: "UART0 Console TX on J7.1. Verify whether boot traffic appears on J7.1 before repurposing.", warning: "Default UART0 TX pin on J7.1 — verify live boot traffic before assigning.", defaultClaims: [], defaultRole: "UART0 TX (Unclaimed / Verify Before Use)" },
+      { gpio: "44", wroom: "36", net: "U0_RXD", header: "J7.2", pinMode: "ASSIGNABLE", hwNote: "UART0 Console RX on J7.2. Verify whether boot traffic appears on J7.2 before repurposing.", warning: "Default UART0 RX pin on J7.2 — verify live boot traffic before assigning.", defaultClaims: [], defaultRole: "UART0 RX (Unclaimed / Verify Before Use)" },
+      { gpio: "45", wroom: "26", net: "NC", header: "Not Routed", pinMode: "LOCKED", hwNote: "VDD_SPI strapping pin — not routed on board.", warning: "Unusable pin (no copper routed).", defaultClaims: [], defaultRole: "Not Routed (NC)" },
+      { gpio: "46", wroom: "16", net: "NC", header: "Not Routed", pinMode: "LOCKED", hwNote: "ROM boot message strapping pin — not routed on board.", warning: "Unusable pin (no copper routed).", defaultClaims: [], defaultRole: "Not Routed (NC)" },
+      { gpio: "47", wroom: "24", net: "PWR_EN_3V3P", header: "U6 +3.3VP Gate", pinMode: "SHARED_BUS", hwNote: "Controls TPS22917 load switch for +3.3VP rail (powers J1.8, J3/J4.11, J6.1, ADS1220, MCP23017, uSD). Must stay HIGH.", warning: "Critical power gate: clearing GPIO 47 cuts +3.3VP power to all headers and sensors.", defaultClaims: ["REII"], defaultRole: "+3.3VP Peripheral Rail Enable (Must Stay High)" },
+      { gpio: "48", wroom: "25", net: "STAT_LED", header: "D4 WS2812B", pinMode: "LOCKED", hwNote: "On-board RGB status LED data line (22Ω series resistor to WS2812B).", warning: "", defaultClaims: [], defaultRole: "On-Board RGB Status LED" },
+      { gpio: "EN", wroom: "3", net: "ESP32_EN", header: "SW1 Reset", pinMode: "LOCKED", hwNote: "Hardware module reset pin (not a programmable GPIO).", warning: "", defaultClaims: [], defaultRole: "Module Reset (Not a GPIO)" }
+    ];
+
+    const STORAGE_KEY = "esp32s3_team_gpio_signoff_v2";
+    let state = {}; // keyed by gpio string: { claims: [...pkgIds], signoffs: { REII: bool, EERI_MAG: bool, EERI_DRV: bool, MCTR_LAT: bool, MCTR_GBX: bool }, role: string }
+    let selectedGpio = "10";
+    let activeFilter = "ALL";
+    let searchQuery = "";
+
+    function createEmptySignoffs() {
+      return { REII: false, EERI_MAG: false, EERI_DRV: false, MCTR_LAT: false, MCTR_GBX: false };
+    }
+
+    function initDefaultState() {
+      const next = {};
+      BASE_GPIOS.forEach(item => {
+        const so = createEmptySignoffs();
+        // Pre-tick sign-off for any package that claims it by default
+        item.defaultClaims.forEach(pkgId => {
+          if (so[pkgId] !== undefined) so[pkgId] = true;
+        });
+        next[item.gpio] = {
+          claims: [...item.defaultClaims],
+          signoffs: so,
+          role: item.defaultRole
+        };
+      });
+      state = next;
+      saveState();
+    }
+
+    function clearAllClaimsState() {
+      const next = {};
+      BASE_GPIOS.forEach(item => {
+        next[item.gpio] = {
+          claims: [],
+          signoffs: createEmptySignoffs(),
+          role: item.pinMode === "LOCKED" ? item.defaultRole : "Unassigned"
+        };
+      });
+      state = next;
+      saveState();
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object" && parsed["38"]) {
+            state = parsed;
+            return;
+          }
+        }
+      } catch (e) {
+        // Ignore storage errors in sandboxed iframes
+      }
+      initDefaultState();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    function showToast(msg) {
+      const banner = document.getElementById("toastBanner");
+      const text = document.getElementById("toastText");
+      text.textContent = msg;
+      banner.classList.remove("hidden");
+      banner.classList.add("flex");
+      setTimeout(() => {
+        banner.classList.add("hidden");
+        banner.classList.remove("flex");
+      }, 2300);
+    }
+
+    // Evaluate status of a single GPIO based on claims + 5-package signoffs
+    function evaluateGpioStatus(baseItem) {
+      const st = state[baseItem.gpio] || { claims: [], signoffs: createEmptySignoffs(), role: baseItem.defaultRole };
+      const claims = st.claims || [];
+      const signoffCount = PACKAGES.reduce((acc, p) => acc + (st.signoffs[p.id] ? 1 : 0), 0);
+
+      // Collision rules:
+      // 1. If a LOCKED pin is claimed by any package -> COLLISION
+      // 2. If an ASSIGNABLE (non-shared) pin is claimed by 2 or more packages -> COLLISION
+      const isLockedClaimed = baseItem.pinMode === "LOCKED" && claims.length > 0;
+      const isMultiClaimCollision = baseItem.pinMode === "ASSIGNABLE" && claims.length > 1;
+      const hasCollision = isLockedClaimed || isMultiClaimCollision;
+
+      if (hasCollision) {
+        return {
+          code: "COLLISION",
+          label: `COLLISION (${claims.length} Claims)`,
+          badgeCls: "bg-rose-500/20 text-rose-200 border-rose-500/60",
+          cardBorderCls: "border-rose-500/70 bg-rose-950/20",
+          signoffCount
+        };
+      }
+
+      if (baseItem.pinMode === "LOCKED") {
+        return {
+          code: "LOCKED",
+          label: "SYSTEM / LOCKED",
+          badgeCls: "bg-slate-800 text-slate-400 border-slate-700",
+          cardBorderCls: "border-slate-800/80 bg-slate-950/60 opacity-75",
+          signoffCount
+        };
+      }
+
+      if (claims.length === 0) {
+        return {
+          code: "FREE",
+          label: baseItem.pinMode === "SHARED_BUS" ? "SHARED BUS (UNCLAIMED)" : "FREE GPIO",
+          badgeCls: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+          cardBorderCls: "border-slate-800 bg-slate-950 hover:border-slate-600",
+          signoffCount
+        };
+      }
+
+      // Claimed with no collision: check if all 5 packages signed off
+      if (signoffCount === 5) {
+        return {
+          code: "SIGNED_OFF",
+          label: "SIGNED OFF (5/5 ✔)",
+          badgeCls: "bg-emerald-500/20 text-emerald-200 border-emerald-500/50",
+          cardBorderCls: "border-emerald-500/60 bg-emerald-950/15",
+          signoffCount
+        };
+      }
+
+      return {
+        code: "REVIEW",
+        label: `UP FOR REVIEW (${signoffCount}/5)`,
+        badgeCls: "bg-amber-500/20 text-amber-200 border-amber-500/50",
+        cardBorderCls: "border-amber-500/50 bg-amber-950/10",
+        signoffCount
+      };
+    }
+
+    function getPkgMeta(pkgId) {
+      return PACKAGES.find(p => p.id === pkgId);
+    }
+
+    // Toggle whether a package claims a GPIO
+    function togglePackageClaim(gpioId, pkgId) {
+      const st = state[gpioId];
+      if (!st) return;
+      const idx = st.claims.indexOf(pkgId);
+      if (idx === -1) {
+        st.claims.push(pkgId);
+        // Automatically tick this package's own sign-off when claiming
+        st.signoffs[pkgId] = true;
+        if (!st.role || st.role === "Unassigned" || st.role.startsWith("Unclaimed")) {
+          const pkg = getPkgMeta(pkgId);
+          st.role = `${pkg ? pkg.short : pkgId} Assigned Signal`;
+        }
+      } else {
+        st.claims.splice(idx, 1);
+      }
+      saveState();
+      renderAll();
+    }
+
+    // Toggle a package's sign-off checkbox on a GPIO
+    function togglePackageSignoff(gpioId, pkgId) {
+      const st = state[gpioId];
+      if (!st) return;
+      st.signoffs[pkgId] = !st.signoffs[pkgId];
+      saveState();
+      renderAll();
+    }
+
+    // Sign off all 5 packages at once on the selected GPIO
+    function approveAllFiveOnGpio(gpioId) {
+      const st = state[gpioId];
+      if (!st) return;
+      PACKAGES.forEach(p => { st.signoffs[p.id] = true; });
+      saveState();
+      renderAll();
+      showToast(`GPIO ${gpioId} signed off by all 5 packages!`);
+    }
+
+    // Update KPI counters
+    function renderKpis() {
+      const signedOffPins = [];
+      const reviewPins = [];
+      const collisionPins = [];
+      const freePins = [];
+      let lockedCount = 0;
+
+      BASE_GPIOS.forEach(item => {
+        const ev = evaluateGpioStatus(item);
+        const label = item.gpio === "EN" ? "EN" : `GPIO${item.gpio}`;
+        if (ev.code === "SIGNED_OFF") signedOffPins.push(label);
+        else if (ev.code === "REVIEW") reviewPins.push(label);
+        else if (ev.code === "COLLISION") collisionPins.push(label);
+        else if (ev.code === "FREE") freePins.push(label);
+        else if (ev.code === "LOCKED") lockedCount++;
+      });
+
+      document.getElementById("kpiSignedOffCount").textContent = signedOffPins.length;
+      document.getElementById("kpiSignedOffList").textContent = signedOffPins.length ? signedOffPins.join(", ") : "None signed off (5/5) yet";
+
+      document.getElementById("kpiReviewCount").textContent = reviewPins.length;
+      document.getElementById("kpiReviewList").textContent = reviewPins.length ? reviewPins.join(", ") : "No pending reviews";
+
+      document.getElementById("kpiCollisionCount").textContent = collisionPins.length;
+      document.getElementById("kpiCollisionList").textContent = collisionPins.length ? collisionPins.join(", ") : "Zero pin collisions!";
+      const pulseDot = document.getElementById("collisionPulseDot");
+      pulseDot.className = collisionPins.length > 0 ? "w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" : "w-2.5 h-2.5 rounded-full bg-emerald-400";
+
+      document.getElementById("kpiFreeCount").textContent = freePins.length;
+      document.getElementById("kpiFreeList").textContent = freePins.length ? freePins.join(", ") : "No unclaimed pins left";
+
+      document.getElementById("kpiLockedCount").textContent = lockedCount;
+    }
+
+    function matchesFilterAndSearch(baseItem) {
+      const st = state[baseItem.gpio];
+      const ev = evaluateGpioStatus(baseItem);
+
+      if (activeFilter !== "ALL") {
+        if (["SIGNED_OFF", "REVIEW", "COLLISION", "FREE", "LOCKED"].includes(activeFilter)) {
+          if (ev.code !== activeFilter) return false;
+        } else {
+          // Package filter: show pins claimed by this package OR where this package is a candidate
+          const pkgMeta = getPkgMeta(activeFilter);
+          const isClaimedByPkg = st.claims.includes(activeFilter);
+          const isCandidateForPkg = pkgMeta && pkgMeta.candidateGpios.includes(baseItem.gpio);
+          if (!isClaimedByPkg && !isCandidateForPkg) return false;
+        }
+      }
+
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const hay = `gpio${baseItem.gpio} ${baseItem.gpio} ${baseItem.net} ${baseItem.header} ${st.role} ${st.claims.join(" ")} ${baseItem.hwNote}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+
+      return true;
+    }
+
+    // Render Big All-GPIO Matrix
+    function renderGpioMatrix() {
+      const grid = document.getElementById("gpioMatrixGrid");
+      const filtered = BASE_GPIOS.filter(matchesFilterAndSearch);
+
+      document.getElementById("matrixFilterSummary").textContent =
+        `Showing ${filtered.length} of ${BASE_GPIOS.length} pins`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-6 text-center text-xs text-slate-400 bg-slate-950 rounded-xl border border-slate-800">No GPIOs match the active filter. Click "All GPIOs (36)" to reset.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const st = state[item.gpio];
+        const ev = evaluateGpioStatus(item);
+        const isSelected = item.gpio === selectedGpio;
+
+        const claimBadges = st.claims.length
+          ? st.claims.map(cid => {
+              const p = getPkgMeta(cid);
+              return p ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono border ${p.badgeCls}">${p.short}</span>` : "";
+            }).join("")
+          : `<span class="text-[10px] font-mono text-slate-500">${item.pinMode === 'LOCKED' ? 'Locked' : 'Unclaimed'}</span>`;
+
+        // 5 mini sign-off dots
+        const dots = PACKAGES.map(p => {
+          const signed = st.signoffs[p.id];
+          return `<span title="${p.name}: ${signed ? 'Signed Off' : 'Not Signed Off'}" class="w-2 h-2 rounded-full ${signed ? 'bg-emerald-400' : 'bg-slate-700'}"></span>`;
+        }).join("");
+
+        return `
+          <button data-matrix-gpio="${item.gpio}" class="pin-chip text-left p-2.5 rounded-xl border ${ev.cardBorderCls} ${isSelected ? 'ring-2 ring-cyan-400 border-cyan-400' : ''} flex flex-col justify-between gap-1.5">
+            <div class="flex items-center justify-between gap-1 w-full">
+              <span class="font-mono font-bold text-xs text-white">
+                ${item.gpio === "EN" ? "PIN EN" : "GPIO " + item.gpio}
+              </span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-mono border ${ev.badgeCls}">
+                ${ev.code === 'SIGNED_OFF' ? '5/5 ✔' : ev.code === 'COLLISION' ? 'COLLISION' : ev.code === 'REVIEW' ? `${ev.signoffCount}/5` : ev.code}
+              </span>
+            </div>
+
+            <div class="font-mono text-[11px] text-cyan-300 truncate">
+              ${item.net} <span class="text-slate-500">→</span> <span class="text-slate-300">${item.header}</span>
+            </div>
+
+            <div class="text-[10px] text-slate-300 truncate">${st.role || item.defaultRole}</div>
+
+            <div class="flex items-center justify-between gap-1 pt-1.5 border-t border-slate-800/80">
+              <div class="flex flex-wrap gap-1">${claimBadges}</div>
+              <div class="flex items-center gap-1 shrink-0" title="5-Package Sign-Off Progress">${dots}</div>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-matrix-gpio]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedGpio = btn.getAttribute("data-matrix-gpio");
+          renderAll();
+        });
+      });
+    }
+
+    // Render Right-Side Inspector Panel for Selected GPIO
+    function renderInspector() {
+      const baseItem = BASE_GPIOS.find(g => g.gpio === selectedGpio) || BASE_GPIOS[0];
+      const st = state[baseItem.gpio];
+      const ev = evaluateGpioStatus(baseItem);
+      const panel = document.getElementById("gpioInspectorPanel");
+
+      const claimButtonsHtml = PACKAGES.map(p => {
+        const isClaimed = st.claims.includes(p.id);
+        return `
+          <button data-insp-claim="${p.id}" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition flex items-center justify-between gap-2 ${isClaimed ? p.btnActiveCls : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-600'}">
+            <span>${p.name}</span>
+            <span class="font-mono text-[10px] px-1.5 py-0.5 rounded ${isClaimed ? 'bg-slate-950/60 text-white' : 'bg-slate-900 text-slate-500'}">
+              ${isClaimed ? 'CLAIMED' : 'Claim'}
+            </span>
+          </button>
+        `;
+      }).join("");
+
+      const signoffBoxesHtml = PACKAGES.map(p => {
+        const isSigned = !!st.signoffs[p.id];
+        const isClaimer = st.claims.includes(p.id);
+        return `
+          <label class="p-2 rounded-lg bg-slate-950 border ${isSigned ? 'border-emerald-500/40' : 'border-slate-800'} flex items-center justify-between gap-2 cursor-pointer hover:border-slate-600 transition">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" data-insp-signoff="${p.id}" ${isSigned ? "checked" : ""} class="w-4 h-4 rounded border-slate-600 text-emerald-500 focus:ring-emerald-500" />
+              <span class="text-xs ${isSigned ? 'text-white font-medium' : 'text-slate-300'}">${p.name}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              ${isClaimer ? `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded ${p.badgeCls}">Using Pin</span>` : ""}
+              <span class="font-mono text-[10px] ${isSigned ? 'text-emerald-300 font-bold' : 'text-slate-500'}">${isSigned ? 'SIGNED ✔' : 'Pending'}</span>
+            </div>
+          </label>
+        `;
+      }).join("");
+
+      panel.innerHTML = `
+        <div class="flex items-start justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/50 font-mono font-bold text-base text-cyan-200">
+                ${baseItem.gpio === "EN" ? "PIN EN" : "GPIO " + baseItem.gpio}
+              </span>
+              <span class="font-mono text-xs text-slate-400">Module Pin ${baseItem.wroom} • Net <span class="text-white font-semibold">${baseItem.net}</span> → <span class="text-cyan-300 font-semibold">${baseItem.header}</span></span>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono border ${ev.badgeCls}">${ev.label}</span>
+        </div>
+
+        <!-- Hardware Note & Warning -->
+        <div class="p-2.5 rounded-xl bg-slate-950 border ${baseItem.warning ? 'border-amber-500/40' : 'border-slate-800'} text-xs space-y-1">
+          <div class="text-slate-300">${baseItem.hwNote}</div>
+          ${baseItem.warning ? `<div class="text-amber-300 font-medium">⚠ ${baseItem.warning}</div>` : ""}
+        </div>
+
+        <!-- Assigned Signal Name Input -->
+        <div class="space-y-1">
+          <label class="text-[10px] font-mono uppercase text-slate-400">Assigned Signal / Function Label</label>
+          <input id="inspectorRoleInput" type="text" value="${(st.role || '').replace(/"/g, '&quot;')}" placeholder="e.g. SPWM Phase A, Magnet PWM, nRF CSN..."
+            class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-cyan-500" />
+        </div>
+
+        <!-- Step 1: Which Package(s) Claim / Need This GPIO -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono uppercase text-slate-400">1. Request / Claim GPIO for Package (Puts Pin Up for Review)</span>
+            <span class="text-[10px] font-mono text-slate-400">${baseItem.pinMode === 'SHARED_BUS' ? 'Shared Bus Pin' : baseItem.pinMode === 'LOCKED' ? 'Locked Pin' : 'Exclusive Pin'}</span>
+          </div>
+          <div class="grid grid-cols-1 gap-1.5">
+            ${claimButtonsHtml}
+          </div>
+        </div>
+
+        <!-- Step 2: 5-Package Sign-Off Checkboxes -->
+        <div class="space-y-2 pt-2 border-t border-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono uppercase text-slate-400">2. 5-Package Sign-Off (${ev.signoffCount}/5 Approved)</span>
+            <button id="signOffAllFiveBtn" class="text-[11px] font-mono text-emerald-300 hover:underline">Tick All 5 ✔</button>
+          </div>
+          <div class="space-y-1.5">
+            ${signoffBoxesHtml}
+          </div>
+        </div>
+      `;
+
+      // Attach listeners inside inspector
+      const roleInput = document.getElementById("inspectorRoleInput");
+      roleInput.addEventListener("input", e => {
+        state[baseItem.gpio].role = e.target.value;
+        saveState();
+        renderGpioMatrix();
+        renderMasterTable();
+      });
+
+      panel.querySelectorAll("[data-insp-claim]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          togglePackageClaim(baseItem.gpio, btn.getAttribute("data-insp-claim"));
+        });
+      });
+
+      panel.querySelectorAll("[data-insp-signoff]").forEach(chk => {
+        chk.addEventListener("change", () => {
+          togglePackageSignoff(baseItem.gpio, chk.getAttribute("data-insp-signoff"));
+        });
+      });
+
+      document.getElementById("signOffAllFiveBtn").addEventListener("click", () => {
+        approveAllFiveOnGpio(baseItem.gpio);
+      });
+    }
+
+    // Render Section 2: Package Options Cards & Live Discrepancies / Collisions
+    function renderPackagesAndDiscrepancies() {
+      const discrepancies = [];
+
+      // 1. Check multi-package pin collisions & locked-pin claims
+      BASE_GPIOS.forEach(item => {
+        const st = state[item.gpio];
+        if (item.pinMode === "LOCKED" && st.claims.length > 0) {
+          const names = st.claims.map(c => getPkgMeta(c)?.name || c).join(" & ");
+          discrepancies.push({
+            severity: "COLLISION",
+            gpio: item.gpio,
+            title: `GPIO ${item.gpio} (${item.net}) is a Locked / Unusable Pin`,
+            desc: `Claimed by ${names}, but GPIO ${item.gpio} (${item.header}) is ${item.hwNote}`
+          });
+        } else if (item.pinMode === "ASSIGNABLE" && st.claims.length > 1) {
+          const names = st.claims.map(c => getPkgMeta(c)?.name || c).join(" vs ");
+          discrepancies.push({
+            severity: "COLLISION",
+            gpio: item.gpio,
+            title: `Direct Pin Collision on GPIO ${item.gpio} (${item.net} → ${item.header})`,
+            desc: `Multiple packages have claimed GPIO ${item.gpio} for exclusive use: ${names}. One package must untick this pin or move to an alternative (e.g. GPIO 16 fallback or J3/J4 I2C expander).`
+          });
+        }
+      });
+
+      // 2. Check hardware anomalies on actively claimed pins
+      BASE_GPIOS.forEach(item => {
+        const st = state[item.gpio];
+        if (st.claims.length > 0 && item.warning && item.pinMode !== "LOCKED") {
+          const ev = evaluateGpioStatus(item);
+          if (ev.code !== "SIGNED_OFF") {
+            const names = st.claims.map(c => getPkgMeta(c)?.short || c).join(", ");
+            discrepancies.push({
+              severity: "WARNING",
+              gpio: item.gpio,
+              title: `Hardware Caution on Claimed GPIO ${item.gpio} (${item.header}) — [${names}]`,
+              desc: `${item.warning} (${ev.signoffCount}/5 packages signed off)`
+            });
+          }
+        }
+      });
+
+      // 3. Check per-package exclusive pin count vs expected fast signal count
+      PACKAGES.forEach(pkg => {
+        const claimedExclusive = BASE_GPIOS.filter(g => g.pinMode === "ASSIGNABLE" && state[g.gpio].claims.includes(pkg.id));
+        if (claimedExclusive.length < pkg.requiredFastCount) {
+          discrepancies.push({
+            severity: "SHORTFALL",
+            gpio: pkg.candidateGpios[0] || "38",
+            title: `${pkg.name}: ${claimedExclusive.length} of ${pkg.requiredFastCount} Direct Signal Pins Claimed`,
+            desc: `${pkg.needSummary}. Currently ticked direct pins: ${claimedExclusive.length ? claimedExclusive.map(g => 'GPIO ' + g.gpio).join(', ') : 'None'}.`
+          });
+        }
+      });
+
+      const badge = document.getElementById("discrepancyCountBadge");
+      const collisionCount = discrepancies.filter(d => d.severity === "COLLISION").length;
+      if (collisionCount > 0) {
+        badge.className = "px-3 py-1 rounded-full text-xs font-mono font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40";
+        badge.textContent = `${collisionCount} Active Collision(s) • ${discrepancies.length} Total Discrepancies`;
+      } else if (discrepancies.length > 0) {
+        badge.className = "px-3 py-1 rounded-full text-xs font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40";
+        badge.textContent = `0 Collisions • ${discrepancies.length} Pending Caution(s) / Shortfalls`;
+      } else {
+        badge.className = "px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+        badge.textContent = `All Package Claims Clean & Signed Off!`;
+      }
+
+      const feedBox = document.getElementById("discrepancyFeedBox");
+      if (discrepancies.length === 0) {
+        feedBox.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-emerald-950/25 border border-emerald-500/40 text-xs text-emerald-200 flex items-center justify-between">
+            <span>✔ Zero collisions or hardware discrepancies detected across all 5 packages.</span>
+          </div>
+        `;
+      } else {
+        feedBox.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">` + discrepancies.map(d => {
+          const tone = d.severity === "COLLISION"
+            ? "bg-rose-950/35 border-rose-500/50 text-rose-200"
+            : d.severity === "SHORTFALL"
+            ? "bg-slate-950 border-purple-500/40 text-slate-200"
+            : "bg-amber-950/25 border-amber-500/40 text-amber-200";
+          return `
+            <div data-disc-gpio="${d.gpio}" class="cursor-pointer p-3 rounded-xl border ${tone} hover:border-cyan-400 transition space-y-1 text-xs">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold">${d.severity === 'COLLISION' ? '⛔ ' : '⚠ '}${d.title}</span>
+                <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-900/90 text-cyan-300 shrink-0">Inspect GPIO ${d.gpio}</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-relaxed">${d.desc}</p>
+            </div>
+          `;
+        }).join("") + `</div>`;
+
+        feedBox.querySelectorAll("[data-disc-gpio]").forEach(el => {
+          el.addEventListener("click", () => {
+            selectedGpio = el.getAttribute("data-disc-gpio");
+            renderAll();
+          });
+        });
+      }
+
+      // Render the 5 Package Option Cards so each package can tick its candidate GPIOs directly
+      const pkgGrid = document.getElementById("packageOptionsGrid");
+      pkgGrid.innerHTML = PACKAGES.map(pkg => {
+        const claimedPins = BASE_GPIOS.filter(g => state[g.gpio].claims.includes(pkg.id));
+        const signedOffByAllCount = claimedPins.filter(g => evaluateGpioStatus(g).code === "SIGNED_OFF").length;
+
+        const candidateCheckboxes = pkg.candidateGpios.map(gpioNum => {
+          const base = BASE_GPIOS.find(g => g.gpio === gpioNum);
+          if (!base) return "";
+          const st = state[gpioNum];
+          const isClaimedByMe = st.claims.includes(pkg.id);
+          const otherClaimers = st.claims.filter(c => c !== pkg.id).map(c => getPkgMeta(c)?.short || c);
+          const ev = evaluateGpioStatus(base);
+
+          return `
+            <div class="p-1.5 rounded-lg bg-slate-900/90 border ${ev.code === 'COLLISION' && isClaimedByMe ? 'border-rose-500/60' : isClaimedByMe ? 'border-slate-700' : 'border-slate-800/60'} flex items-center justify-between gap-1.5 text-[11px]">
+              <label class="flex items-center gap-1.5 cursor-pointer truncate">
+                <input type="checkbox" data-pkg-card-claim="${pkg.id}" data-pkg-card-gpio="${gpioNum}" ${isClaimedByMe ? "checked" : ""}
+                  class="w-3.5 h-3.5 rounded border-slate-600 text-cyan-500 focus:ring-cyan-500" />
+                <span class="font-mono font-bold text-white">GPIO ${gpioNum}</span>
+                <span class="font-mono text-[10px] text-slate-400">(${base.header})</span>
+              </label>
+              <div class="flex items-center gap-1 shrink-0">
+                ${otherClaimers.length > 0 && base.pinMode === 'ASSIGNABLE'
+                  ? `<span class="px-1 py-0.2 rounded text-[9px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40" title="Also claimed by ${otherClaimers.join(', ')}">⚡ ${otherClaimers.join('/')}</span>`
+                  : `<span class="font-mono text-[9px] ${ev.code === 'SIGNED_OFF' ? 'text-emerald-300' : 'text-slate-400'}">${ev.signoffCount}/5</span>`
+                }
+                <button data-pkg-inspect-gpio="${gpioNum}" title="Inspect GPIO ${gpioNum}" class="text-[10px] font-mono text-cyan-400 hover:underline px-1">→</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between gap-3">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between gap-1">
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono border ${pkg.badgeCls}">${pkg.short}</span>
+                <span class="font-mono text-[10px] text-slate-400">${claimedPins.length} claimed (${signedOffByAllCount} signed 5/5)</span>
+              </div>
+              <h3 class="text-xs font-bold text-white">${pkg.name}</h3>
+              <p class="text-[11px] text-slate-400 leading-snug">${pkg.needSummary}</p>
+            </div>
+
+            <div class="space-y-1">
+              <div class="text-[10px] font-mono uppercase text-slate-400">Tick Needed Candidate GPIOs:</div>
+              <div class="space-y-1">
+                ${candidateCheckboxes}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      pkgGrid.querySelectorAll("[data-pkg-card-claim]").forEach(chk => {
+        chk.addEventListener("change", () => {
+          const pkgId = chk.getAttribute("data-pkg-card-claim");
+          const gpioNum = chk.getAttribute("data-pkg-card-gpio");
+          selectedGpio = gpioNum;
+          togglePackageClaim(gpioNum, pkgId);
+        });
+      });
+
+      pkgGrid.querySelectorAll("[data-pkg-inspect-gpio]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedGpio = btn.getAttribute("data-pkg-inspect-gpio");
+          renderAll();
+        });
+      });
+    }
+
+    // Render Full Master Table with Direct 5-Package Sign-Off Checkboxes
+    function renderMasterTable() {
+      const tbody = document.getElementById("masterTableBody");
+      const filtered = BASE_GPIOS.filter(matchesFilterAndSearch);
+
+      tbody.innerHTML = filtered.map(item => {
+        const st = state[item.gpio];
+        const ev = evaluateGpioStatus(item);
+        const isSelected = item.gpio === selectedGpio;
+
+        const claimBadges = st.claims.length
+          ? st.claims.map(cid => {
+              const p = getPkgMeta(cid);
+              return p ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono border ${p.badgeCls}">${p.short}</span>` : "";
+            }).join(" ")
+          : `<span class="text-slate-500 font-mono text-[11px]">—</span>`;
+
+        const signoffCells = PACKAGES.map(p => {
+          const checked = !!st.signoffs[p.id];
+          return `
+            <td class="py-2 px-2 text-center">
+              <input type="checkbox" data-table-signoff-gpio="${item.gpio}" data-table-signoff-pkg="${p.id}" ${checked ? "checked" : ""}
+                class="w-3.5 h-3.5 rounded border-slate-600 text-emerald-500 focus:ring-emerald-500 cursor-pointer" />
+            </td>
+          `;
+        }).join("");
+
+        return `
+          <tr data-table-row-gpio="${item.gpio}" class="hover:bg-slate-800/50 transition cursor-pointer ${isSelected ? 'bg-cyan-950/30' : ev.code === 'COLLISION' ? 'bg-rose-950/20' : ev.code === 'SIGNED_OFF' ? 'bg-emerald-950/10' : ''}">
+            <td class="py-2 px-3 font-mono font-bold text-white">${item.gpio === "EN" ? "EN" : "GPIO " + item.gpio}</td>
+            <td class="py-2 px-2.5 font-mono text-cyan-300">${item.net} <span class="text-slate-500">→</span> <span class="text-slate-300">${item.header}</span></td>
+            <td class="py-2 px-3"><div class="flex flex-wrap gap-1">${claimBadges}</div></td>
+            <td class="py-2 px-3 text-slate-200 font-mono text-[11px]">${st.role || item.defaultRole}</td>
+            ${signoffCells}
+            <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-mono border ${ev.badgeCls}">${ev.label}</span></td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.querySelectorAll("[data-table-row-gpio]").forEach(row => {
+        row.addEventListener("click", e => {
+          if (e.target && e.target.tagName === "INPUT") return;
+          selectedGpio = row.getAttribute("data-table-row-gpio");
+          renderAll();
+        });
+      });
+
+      tbody.querySelectorAll("[data-table-signoff-gpio]").forEach(chk => {
+        chk.addEventListener("change", e => {
+          e.stopPropagation();
+          const g = chk.getAttribute("data-table-signoff-gpio");
+          const p = chk.getAttribute("data-table-signoff-pkg");
+          selectedGpio = g;
+          togglePackageSignoff(g, p);
+        });
+      });
+    }
+
+    function renderAll() {
+      renderKpis();
+      renderGpioMatrix();
+      renderInspector();
+      renderPackagesAndDiscrepancies();
+      renderMasterTable();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      renderAll();
+
+      // Matrix Filter Buttons
+      document.querySelectorAll(".matrix-filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeFilter = btn.getAttribute("data-filter");
+          document.querySelectorAll(".matrix-filter-btn").forEach(b => {
+            b.classList.remove("bg-cyan-500/20", "text-cyan-200", "border-cyan-500/50");
+          });
+          btn.classList.add("bg-cyan-500/20", "text-cyan-200", "border-cyan-500/50");
+          renderGpioMatrix();
+          renderMasterTable();
+        });
+      });
+
+      // KPI Strip Filter Buttons
+      document.querySelectorAll(".kpi-filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeFilter = btn.getAttribute("data-status-filter");
+          renderGpioMatrix();
+          renderMasterTable();
+        });
+      });
+
+      // Search Input
+      const searchInput = document.getElementById("globalSearchInput");
+      const clearBtn = document.getElementById("clearSearchBtn");
+      searchInput.addEventListener("input", e => {
+        searchQuery = e.target.value.trim();
+        clearBtn.classList.toggle("hidden", !searchQuery);
+        renderGpioMatrix();
+        renderMasterTable();
+      });
+      clearBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchQuery = "";
+        clearBtn.classList.add("hidden");
+        renderGpioMatrix();
+        renderMasterTable();
+      });
+
+      // Load Defaults & Reset All
+      document.getElementById("loadDefaultsBtn").addEventListener("click", () => {
+        initDefaultState();
+        renderAll();
+        showToast("Loaded default candidate package proposals");
+      });
+      document.getElementById("resetAllBtn").addEventListener("click", () => {
+        clearAllClaimsState();
+        renderAll();
+        showToast("Cleared all package claims & sign-offs");
+      });
+
+      // Export / Import JSON Modal
+      const modal = document.getElementById("syncModal");
+      const syncTextarea = document.getElementById("syncJsonTextarea");
+      document.getElementById("openSyncModalBtn").addEventListener("click", () => {
+        syncTextarea.value = JSON.stringify(state, null, 2);
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      });
+      document.getElementById("closeSyncModalBtn").addEventListener("click", () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      });
+      document.getElementById("copyJsonBtn").addEventListener("click", () => {
+        syncTextarea.select();
+        document.execCommand("copy");
+        showToast("Copied allocation state JSON to clipboard!");
+      });
+      document.getElementById("applyJsonBtn").addEventListener("click", () => {
+        try {
+          const parsed = JSON.parse(syncTextarea.value);
+          if (parsed && typeof parsed === "object") {
+            state = parsed;
+            saveState();
+            renderAll();
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+            showToast("Loaded team JSON allocation state!");
+          }
+        } catch (err) {
+          showToast("Invalid JSON format — please check syntax");
+        }
+      });
+
+      // Copy CSV
+      document.getElementById("copyCsvBtn").addEventListener("click", () => {
+        const header = "GPIO,Module_Pin,Net,Header,Claimed_By,Role,REII_Signed,EERI_Mag_Signed,EERI_Drv_Signed,MCTR_Lat_Signed,MCTR_Gbx_Signed,Status\n";
+        const rows = BASE_GPIOS.map(item => {
+          const st = state[item.gpio];
+          const ev = evaluateGpioStatus(item);
+          return `"${item.gpio}","${item.wroom}","${item.net}","${item.header}","${st.claims.join('/')}","${(st.role || '').replace(/"/g, '""')}","${st.signoffs.REII}","${st.signoffs.EERI_MAG}","${st.signoffs.EERI_DRV}","${st.signoffs.MCTR_LAT}","${st.signoffs.MCTR_GBX}","${ev.label}"`;
+        }).join("\n");
+        const csv = header + rows;
+        const ta = document.createElement("textarea");
+        ta.value = csv;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("Copied GPIO Allocation & Sign-Off CSV!");
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\firmware> cd ..
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/channel_analysis.py --port COM10 --sweeps 200 --label "lab quiet"
+saved D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1404.raw
+wrote D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1404.csv and D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1404.png
+
+RPD sweeps: 200   WiFi APs seen: 5
+  WiFi ch  6 (2437 MHz): 4 AP(s), strongest -80 dBm  -> nRF ch 26..48
+  WiFi ch 10 (2457 MHz): 1 AP(s), strongest -95 dBm  -> nRF ch 46..68
+
+Quietest channels (score = 0.5*WiFi overlap + 0.5*RPD occupancy, lower is better):
+  ch   4  2404 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   5  2405 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   6  2406 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   7  2407 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   8  2408 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   9  2409 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  10  2410 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  11  2411 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  12  2412 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  13  2413 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+
+RECOMMENDED: ch 6 (2406 MHz) — quietest channel whose ±2 neighbours are also quiet
+GROUP PLAN (5 links, ≥4 ch apart): [4, 8, 12, 16, 20]
+(channels above the ISM band that look quieter, NOT recommended for the product: [82, 83, 84, 85, 86, 87, 88, 89]...)
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/channel_analysis.py --port COM10 --sweeps 200 --label "lab quiet"
+saved D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1405.raw
+wrote D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1405.csv and D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1405.png
+
+RPD sweeps: 200   WiFi APs seen: 3
+  WiFi ch  2 (2417 MHz): 3 AP(s), strongest -84 dBm  -> nRF ch 6..28
+
+Quietest channels (score = 0.5*WiFi overlap + 0.5*RPD occupancy, lower is better):
+  ch   2  2402 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  32  2432 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  33  2433 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  34  2434 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  35  2435 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  36  2436 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  37  2437 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  38  2438 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  39  2439 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  41  2441 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+
+RECOMMENDED: ch 34 (2434 MHz) — quietest channel whose ±2 neighbours are also quiet
+GROUP PLAN (5 links, ≥4 ch apart): [2, 32, 36, 41, 45]
+(channels above the ISM band that look quieter, NOT recommended for the product: [82, 83, 84, 85, 86, 87, 88, 89]...)
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/channel_analysis.py --port COM10 --sweeps 200 --label "lab quiet"
+saved D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1406.raw
+wrote D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1406.csv and D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1406.png
+
+RPD sweeps: 200   WiFi APs seen: 3
+  WiFi ch  6 (2437 MHz): 3 AP(s), strongest -78 dBm  -> nRF ch 26..48
+
+Quietest channels (score = 0.5*WiFi overlap + 0.5*RPD occupancy, lower is better):
+  ch   2  2402 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   3  2403 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   4  2404 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   5  2405 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   6  2406 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   7  2407 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   8  2408 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch   9  2409 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  10  2410 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  11  2411 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+
+RECOMMENDED: ch 4 (2404 MHz) — quietest channel whose ±2 neighbours are also quiet
+GROUP PLAN (5 links, ≥4 ch apart): [2, 6, 10, 14, 18]
+(channels above the ISM band that look quieter, NOT recommended for the product: [82, 83, 84, 85, 86, 87, 88, 89]...)
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/channel_analysis.py --port COM10 --sweeps 200 --label "lab quiet"
+saved D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1408.raw
+wrote D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1408.csv and D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\channel_survey_2026-09-08_1408.png
+
+RPD sweeps: 200   WiFi APs seen: 6
+  WiFi ch  2 (2417 MHz): 3 AP(s), strongest -83 dBm  -> nRF ch 6..28
+  WiFi ch  6 (2437 MHz): 2 AP(s), strongest -88 dBm  -> nRF ch 26..48
+  WiFi ch 11 (2462 MHz): 1 AP(s), strongest -86 dBm  -> nRF ch 51..73
+
+Quietest channels (score = 0.5*WiFi overlap + 0.5*RPD occupancy, lower is better):
+  ch   4  2404 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  77  2477 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  78  2478 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  79  2479 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  81  2481 MHz  score=0.000  rpd=  0.0%  wifi=     0.0
+  ch  75  2475 MHz  score=0.003  rpd=  0.5%  wifi=     0.0
+  ch  76  2476 MHz  score=0.003  rpd=  0.5%  wifi=     0.0
+  ch   2  2402 MHz  score=0.005  rpd=  1.0%  wifi=     0.0
+  ch   3  2403 MHz  score=0.010  rpd=  2.0%  wifi=     0.0
+  ch  50  2450 MHz  score=0.018  rpd=  0.0%  wifi=     0.7
+
+RECOMMENDED: ch 77 (2477 MHz) — quietest channel whose ±2 neighbours are also quiet
+GROUP PLAN (5 links, ≥4 ch apart): [4, 50, 73, 77, 81]
+(channels above the ISM band that look quieter, NOT recommended for the product: [82, 83, 84, 85, 86, 87, 88, 89]...)
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> 

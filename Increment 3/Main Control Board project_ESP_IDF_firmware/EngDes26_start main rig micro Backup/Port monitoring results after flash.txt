@@ -1,0 +1,313 @@
+PS D:\DESIGN GIT\REII_Cline_Project_Context_Verified_New\project_sources\ESP32 S3 WROOM-1U\Newest info 10102026\EngDes26_start\EngDes26_start> $env:IDF_PATH = 'C:\esp\v6.1\esp-idf';
+PS D:\DESIGN GIT\REII_Cline_Project_Context_Verified_New\project_sources\ESP32 S3 WROOM-1U\Newest info 10102026\EngDes26_start\EngDes26_start>  & 'C:\Espressif\tools\python\v6.1\venv\Scripts\python.exe' 'C:\esp\v6.1\esp-idf\tools\idf_monitor.py' -p COM12 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --make '''C:\Espressif\tools\python\v6.1\venv\Scripts\python.exe'' ''C:\esp\v6.1\esp-idf\tools\idf.py''' --target esp32s3 'd:\DESIGN GIT\REII_Cline_Project_Context_Verified_New\project_sources\ESP32 S3 WROOM-1U\Newest info 10102026\EngDes26_start\EngDes26_start\build\EngDes26_start.elf'
+--- WARNING: GDB cannot open serial ports accessed as COMx
+--- NOTE: Using \\.\COM12 instead...
+--- esp-idf-monitor 1.10.0 on \\.\COM12 115200
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037ce82
+--- 0x4037ce82: esp_cpu_wait_for_intr at C:/esp/v6.1/esp-idf/components/esp_hw_support/cpu.c:64
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x14f0
+load:0x403c8700,len:0xde4
+load:0x403cb700,len:0x2f58
+entry 0x403c8904
+I (24) boot: ESP-IDF v6.1 2nd stage bootloader
+I (24) boot: compile time Oct 15 2026 19:22:45
+I (25) boot: Multicore bootloader
+I (25) boot: chip revision: v0.2
+I (27) boot: efuse block revision: v1.4
+I (31) boot.esp32s3: Boot SPI Speed : 80MHz
+I (35) boot.esp32s3: SPI Mode       : DIO
+I (39) boot.esp32s3: SPI Flash Size : 16MB
+I (42) boot: Enabling RNG early entropy source...
+I (47) boot: Partition Table:
+I (49) boot: ## Label            Usage          Type ST Offset   Length
+I (56) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (62) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (69) boot:  2 factory          factory app      00 00 00010000 00100000
+I (75) boot: End of partition table
+I (79) esp_image: segment 0: paddr=00010020 vaddr=3c030020 size=1187ch ( 71804) map
+I (99) esp_image: segment 1: paddr=000218a4 vaddr=3fc95000 size=03650h ( 13904) load
+I (103) esp_image: segment 2: paddr=00024efc vaddr=40374000 size=0b11ch ( 45340) load
+I (113) esp_image: segment 3: paddr=00030020 vaddr=42000020 size=274f0h (161008) map
+I (143) esp_image: segment 4: paddr=00057518 vaddr=4037f11c size=05each ( 24236) load
+I (149) esp_image: segment 5: paddr=0005d3cc vaddr=50000000 size=00024h (    36) load
+I (157) boot: Loaded app from partition at offset 0x10000
+I (157) boot: Disabling RNG early entropy source...
+I (169) cpu_start: Multicore app
+I (177) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
+I (178) cpu_start: Pro cpu start user code
+I (178) cpu_start: cpu freq: 160000000 Hz
+I (179) app_init: Application information:
+I (183) app_init: Project name:     EngDes26_start
+I (188) app_init: App version:      f465a43-dirty
+I (192) app_init: Compile time:     Oct 15 2026 19:21:01
+I (197) app_init: ELF file SHA256:  a3f408d83...
+I (201) app_init: ESP-IDF:          v6.1
+I (205) efuse_init: Min chip rev:     v0.0
+I (209) efuse_init: Max chip rev:     v0.99 
+I (213) efuse_init: Chip rev:         v0.2
+I (217) heap_init: Initializing. RAM available for dynamic allocation:
+I (223) heap_init: At 3FC99580 len 00050190 (320 KiB): RAM
+I (228) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+I (233) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+I (238) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+I (245) spi_flash: detected chip: generic
+I (248) spi_flash: flash io: dio
+I (251) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (257) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (264) main_task: Started on CPU0
+I (264) main_task: Calling app_main()
+I (274) main: Hello world from esp32s3!
+I (274) main: 2 CPU core(s), WiFi/BLE, silicon revision v0.2
+I (274) main: 16MB flash
+I (434) main: Scanning I2C bus (SDA=8, SCL=9)...
+I (434) main:   found device at 0x20
+I (434) main:   found device at 0x38
+I (444) main:   found device at 0x51
+I (444) main: I2C scan complete: 3 device(s) found
+I (454) main: MCP23017 at 0x20 responding with sane register defaults
+I (454) main: OLED support disabled (OLED_ENABLED=0 in main.c) - skipping init
+I (454) ads1220: attempt 1: before reset: 00 00 00 00
+I (464) main: ADS1220 responding with sane register defaults
+W (484) sdcard: card init attempt 1/5 failed (ESP_ERR_TIMEOUT)
+I (514) main: ADS1220 AIN0: 0.0008 V
+W (524) sdcard: card init attempt 2/5 failed (ESP_ERR_TIMEOUT)
+I (534) main: AHT20: 27.68 degC, 39.95 %RH
+W (564) sdcard: card init attempt 3/5 failed (ESP_ERR_TIMEOUT)
+W (604) sdcard: card init attempt 4/5 failed (ESP_ERR_TIMEOUT)
+W (644) sdcard: card init attempt 5/5 failed (ESP_ERR_TIMEOUT)
+E (664) sdcard: card init failed after 5 attempts (ESP_ERR_TIMEOUT)
+E (664) main: SD card not responding (ESP_ERR_TIMEOUT)
+I (664) spwm: started: 20000 Hz carrier, 50.0 Hz sine, GPIOs 38/39/40
+I (664) main_task: Returned from app_main()
+I (814) main: ADS1220 AIN0: 0.0030 V
+I (1114) main: ADS1220 AIN0: 0.0034 V
+I (1414) main: ADS1220 AIN0: 0.0035 V
+I (1614) main: AHT20: 27.67 degC, 39.95 %RH
+I (1714) main: ADS1220 AIN0: 0.0036 V
+I (2014) main: ADS1220 AIN0: 0.0036 V
+I (2314) main: ADS1220 AIN0: 0.0036 V
+I (2614) main: ADS1220 AIN0: 0.0036 V
+I (2694) main: AHT20: 27.66 degC, 39.93 %RH
+I (2914) main: ADS1220 AIN0: 0.0036 V
+I (3214) main: ADS1220 AIN0: 0.0036 V
+I (3514) main: ADS1220 AIN0: 0.0036 V
+I (3774) main: AHT20: 27.67 degC, 39.93 %RH
+I (3814) main: ADS1220 AIN0: 0.0036 V
+I (4114) main: ADS1220 AIN0: 0.0036 V
+I (4414) main: ADS1220 AIN0: 0.0036 V
+I (4714) main: ADS1220 AIN0: 0.0036 V
+I (4854) main: AHT20: 27.67 degC, 39.95 %RH
+I (5014) main: ADS1220 AIN0: 0.0035 V
+I (5314) main: ADS1220 AIN0: 0.0035 V
+I (5614) main: ADS1220 AIN0: 0.0035 V
+I (5914) main: ADS1220 AIN0: 0.0035 V
+I (5934) main: AHT20: 27.69 degC, 39.90 %RH
+I (6214) main: ADS1220 AIN0: 0.0035 V
+I (6514) main: ADS1220 AIN0: 0.0035 V
+I (6814) main: ADS1220 AIN0: 0.0035 V
+I (7014) main: AHT20: 27.69 degC, 39.91 %RH
+I (7114) main: ADS1220 AIN0: 0.0035 V
+I (7414) main: ADS1220 AIN0: 0.0035 V
+I (7714) main: ADS1220 AIN0: 0.0034 V
+I (8014) main: ADS1220 AIN0: 0.0034 V
+I (8094) main: AHT20: 27.69 degC, 39.92 %RH
+I (8314) main: ADS1220 AIN0: 0.0034 V
+I (8614) main: ADS1220 AIN0: 0.0034 V
+I (8914) main: ADS1220 AIN0: 0.0034 V
+I (9174) main: AHT20: 27.70 degC, 39.92 %RH
+I (9214) main: ADS1220 AIN0: 0.0034 V
+I (9514) main: ADS1220 AIN0: 0.0035 V
+I (9814) main: ADS1220 AIN0: 0.0035 V
+I (10114) main: ADS1220 AIN0: 0.0035 V
+I (10254) main: AHT20: 27.69 degC, 39.89 %RH
+I (10414) main: ADS1220 AIN0: 0.0035 V
+I (10714) main: ADS1220 AIN0: 0.0035 V
+I (11014) main: ADS1220 AIN0: 0.0035 V
+I (11314) main: ADS1220 AIN0: 0.0035 V
+I (11334) main: AHT20: 27.70 degC, 39.92 %RH
+I (11614) main: ADS1220 AIN0: 0.0035 V
+I (11914) main: ADS1220 AIN0: 0.0035 V
+I (12214) main: ADS1220 AIN0: 0.0035 V
+I (12414) main: AHT20: 27.71 degC, 39.92 %RH
+I (12514) main: ADS1220 AIN0: 0.0035 V
+I (12814) main: ADS1220 AIN0: 0.0035 V
+I (13114) main: ADS1220 AIN0: 0.0035 V
+I (13414) main: ADS1220 AIN0: 0.0036 V
+I (13494) main: AHT20: 27.71 degC, 39.90 %RH
+I (13714) main: ADS1220 AIN0: 0.0036 V
+I (14014) main: ADS1220 AIN0: 0.0036 V
+I (14314) main: ADS1220 AIN0: 0.0036 V
+I (14574) main: AHT20: 27.71 degC, 39.88 %RH
+I (14614) main: ADS1220 AIN0: 0.0036 V
+I (14914) main: ADS1220 AIN0: 0.0036 V
+I (15214) main: ADS1220 AIN0: 0.0036 V
+I (15514) main: ADS1220 AIN0: 0.0036 V
+I (15654) main: AHT20: 27.72 degC, 39.87 %RH
+I (15814) main: ADS1220 AIN0: 0.0036 V
+I (16114) main: ADS1220 AIN0: 0.0036 V
+I (16414) main: ADS1220 AIN0: 0.0036 V
+I (16714) main: ADS1220 AIN0: 0.0036 V
+I (16734) main: AHT20: 27.74 degC, 39.90 %RH
+I (17014) main: ADS1220 AIN0: 0.0037 V
+I (17314) main: ADS1220 AIN0: 0.0037 V
+I (17614) main: ADS1220 AIN0: 0.0037 V
+I (17814) main: AHT20: 27.72 degC, 39.82 %RH
+I (17914) main: ADS1220 AIN0: 0.0037 V
+I (18214) main: ADS1220 AIN0: 0.0037 V
+I (18514) main: ADS1220 AIN0: 0.0036 V
+I (18814) main: ADS1220 AIN0: 0.0036 V
+I (18894) main: AHT20: 27.76 degC, 39.85 %RH
+I (19114) main: ADS1220 AIN0: 0.0036 V
+I (19414) main: ADS1220 AIN0: 0.0036 V
+I (19714) main: ADS1220 AIN0: 0.0036 V
+I (19974) main: AHT20: 27.75 degC, 39.82 %RH
+I (20014) main: ADS1220 AIN0: 0.0036 V
+I (20314) main: ADS1220 AIN0: 0.0036 V
+I (20614) main: ADS1220 AIN0: 0.0036 V
+I (20914) main: ADS1220 AIN0: 0.0036 V
+I (21054) main: AHT20: 27.75 degC, 39.83 %RH
+I (21214) main: ADS1220 AIN0: 0.0035 V
+I (21514) main: ADS1220 AIN0: 0.0035 V
+I (21814) main: ADS1220 AIN0: 0.0035 V
+I (22114) main: ADS1220 AIN0: 0.0035 V
+I (22134) main: AHT20: 27.77 degC, 39.84 %RH
+I (22414) main: ADS1220 AIN0: 0.0035 V
+I (22714) main: ADS1220 AIN0: 0.0035 V
+I (23014) main: ADS1220 AIN0: 0.0035 V
+I (23214) main: AHT20: 27.76 degC, 39.83 %RH
+I (23314) main: ADS1220 AIN0: 0.0035 V
+I (23614) main: ADS1220 AIN0: 0.0035 V
+I (23914) main: ADS1220 AIN0: 0.0035 V
+I (24214) main: ADS1220 AIN0: 0.0034 V
+I (24294) main: AHT20: 27.76 degC, 39.80 %RH
+I (24514) main: ADS1220 AIN0: 0.0035 V
+I (24814) main: ADS1220 AIN0: 0.0034 V
+I (25114) main: ADS1220 AIN0: 0.0034 V
+I (25374) main: AHT20: 27.76 degC, 39.80 %RH
+I (25414) main: ADS1220 AIN0: 0.0034 V
+I (25714) main: ADS1220 AIN0: 0.0034 V
+I (26014) main: ADS1220 AIN0: 0.0035 V
+I (26314) main: ADS1220 AIN0: 0.0035 V
+I (26454) main: AHT20: 27.76 degC, 39.83 %RH
+I (26614) main: ADS1220 AIN0: 0.0035 V
+I (26914) main: ADS1220 AIN0: 0.0035 V
+I (27214) main: ADS1220 AIN0: 0.0035 V
+I (27514) main: ADS1220 AIN0: 0.0035 V
+I (27534) main: AHT20: 27.79 degC, 39.84 %RH
+I (27814) main: ADS1220 AIN0: 0.0035 V
+I (28114) main: ADS1220 AIN0: 0.0035 V
+I (28414) main: ADS1220 AIN0: 0.0035 V
+I (28614) main: AHT20: 27.79 degC, 39.84 %RH
+I (28714) main: ADS1220 AIN0: 0.0035 V
+I (29014) main: ADS1220 AIN0: 0.0036 V
+I (29314) main: ADS1220 AIN0: 0.0036 V
+I (29614) main: ADS1220 AIN0: 0.0036 V
+I (29694) main: AHT20: 27.80 degC, 39.84 %RH
+I (29914) main: ADS1220 AIN0: 0.0036 V
+I (30214) main: ADS1220 AIN0: 0.0036 V
+I (30514) main: ADS1220 AIN0: 0.0036 V
+I (30774) main: AHT20: 27.79 degC, 39.80 %RH
+I (30814) main: ADS1220 AIN0: 0.0036 V
+I (31114) main: ADS1220 AIN0: 0.0036 V
+I (31414) main: ADS1220 AIN0: 0.0037 V
+I (31714) main: ADS1220 AIN0: 0.0037 V
+I (31854) main: AHT20: 27.78 degC, 39.82 %RH
+I (32014) main: ADS1220 AIN0: 0.0037 V
+I (32314) main: ADS1220 AIN0: 0.0037 V
+I (32614) main: ADS1220 AIN0: 0.0037 V
+I (32914) main: ADS1220 AIN0: 0.0037 V
+I (32934) main: AHT20: 27.78 degC, 39.82 %RH
+I (33214) main: ADS1220 AIN0: 0.0036 V
+I (33514) main: ADS1220 AIN0: 0.0036 V
+I (33814) main: ADS1220 AIN0: 0.0036 V
+I (34014) main: AHT20: 27.79 degC, 39.80 %RH
+I (34114) main: ADS1220 AIN0: 0.0036 V
+I (34414) main: ADS1220 AIN0: 0.0036 V
+I (34714) main: ADS1220 AIN0: 0.0036 V
+I (35014) main: ADS1220 AIN0: 0.0035 V
+I (35094) main: AHT20: 27.79 degC, 39.79 %RH
+I (35314) main: ADS1220 AIN0: 0.0035 V
+I (35614) main: ADS1220 AIN0: 0.0035 V
+I (35914) main: ADS1220 AIN0: 0.0035 V
+I (36174) main: AHT20: 27.81 degC, 39.75 %RH
+I (36214) main: ADS1220 AIN0: 0.0035 V
+I (36514) main: ADS1220 AIN0: 0.0035 V
+I (36814) main: ADS1220 AIN0: 0.0035 V
+I (37114) main: ADS1220 AIN0: 0.0035 V
+I (37254) main: AHT20: 27.80 degC, 39.77 %RH
+I (37414) main: ADS1220 AIN0: 0.0034 V
+I (37714) main: ADS1220 AIN0: 0.0035 V
+I (38014) main: ADS1220 AIN0: 0.0035 V
+I (38314) main: ADS1220 AIN0: 0.0035 V
+I (38334) main: AHT20: 27.80 degC, 39.76 %RH
+I (38614) main: ADS1220 AIN0: 0.0035 V
+I (38914) main: ADS1220 AIN0: 0.0035 V
+I (39214) main: ADS1220 AIN0: 0.0035 V
+I (39414) main: AHT20: 27.80 degC, 39.73 %RH
+I (39514) main: ADS1220 AIN0: 0.0035 V
+I (39814) main: ADS1220 AIN0: 0.0035 V
+I (40114) main: ADS1220 AIN0: 0.0035 V
+I (40414) main: ADS1220 AIN0: 0.0035 V
+I (40494) main: AHT20: 27.78 degC, 39.76 %RH
+I (40714) main: ADS1220 AIN0: 0.0035 V
+I (41014) main: ADS1220 AIN0: 0.0035 V
+I (41314) main: ADS1220 AIN0: 0.0035 V
+I (41574) main: AHT20: 27.79 degC, 39.73 %RH
+I (41614) main: ADS1220 AIN0: 0.0036 V
+I (41914) main: ADS1220 AIN0: 0.0036 V
+I (42214) main: ADS1220 AIN0: 0.0036 V
+I (42514) main: ADS1220 AIN0: 0.0036 V
+I (42654) main: AHT20: 27.81 degC, 39.75 %RH
+I (42814) main: ADS1220 AIN0: 0.0036 V
+I (43114) main: ADS1220 AIN0: 0.0036 V
+I (43414) main: ADS1220 AIN0: 0.0036 V
+I (43714) main: ADS1220 AIN0: 0.0036 V
+I (43734) main: AHT20: 27.82 degC, 39.71 %RH
+I (44014) main: ADS1220 AIN0: 0.0036 V
+I (44314) main: ADS1220 AIN0: 0.0037 V
+I (44614) main: ADS1220 AIN0: 0.0037 V
+I (44814) main: AHT20: 27.81 degC, 39.72 %RH
+I (44914) main: ADS1220 AIN0: 0.0037 V
+I (45214) main: ADS1220 AIN0: 0.0037 V
+I (45514) main: ADS1220 AIN0: 0.0037 V
+I (45814) main: ADS1220 AIN0: 0.0037 V
+I (45894) main: AHT20: 27.83 degC, 39.71 %RH
+I (46114) main: ADS1220 AIN0: 0.0037 V
+I (46414) main: ADS1220 AIN0: 0.0037 V
+I (46714) main: ADS1220 AIN0: 0.0036 V
+I (46974) main: AHT20: 27.86 degC, 39.70 %RH
+I (47014) main: ADS1220 AIN0: 0.0036 V
+I (47314) main: ADS1220 AIN0: 0.0036 V
+I (47614) main: ADS1220 AIN0: 0.0036 V
+I (47914) main: ADS1220 AIN0: 0.0036 V
+I (48054) main: AHT20: 27.85 degC, 39.72 %RH
+I (48214) main: ADS1220 AIN0: 0.0036 V
+I (48514) main: ADS1220 AIN0: 0.0036 V
+I (48814) main: ADS1220 AIN0: 0.0035 V
+I (49114) main: ADS1220 AIN0: 0.0035 V
+I (49134) main: AHT20: 27.85 degC, 39.71 %RH
+I (49414) main: ADS1220 AIN0: 0.0035 V
+I (49714) main: ADS1220 AIN0: 0.0035 V
+I (50014) main: ADS1220 AIN0: 0.0035 V
+I (50214) main: AHT20: 27.83 degC, 39.69 %RH
+I (50314) main: ADS1220 AIN0: 0.0035 V
+I (50614) main: ADS1220 AIN0: 0.0035 V
+I (50914) main: ADS1220 AIN0: 0.0035 V
+I (51214) main: ADS1220 AIN0: 0.0035 V
+I (51294) main: AHT20: 27.85 degC, 39.70 %RH
+I (51514) main: ADS1220 AIN0: 0.0035 V
+I (51814) main: ADS1220 AIN0: 0.0035 V
+I (52114) main: ADS1220 AIN0: 0.0035 V
+I (52374) main: AHT20: 27.84 degC, 39.69 %RH
+I (52414) main: ADS1220 AIN0: 0.0035 V
+I (52714) main: ADS1220 AIN0: 0.0035 V
+I (53014) main: ADS1220 AIN0: 0.0034 V
+I (53314) main: ADS1220 AIN0: 0.0035 V
+I (53454) main: AHT20: 27.84 degC, 39.67 %RH
+I (53614) main: ADS1220 AIN0: 0.0035 V

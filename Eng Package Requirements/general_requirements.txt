@@ -1,0 +1,17 @@
+
+### Functional Requirements
+============================
+->These use the 9-part template: Actor, Condition, Action, Object, Constraints, Object Refinement, Source, Destination, Action Refinement.
+
+1. The hoisting system, upon activation of the lift command, shall lift the steel plate at a variable speed not exceeding 0.5 m/s for plates weighing up to 2000 kg, from the ground level to a maximum clearance height of 5 m while maintaining a strictly horizontal orientation.
+2. The magnetic attachment module, upon receiving the engage signal, shall generate a magnetic holding force of at least 1.5 times the weight of the payload for any steel plate handled, from the magnetic contact face across the entire mating area within 2 seconds of signal receipt.
+3. The hoisting system trolley, during lateral transport operations, shall transport the magnetically attached steel plate without exceeding a lateral acceleration that causes a pendulum sway greater than 5 degrees for varying payloads up to 2000 kg, from the loading zone to the designated unloading coordinate while maintaining continuous magnetic engagement.
+4. The magnetic attachment module, upon receipt of the release command coupled with a weight-on-ground confirmation, shall release the steel plate by reducing residual magnetism to less than 1% for the previously secured plate, from the magnetic contact face to a fully detached physical state within 3 seconds.
+5. The hoisting control system, upon activation of the emergency stop switch, shall halt all mechanical movement completely within a maximum of 1.5 seconds for both the hoist line and trolley, from its current operational speed to a completely stationary state without interrupting power to the magnetic holding module.
+
+# Non-Functional Requirements
+==============================
+->These use the 3-part template: System/Entity, Quality to be achieved, Description.
+
+6. The hoisting system's electronic control enclosure must possess a minimum IP54 protection rating to prevent dust and water ingress within an environment open to the elements.
+7. The hoisting system's mechanical braking unit must default to a fully engaged, locked state to prevent the payload from dropping in the event of a total facility power loss.

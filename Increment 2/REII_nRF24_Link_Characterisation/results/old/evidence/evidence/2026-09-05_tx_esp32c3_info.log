@@ -1,0 +1,66 @@
+ *  Executing task: C:\Users\Uni\.platformio\penv\Scripts\platformio.exe device monitor --environment tx_esp32c3 --port COM9 
+
+--- forcing DTR inactive
+--- forcing RTS inactive
+--- Terminal on COM9 | 115200 8-N-1
+--- Available filters and text transformations: debug, default, direct, esp32_exception_decoder, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+INFO +
+ERR,unknown command
+INFO
+SPI Frequency           = 4 Mhz
+Channel                 = 80 (~ 2480 MHz)
+Model                   = nRF24L01+
+RF Data Rate            = 250 KBPS
+RF Power Amplifier      = PA_MAX
+RF Low Noise Amplifier  = Enabled
+CRC Length              = 16 bits
+Address Length          = 5 bytes
+Static Payload Length   = 32 bytes
+Auto Retry Delay        = 1500 microseconds
+Auto Retry Attempts     = 15 maximum
+Packets lost on
+    current channel     = 0
+Retry attempts made for
+    last transmission   = 0
+Multicast               = Disabled
+Custom ACK Payload      = Disabled
+Dynamic Payloads        = Disabled
+Auto Acknowledgment     = Enabled
+Primary Mode            = RX
+TX address              = 0x3149494552
+pipe 0 (closed) bound   = 0x3149494552
+pipe 1 ( open ) bound   = 0x3249494552
+pipe 2 (closed) bound   = 0xc3
+pipe 3 (closed) bound   = 0xc4
+pipe 4 (closed) bound   = 0xc5
+pipe 5 (closed) bound   = 0xc6
+Disconnected (ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22)))
+Reconnecting to COM9 --- forcing DTR inactive
+--- forcing RTS inactive
+         Connected!
+
+
+# REII nRF24 linktest v0.1.0 role=TX board=ESP32-C3 ctrl_ch=80
+READY (waiting for commands from RX)
+Disconnected (ClearCommError failed (PermissionError(13, 'The device does not recognize the command.', None, 22)))
+Reconnecting to COM9 --- forcing DTR inactive
+--- forcing RTS inactive
+         Connected!
+
+
+# REII nRF24 linktest v0.1.0 role=TX board=ESP32-C3 ctrl_ch=80
+READY (waiting for commands from RX)
+
+
+# REII nRF24 linktest v0.1.0 role=TX board=ESP32-C3 ctrl_ch=80
+READY (waiting for commands from RX)
+
+
+# REII nRF24 linktest v0.1.0 role=TX board=ESP32-C3 ctrl_ch=80
+READY (waiting for commands from RX)
+
+
+# REII nRF24 linktest v0.1.0 role=TX board=ESP32-C3 ctrl_ch=80
+READY (waiting for commands from RX)

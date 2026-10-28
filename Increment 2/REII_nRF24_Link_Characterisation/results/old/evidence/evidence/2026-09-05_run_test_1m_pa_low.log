@@ -1,0 +1,8 @@
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/run_test.py --port COM10 --distance 1 --pa LOW --n 200
+  NOACK  250 kbps ch76 PA_LOW: PER=0.50%  rx_unique=199/200  acked=0 failed=0 retries=0 (max 0)  rpd=601/662  OK
+  ACK    250 kbps ch76 PA_LOW: PER=0.00%  rx_unique=200/200  acked=200 failed=0 retries=1 (max 1)  rpd=259/694  OK
+  NOACK 1000 kbps ch76 PA_LOW: PER=0.00%  rx_unique=200/200  acked=0 failed=0 retries=0 (max 0)  rpd=601/660  OK
+  ACK   1000 kbps ch76 PA_LOW: PER=0.00%  rx_unique=200/200  acked=200 failed=0 retries=0 (max 0)  rpd=131/441  OK
+  NOACK 2000 kbps ch76 PA_LOW: PER=0.50%  rx_unique=199/200  acked=0 failed=0 retries=0 (max 0)  rpd=599/659  OK
+  ACK   2000 kbps ch76 PA_LOW: PER=0.00%  rx_unique=200/200  acked=200 failed=0 retries=1 (max 1)  rpd=86/402  OK
+6 rows appended to D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\packet_loss_2026-09-05.csv

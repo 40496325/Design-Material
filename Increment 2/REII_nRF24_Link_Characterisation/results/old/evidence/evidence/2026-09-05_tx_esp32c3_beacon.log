@@ -1,0 +1,53 @@
+ *  Executing task: C:\Users\Uni\.platformio\penv\Scripts\platformio.exe device monitor --environment tx_esp32c3 --port COM9 
+
+--- forcing DTR inactive
+--- forcing RTS inactive
+--- Terminal on COM9 | 115200 8-N-1
+--- Available filters and text transformations: debug, default, direct, esp32_exception_decoder, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+BEACON 1000 76 LOW
+BEACON (any key to stop)
+BEACON,sent=16,ok=16
+BEACON,sent=32,ok=32
+BEACON,sent=48,ok=48
+BEACON,sent=64,ok=64
+BEACON,sent=80,ok=80
+BEACON,sent=96,ok=96
+BEACON,sent=112,ok=112
+BEACON,sent=128,ok=128
+BEACON,sent=144,ok=144
+BEACON,sent=160,ok=160
+BEACON,sent=176,ok=176
+BEACON,sent=192,ok=192
+BEACON,sent=208,ok=208
+BEACON,sent=224,ok=224
+BEACON,sent=240,ok=240
+BEACON,sent=256,ok=256
+BEACON,sent=272,ok=272
+BEACON,sent=288,ok=288
+BEACON,sent=304,ok=304
+BEACON,sent=320,ok=320
+BEACON,sent=336,ok=336
+BEACON,sent=352,ok=352
+BEACON,sent=368,ok=368
+BEACON,sent=384,ok=384
+BEACON,sent=400,ok=400
+BEACON,sent=416,ok=416
+BEACON,sent=432,ok=432
+BEACON,sent=448,ok=448
+BEACON,sent=464,ok=464
+BEACON,sent=480,ok=480
+BEACON,sent=496,ok=496
+BEACON,sent=512,ok=512
+BEACON,sent=528,ok=528
+BEACON,sent=544,ok=544
+BEACON,sent=560,ok=560
+BEACON,sent=576,ok=576
+BEACON,sent=592,ok=592
+BEACON,sent=608,ok=608
+BEACON,sent=624,ok=624
+BEACON,sent=640,ok=640
+BEACON,sent=656,ok=656
+
+STOPPED

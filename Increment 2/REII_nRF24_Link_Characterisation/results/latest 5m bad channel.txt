@@ -1,0 +1,34 @@
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\firmware> cd ..
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/run_test.py --port COM10 --distance 5 --los 1 --channel 2 --pa MAX --n 1000   
+  NOACK  250 kbps ch2 PA_MAX: PER=13.40%  rx_unique=866/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2206/2266  OK
+  ACK    250 kbps ch2 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=197 (max 4)  rpd=1621/3001  OK
+  NOACK 1000 kbps ch2 PA_MAX: PER=12.00%  rx_unique=880/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2207/2265  OK
+  ACK   1000 kbps ch2 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=250 (max 9)  rpd=955/1656  OK
+  NOACK 2000 kbps ch2 PA_MAX: PER=0.70%  rx_unique=993/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2205/2266  OK
+  ACK   2000 kbps ch2 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=5 (max 1)  rpd=310/974  OK
+6 rows appended to D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\packet_loss_2026-09-08.csv
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/run_test.py --port COM10 --distance 5 --los 1 --channel 4 --pa MAX --n 1000
+  NOACK  250 kbps ch4 PA_MAX: PER=7.50%  rx_unique=925/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2206/2266  OK
+  ACK    250 kbps ch4 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=142 (max 3)  rpd=1493/2838  OK
+  NOACK 1000 kbps ch4 PA_MAX: PER=12.70%  rx_unique=873/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2205/2265  OK
+  ACK   1000 kbps ch4 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=306 (max 10)  rpd=1081/1764  OK
+  NOACK 2000 kbps ch4 PA_MAX: PER=0.50%  rx_unique=995/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2205/2265  OK
+  ACK   2000 kbps ch4 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=5 (max 1)  rpd=341/975  OK
+6 rows appended to D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\packet_loss_2026-09-08.csv
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/run_test.py --port COM10 --distance 5 --los 1 --channel 11 --pa MAX --n 1000
+  NOACK  250 kbps ch11 PA_MAX: PER=17.20%  rx_unique=828/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2206/2267  OK
+  ACK    250 kbps ch11 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=276 (max 6)  rpd=1887/3235  OK
+  NOACK 1000 kbps ch11 PA_MAX: PER=20.10%  rx_unique=799/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2205/2266  OK
+  ACK   1000 kbps ch11 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=448 (max 10)  rpd=1316/2043  OK
+  NOACK 2000 kbps ch11 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2205/2265  OK
+  ACK   2000 kbps ch11 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=3 (max 3)  rpd=320/971  OK
+6 rows appended to D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\packet_loss_2026-09-08.csv
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> python tools/run_test.py --port COM10 --distance 5 --los 1 --channel 6 --pa MAX --n 1000 
+  NOACK  250 kbps ch6 PA_MAX: PER=12.40%  rx_unique=876/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2206/2266  OK
+  ACK    250 kbps ch6 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=182 (max 4)  rpd=1638/2956  OK
+  NOACK 1000 kbps ch6 PA_MAX: PER=22.30%  rx_unique=777/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2202/2265  OK
+  ACK   1000 kbps ch6 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=529 (max 10)  rpd=1334/2202  OK
+  NOACK 2000 kbps ch6 PA_MAX: PER=3.00%  rx_unique=970/1000  acked=0 failed=0 retries=0 (max 0)  rpd=2196/2265  OK
+  ACK   2000 kbps ch6 PA_MAX: PER=0.00%  rx_unique=1000/1000  acked=1000 failed=0 retries=2 (max 1)  rpd=318/969  OK
+6 rows appended to D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation\results\packet_loss_2026-09-08.csv
+PS D:\DESIGN GIT\Design-Git-AI\REII_nRF24_Link_Characterisation> 

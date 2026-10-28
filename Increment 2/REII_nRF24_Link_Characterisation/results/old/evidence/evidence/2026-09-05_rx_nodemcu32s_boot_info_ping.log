@@ -1,0 +1,120 @@
+ *  Executing task: C:\Users\Uni\.platformio\penv\Scripts\platformio.exe device monitor --environment rx_nodemcu32s --port COM10 
+
+--- Terminal on COM10 | 115200 8-N-1
+--- Available filters and text transformations: debug, default, direct, esp32_exception_decoder, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+����������������������������������������������������������������s Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+
+# REII nRF24 linktest v0.1.0 role=RX board=NodeMCU-32S ctrl_ch=80
+radio.begin() OK, isPVariant=1
+SPI Frequency           = 4 Mhz
+Channel                 = 80 (~ 2480 MHz)
+Model                   = nRF24L01+
+RF Data Rate            = 250 KBPS
+RF Power Amplifier      = PA_MAX
+RF Low Noise Amplifier  = Enabled
+CRC Length              = 16 bits
+Address Length          = 5 bytes
+Static Payload Length   = 32 bytes
+Auto Retry Delay        = 1500 microseconds
+Auto Retry Attempts     = 15 maximum
+Packets lost on
+    current channel     = 0
+Retry attempts made for
+    last transmission   = 0
+Multicast               = Disabled
+Custom ACK Payload      = Disabled
+Dynamic Payloads        = Disabled
+Auto Acknowledgment     = Enabled
+Primary Mode            = RX
+TX address              = 0x3249494552
+pipe 0 (closed) bound   = 0x3249494552
+pipe 1 ( open ) bound   = 0x3149494552
+pipe 2 (closed) bound   = 0xc3
+pipe 3 (closed) bound   = 0xc4
+pipe 4 (closed) bound   = 0xc5
+pipe 5 (closed) bound   = 0xc6
+READY
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+
+# REII nRF24 linktest v0.1.0 role=RX board=NodeMCU-32S ctrl_ch=80
+radio.begin() OK, isPVariant=1
+SPI Frequency           = 4 Mhz
+Channel                 = 80 (~ 2480 MHz)
+Model                   = nRF24L01+
+RF Data Rate            = 250 KBPS
+RF Power Amplifier      = PA_MAX
+RF Low Noise Amplifier  = Enabled
+CRC Length              = 16 bits
+Address Length          = 5 bytes
+Static Payload Length   = 32 bytes
+Auto Retry Delay        = 1500 microseconds
+Auto Retry Attempts     = 15 maximum
+Packets lost on
+    current channel     = 0
+Retry attempts made for
+    last transmission   = 0
+Multicast               = Disabled
+Custom ACK Payload      = Disabled
+Dynamic Payloads        = Disabled
+Auto Acknowledgment     = Enabled
+Primary Mode            = RX
+TX address              = 0x3249494552
+pipe 0 (closed) bound   = 0x3249494552
+pipe 1 ( open ) bound   = 0x3149494552
+pipe 2 (closed) bound   = 0xc3
+pipe 3 (closed) bound   = 0xc4
+pipe 4 (closed) bound   = 0xc5
+pipe 5 (closed) bound   = 0xc6
+READY
+INFO
+ERR,unknown command
+INFO +
+SPI Frequency           = 4 Mhz
+Channel                 = 80 (~ 2480 MHz)
+Model                   = nRF24L01+
+RF Data Rate            = 250 KBPS
+RF Power Amplifier      = PA_MAX
+RF Low Noise Amplifier  = Enabled
+CRC Length              = 16 bits
+Address Length          = 5 bytes
+Static Payload Length   = 32 bytes
+Auto Retry Delay        = 1500 microseconds
+Auto Retry Attempts     = 15 maximum
+Packets lost on
+    current channel     = 0
+Retry attempts made for
+    last transmission   = 0
+Multicast               = Disabled
+Custom ACK Payload      = Disabled
+Dynamic Payloads        = Disabled
+Auto Acknowledgment     = Enabled
+Primary Mode            = RX
+TX address              = 0x3249494552
+pipe 0 (closed) bound   = 0x3249494552
+pipe 1 ( open ) bound   = 0x3149494552
+pipe 2 (closed) bound   = 0xc3
+pipe 3 (closed) bound   = 0xc4
+pipe 4 (closed) bound   = 0xc5
+pipe 5 (closed) bound   = 0xc6
+PING
+PONG,1,3

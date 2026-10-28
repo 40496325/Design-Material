@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>26 — ESP32-S3 Controller GPIO &amp; Crane Package Map</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .pin-chip { transition: all 0.15s ease; }
+    .pin-chip:hover { transform: translateY(-1px); }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.5); border-radius: 3px; }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+    .animate-pulse-slow { animation: pulse-slow 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- Top Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-mono font-bold text-sm shadow-inner">
+          S3
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-mono text-xs uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Doc 26</span>
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">ESP32-S3 Controller GPIO &amp; Crane Package Visualizer</h1>
+          </div>
+          <p class="text-xs text-slate-400">
+            NWU Engineering Core Board (<span class="font-mono text-slate-300">ESP32S3Devboard.pdf</span>, KiCad 10.0.2 Rev 2, 2026-09-20) • Evidence Date: <span class="font-mono text-slate-300">2026-10-15</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Global Quick Filter & Actions -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <div class="relative">
+          <input id="globalSearchInput" type="text" placeholder="Search GPIO, net, J7, EE1, SPWM..."
+            class="w-52 sm:w-64 bg-slate-900 border border-slate-700/80 rounded-lg pl-8 pr-7 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
+          <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <button id="clearSearchBtn" title="Clear search" class="hidden absolute right-2 top-1.5 text-slate-400 hover:text-white text-xs font-bold">✕</button>
+        </div>
+
+        <button id="copySummaryBtn" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+          <span>Copy CSV Map</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto custom-scroll border-t border-slate-900/80 pt-1">
+      <button data-tab="topology" class="nav-tab px-3.5 py-2 text-xs sm:text-sm font-medium border-b-2 border-cyan-400 text-cyan-300 whitespace-nowrap transition">
+        1. Board &amp; Package Topology
+      </button>
+      <button data-tab="connectors" class="nav-tab px-3.5 py-2 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition">
+        2. Physical Connectors (J1/J7/J3/J4/J6)
+      </button>
+      <button data-tab="packages" class="nav-tab px-3.5 py-2 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition">
+        3. Crane Packages &amp; Pin Budget
+      </button>
+      <button data-tab="master" class="nav-tab px-3.5 py-2 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition">
+        4. Master U1 GPIO Table (36 Pins)
+      </button>
+      <button data-tab="cautions" class="nav-tab px-3.5 py-2 text-xs sm:text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition flex items-center gap-1.5">
+        <span>5. Bring-Up &amp; 8 Risk Gates</span>
+        <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40">8</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Toast notification -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden bg-emerald-950/95 border border-emerald-500/50 text-emerald-200 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium items-center gap-2">
+    <span id="toastText">Copied to clipboard!</span>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-6">
+
+    <!-- Top KPI & Status Legend Strip -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+      <button data-quick-filter="COMMITTED" class="kpi-card text-left p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-medium text-slate-400">Firmware-Committed</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        </div>
+        <div class="text-xl font-bold font-mono text-emerald-300 mt-1">13 GPIOs</div>
+        <div class="text-[10px] font-mono text-slate-400 mt-0.5 truncate">2,8,9,11-15,38-40,47,48</div>
+      </button>
+
+      <button data-quick-filter="FREE_HEADER" class="kpi-card text-left p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-medium text-slate-400">Free Header GPIOs</span>
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+        </div>
+        <div class="text-xl font-bold font-mono text-cyan-300 mt-1">7 + CS(17)</div>
+        <div class="text-[10px] font-mono text-slate-400 mt-0.5 truncate">J7: 1,4,10,18,21,41,42 | J1: 17</div>
+      </button>
+
+      <button data-quick-filter="EXPANDER" class="kpi-card text-left p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-violet-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-medium text-slate-400">I2C Expander (0x20)</span>
+          <span class="w-2 h-2 rounded-full bg-violet-400"></span>
+        </div>
+        <div class="text-xl font-bold font-mono text-violet-300 mt-1">15 + GPB0</div>
+        <div class="text-[10px] font-mono text-slate-400 mt-0.5 truncate">J3 GPA0-7, J4 GPB1-7 + JP4</div>
+      </button>
+
+      <button data-quick-filter="ADC" class="kpi-card text-left p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-blue-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-medium text-slate-400">ADS1220 Analog (J6)</span>
+          <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+        </div>
+        <div class="text-xl font-bold font-mono text-blue-300 mt-1">4 Ch (AIN0-3)</div>
+        <div class="text-[10px] font-mono text-slate-400 mt-0.5 truncate">EE1 + EE2 + MC2 Diff = 4/4</div>
+      </button>
+
+      <button data-quick-filter="CONTESTED" class="kpi-card text-left p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-medium text-slate-400">Direct PWM Demand</span>
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+        </div>
+        <div class="text-xl font-bold font-mono text-amber-300 mt-1">~12 Signals</div>
+        <div class="text-[10px] font-mono text-slate-400 mt-0.5 truncate">vs 7+1 free header pins (OPEN)</div>
+      </button>
+
+      <button data-quick-filter="UNUSABLE" class="kpi-card text-left p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-rose-500/50 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-medium text-slate-400">Off-Limits / NC</span>
+          <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+        </div>
+        <div class="text-xl font-bold font-mono text-rose-300 mt-1">9 Pins + EN</div>
+        <div class="text-[10px] font-mono text-slate-400 mt-0.5 truncate">0,19,20 + NC: 3,35-37,45,46</div>
+      </button>
+    </section>
+
+    <!-- Evidence Chain & Authority Legend Bar -->
+    <div class="bg-slate-900/70 border border-slate-800/90 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Evidence Status:</span>
+        <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono text-[11px]">MEASURED (Boot Log 2026-10-15)</span>
+        <span class="px-2 py-0.5 rounded bg-teal-500/15 text-teal-300 border border-teal-500/30 font-mono text-[11px]">VERIFIED (Schematic + main.c)</span>
+        <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[11px]">PROPOSED (Engineering / Draft ICD)</span>
+        <span class="px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 font-mono text-[11px]">TBD / OPEN (Unresolved)</span>
+        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono text-[11px]">RESERVED / NC</span>
+      </div>
+      <div class="text-[11px] text-slate-400">
+        Click any <span class="text-cyan-300 font-medium">GPIO chip</span>, <span class="text-cyan-300 font-medium">Connector pin</span>, or <span class="text-cyan-300 font-medium">Package block</span> to inspect its full net path &amp; evidence.
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: BOARD & PACKAGE TOPOLOGY            -->
+    <!-- ========================================== -->
+    <section id="tab-topology" class="tab-panel space-y-6">
+
+      <!-- Package Filter Pills -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-xs text-slate-400 mr-1 font-medium">Highlight Crane Package / Subsystem:</span>
+          <button data-pkg="ALL" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-500/20 text-cyan-200 border border-cyan-500/50">All (36)</button>
+          <button data-pkg="EE1" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-orange-300 border border-orange-500/30 hover:bg-orange-500/15">EE1: VFD (IR1)</button>
+          <button data-pkg="EE2" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/15">EE2: Magnet (IR2)</button>
+          <button data-pkg="MC2" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-purple-300 border border-purple-500/30 hover:bg-purple-500/15">MC2: Trolley &amp; Hoist (IR3/IR4)</button>
+          <button data-pkg="REII" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-sky-300 border border-sky-500/30 hover:bg-sky-500/15">REII: Radio / Comms</button>
+          <button data-pkg="ONBOARD" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/15">On-Board Buses &amp; Power</button>
+          <button data-pkg="EXP" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-pink-300 border border-pink-500/30 hover:bg-pink-500/15">Expansion (IR5) / Expander</button>
+          <button data-pkg="NC" class="pkg-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800/80 text-slate-400 border border-slate-700 hover:bg-slate-700">Reserved / NC</button>
+        </div>
+        <span id="activeFilterCount" class="text-xs font-mono text-cyan-300">Showing all 36 U1 entries</span>
+      </div>
+
+      <!-- 3-Tier System Architecture Diagram + Interactive Pin Inspector -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+        <!-- Left 8 cols: System Context Flow + U1 Chip Grid -->
+        <div class="lg:col-span-8 space-y-5">
+
+          <!-- System Context Flow (§1 Visualized) -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider">§1. System Context — Where GPIOs Go, Per Package</h2>
+                <p class="text-xs text-slate-400">Interactive block diagram of Ground Station → NWU ESP32-S3 Core Board → Student Opto-Isolated IO Board → Crane Packages</p>
+              </div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Click any block to filter pins</span>
+            </div>
+
+            <!-- Tier 1: REII Ground & RF Link -->
+            <div class="p-3 rounded-xl bg-sky-950/25 border border-sky-500/30">
+              <div class="flex items-center justify-between text-xs mb-2">
+                <span class="font-bold text-sky-300 font-mono">TIER 1 — REII TELEMETRY &amp; RF LINK (Unsigned ICD_REII.pdf §1)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">Rig nRF Code: NOT STARTED</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs items-center">
+                <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800 text-center">
+                  <div class="font-semibold text-slate-200">PC Dashboard (SW)</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">USB Serial Link</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-900/90 border border-slate-800 text-center">
+                  <div class="font-semibold text-slate-200">Ground ESP (NodeMCU-32S)</div>
+                  <div class="text-[10px] text-slate-400 font-mono mt-0.5">D-08/D-09 (Supersedes STM32F411)</div>
+                </div>
+                <div class="p-2 rounded-lg bg-sky-900/30 border border-sky-500/40 text-center">
+                  <div class="font-semibold text-sky-200">nRF24L01+ (Ground)</div>
+                  <div class="text-[10px] text-sky-300 font-mono mt-0.5">)) 2.4 GHz RF Link ((</div>
+                </div>
+                <button data-pkg="REII" class="pkg-jump-btn p-2 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/50 text-center transition">
+                  <div class="font-bold text-sky-200">nRF24L01+ (Crane Rig)</div>
+                  <div class="text-[10px] text-sky-300 font-mono mt-0.5">J1 SPI + CSN(17) + CE(10/16?)</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Tier 2: NWU ESP32-S3 Core Board -->
+            <div class="p-3.5 rounded-xl bg-slate-950/90 border-2 border-cyan-500/40 space-y-3">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <span class="font-bold text-xs sm:text-sm text-white font-mono">TIER 2 — NWU ESP32-S3 CORE BOARD (U1 = ESP32-S3-WROOM-1U, Lecture-Supplied)</span>
+                </div>
+                <span class="text-[11px] font-mono text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">16 MB Flash Measured • ESP-IDF v6.1</span>
+              </div>
+
+              <!-- Internal Buses & On-board Peripherals -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+                <div data-select-gpio="47" class="gpio-trigger cursor-pointer p-2.5 rounded-lg bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-emerald-300">Switched Rail +3.3VP</span>
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-200">GPIO 47</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-1">U6 TPS22917 (+150 ms settle). Gates J1.8, J3/J4.11, ADS1220, MCP23017, RTCC, uSD, AHT20, OLED, J6.</p>
+                </div>
+
+                <div data-select-gpio="8" class="gpio-trigger cursor-pointer p-2.5 rounded-lg bg-slate-900 border border-teal-500/30 hover:border-teal-400 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-teal-300">I2C Bus (SDA 8 / SCL 9)</span>
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-200">MEASURED</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-1">MCP23017 <span class="font-mono text-slate-200">0x20</span> • AHT20 <span class="font-mono text-slate-200">0x38</span> (27.7°C) • PCF8563 <span class="font-mono text-slate-200">0x51</span> • J8 OLED <span class="font-mono text-slate-200">0x3C</span> • J1.9/10</p>
+                </div>
+
+                <div data-select-gpio="12" class="gpio-trigger cursor-pointer p-2.5 rounded-lg bg-slate-900 border border-cyan-500/30 hover:border-cyan-400 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-cyan-300">SPI2 Bus (12 / 11 / 13)</span>
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-200">SHARED</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-1">ADS1220 (<span class="font-mono text-slate-200">CS14, DRDY15</span>) • microSD (<span class="font-mono text-slate-200">CS2</span>) • J1 Comms (<span class="font-mono text-amber-300">CS17 floats!</span>)</p>
+                </div>
+
+                <div data-select-gpio="38" class="gpio-trigger cursor-pointer p-2.5 rounded-lg bg-slate-900 border border-orange-500/30 hover:border-orange-400 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-orange-300">MCPWM 3-Phase SPWM</span>
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-200">GPIO 38/39/40</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-1">Measured running <span class="font-mono text-slate-200">20 kHz carrier / 50.0 Hz sine</span> on J7.8/7/6. Proposed EE1 VFD bank.</p>
+                </div>
+
+                <div data-select-gpio="19" class="gpio-trigger cursor-pointer p-2.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-slate-500 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-200">Native USB-C (J5) &amp; UART0</span>
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">19/20 &amp; 43/44</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-1">D-/D+ (19/20) via USBLC6 → COM12 monitor. UART0 (43/44) on J7.1/2 traffic unverified.</p>
+                </div>
+
+                <div data-select-gpio="48" class="gpio-trigger cursor-pointer p-2.5 rounded-lg bg-slate-900 border border-pink-500/30 hover:border-pink-400 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-pink-300">Status LED &amp; Expander Ctrl</span>
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-200">48 &amp; 5/6/7/16</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-1">WS2812B on <span class="font-mono text-slate-200">GPIO48</span> (verified). MCP23017 RST/INTB/INTA (5/6/7), RTCC_INT (16).</p>
+                </div>
+              </div>
+
+              <!-- Board Edge Headers Bar -->
+              <div class="pt-2 border-t border-slate-800">
+                <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-2">Board Edge Connectors (Candidate Attach Points — Allocation Not Yet Agreed)</div>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                  <button data-goto-connector="J1" class="conn-jump-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-sky-500/40 text-left transition">
+                    <div class="font-mono font-bold text-sky-300">J1 Comms (10p)</div>
+                    <div class="text-[10px] text-slate-400">SPI2 + CS(17) + I2C + 5V⚠/3.3VP</div>
+                  </button>
+                  <button data-goto-connector="J7" class="conn-jump-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-orange-500/40 text-left transition">
+                    <div class="font-mono font-bold text-orange-300">J7 Breakout (12p)</div>
+                    <div class="text-[10px] text-slate-400">UART0 + IO1..6 + IO_A..D</div>
+                  </button>
+                  <button data-goto-connector="J3J4" class="conn-jump-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-violet-500/40 text-left transition">
+                    <div class="font-mono font-bold text-violet-300">J3/J4 Exp (2×12p)</div>
+                    <div class="text-[10px] text-slate-400">MCP23017 GPA0-7 / GPB0-7</div>
+                  </button>
+                  <button data-goto-connector="J6" class="conn-jump-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-blue-500/40 text-left transition">
+                    <div class="font-mono font-bold text-blue-300">J6 ADC_Port (12p)</div>
+                    <div class="text-[10px] text-slate-400">ADS1220 AIN0-3 + REF + 3.3VP</div>
+                  </button>
+                  <button data-goto-connector="OTHER" class="conn-jump-btn p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-left transition">
+                    <div class="font-mono font-bold text-slate-300">J2 / J5 / J8 / J9</div>
+                    <div class="text-[10px] text-slate-400">5V_EXT, USB-C, OLED, Power</div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tier 3: Student Opto-Isolated IO Board & Crane Packages -->
+            <div class="p-3.5 rounded-xl bg-slate-900/95 border border-amber-500/30 space-y-2.5">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <span class="font-bold text-xs text-amber-300 font-mono">TIER 3 — STUDENT PERFBOARD IO BOARD (Opto-Isolated, Slide 7 • Owner EE2 or MC2 TBD)</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Pin Budget: OPEN — RESOLVE BEFORE ICD</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 text-xs">
+                <button data-pkg="EE1" class="pkg-jump-btn p-2.5 rounded-lg bg-orange-950/30 hover:bg-orange-900/40 border border-orange-500/40 text-left transition">
+                  <div class="font-bold text-orange-300">EE1 — VFD (IR1)</div>
+                  <div class="text-[11px] text-slate-300 mt-1">6× iso gate/PWM + 1 res</div>
+                  <div class="text-[10px] font-mono text-orange-200/80 mt-0.5">J7.3–8 (38-42, 1) + J6 ANx</div>
+                </button>
+                <button data-pkg="EE2" class="pkg-jump-btn p-2.5 rounded-lg bg-yellow-950/30 hover:bg-yellow-900/40 border border-yellow-500/40 text-left transition">
+                  <div class="font-bold text-yellow-300">EE2 — Magnet (IR2)</div>
+                  <div class="text-[11px] text-slate-300 mt-1">1× iso PWM + I_sense</div>
+                  <div class="text-[10px] font-mono text-yellow-200/80 mt-0.5">PWM Contested! + J6 ANx</div>
+                </button>
+                <button data-pkg="MC2" class="pkg-jump-btn p-2.5 rounded-lg bg-purple-950/30 hover:bg-purple-900/40 border border-purple-500/40 text-left transition">
+                  <div class="font-bold text-purple-300">MC2 — Trolley (IR3)</div>
+                  <div class="text-[11px] text-slate-300 mt-1">Dir, PWM, Quad Enc ×2</div>
+                  <div class="text-[10px] font-mono text-purple-200/80 mt-0.5">J7.9–12 (IO_A..D: 18,10,4,21)</div>
+                </button>
+                <button data-pkg="MC2" class="pkg-jump-btn p-2.5 rounded-lg bg-purple-950/30 hover:bg-purple-900/40 border border-purple-500/40 text-left transition">
+                  <div class="font-bold text-purple-300">MC2 — Hoist (IR4)</div>
+                  <div class="text-[11px] text-slate-300 mt-1">Load cell + Slow Brake</div>
+                  <div class="text-[10px] font-mono text-purple-200/80 mt-0.5">J6 Diff (2 AIN) + J3/J4 Brake</div>
+                </button>
+                <button data-pkg="EXP" class="pkg-jump-btn p-2.5 rounded-lg bg-pink-950/30 hover:bg-pink-900/40 border border-pink-500/40 text-left transition">
+                  <div class="font-bold text-pink-300">Expansion (IR5)</div>
+                  <div class="text-[11px] text-slate-300 mt-1">5-pin logic header</div>
+                  <div class="text-[10px] font-mono text-pink-200/80 mt-0.5">J3/J4 MCP23017 or IO-board</div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive U1 Chip GPIO Grid -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider">U1 — ESP32-S3-WROOM-1U Interactive GPIO Matrix (Schematic p2)</h2>
+                <p class="text-xs text-slate-400">Every GPIO mapped in §2 with schematic net, header target, and package assignment</p>
+              </div>
+              <div class="flex items-center gap-2 text-[11px] font-mono">
+                <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30">EE1</span>
+                <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">MC2</span>
+                <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">REII</span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">SYS</span>
+              </div>
+            </div>
+
+            <div id="gpioChipGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 4 cols: Sticky Inspector Panel -->
+        <div class="lg:col-span-4 lg:sticky lg:top-28 space-y-4">
+          <div id="pinInspectorCard" class="bg-slate-900 border-2 border-cyan-500/50 rounded-2xl p-4 shadow-xl space-y-4">
+            <!-- Populated by JS on load & click -->
+          </div>
+
+          <!-- Quick Contention Callout Box -->
+          <div class="bg-amber-950/30 border border-amber-500/40 rounded-2xl p-4 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400 font-bold text-sm">⚠ Core Pin Contention Summary (§7)</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              The core board exposes <span class="font-mono font-bold text-cyan-300">7 free GPIOs on J7</span> (<span class="font-mono">1, 4, 10, 18, 21, 41, 42</span>) + <span class="font-mono font-bold text-cyan-300">1 spare CS on J1.1</span> (<span class="font-mono">17</span>), plus 3 active SPWM pins (<span class="font-mono">38, 39, 40</span>).
+            </p>
+            <ul class="text-xs text-slate-300 space-y-1 list-disc pl-4">
+              <li><span class="text-orange-300 font-medium">EE1 (6 gate/PWM)</span> claims J7.3–J7.8 (<span class="font-mono">1, 42, 41, 40, 39, 38</span>), leaving no free pin for its +1 reserve or <span class="text-yellow-300 font-medium">EE2's magnet PWM</span>.</li>
+              <li><span class="text-purple-300 font-medium">MC2 (4 trolley lines)</span> claims J7.9–J7.12 (<span class="font-mono">18, 10, 4, 21</span>), which directly contests <span class="text-sky-300 font-medium">REII nRF CE/IRQ</span> candidates (<span class="font-mono">GPIO 10 / 18</span>).</li>
+            </ul>
+            <button data-OpenTab="packages" class="tab-jump-link w-full mt-2 py-1.5 px-3 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 text-xs font-semibold transition">
+              Explore Pin Budget &amp; Resolution Simulator →
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: PHYSICAL CONNECTORS                 -->
+    <!-- ========================================== -->
+    <section id="tab-connectors" class="tab-panel hidden space-y-6">
+
+      <!-- Connector Selector Sub-bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+        <div>
+          <h2 class="text-sm font-bold text-white">§3. Visually Verified Connector Pinouts (Schematic pp 2/4/5)</h2>
+          <p class="text-xs text-slate-400">All U1/J1/J7/J3/J4/J6 rows re-bound by PDF word coordinates and visual PNG inspection (2026-10-15)</p>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          <button data-scroll-conn="conn-j1" class="conn-scroll-btn px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-sky-300 border border-sky-500/30">J1 Comms</button>
+          <button data-scroll-conn="conn-j7" class="conn-scroll-btn px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-orange-300 border border-orange-500/30">J7 GPIO (12p)</button>
+          <button data-scroll-conn="conn-j3j4" class="conn-scroll-btn px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-violet-300 border border-violet-500/30">J3/J4 Expander</button>
+          <button data-scroll-conn="conn-j6" class="conn-scroll-btn px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-blue-300 border border-blue-500/30">J6 ADC_Port</button>
+          <button data-scroll-conn="conn-other" class="conn-scroll-btn px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-emerald-300 border border-emerald-500/30">Power Tree &amp; J2/J5/J8/J9</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- J1 Comms Expander -->
+        <div id="conn-j1" class="bg-slate-900/90 border border-sky-500/40 rounded-2xl p-4 space-y-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">REII Radio Target Header</span>
+              <h3 class="text-base font-bold text-white mt-1">J1 — "Comms Exander" (10-Pin Header)</h3>
+              <p class="text-xs text-slate-400">Intended comms/radio header carrying SPI2, spare CS (GPIO17), I2C, and power</p>
+            </div>
+            <span class="font-mono text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">VERIFIED</span>
+          </div>
+
+          <!-- 2x5 Visual Pinout Box -->
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+            <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2 text-center">J1 Physical / Schematic Dual-Column Layout</div>
+            <div id="j1PinoutContainer" class="grid grid-cols-2 gap-2.5">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Fatal Hazard Alert -->
+          <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/50 flex items-start gap-2.5">
+            <span class="text-rose-400 text-base leading-none mt-0.5">⚠</span>
+            <div class="text-xs text-rose-200 space-y-1">
+              <div class="font-bold text-rose-300">CRITICAL 5V MIS-PLUG HAZARD (Pin 7 vs Pin 8):</div>
+              <p>Pin 7 (<span class="font-mono font-bold">+5V</span>) sits directly beside Pin 8 (<span class="font-mono font-bold">+3.3VP</span>, gated by GPIO47). Plugging 5 V into an nRF24L01+ VCC <span class="underline font-semibold">destroys the module</span> (<span class="font-mono">docs/04_rf_baseline.md §3</span>). The harness must key Pin 8 only (<span class="font-mono">docs/27 §1</span>). Also note: <span class="font-mono">GPIO17 (SPI_xCS)</span> floats in starter firmware—drive output-high before SPI2 bus init.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- J7 Conn_01x12 -->
+        <div id="conn-j7" class="bg-slate-900/90 border border-orange-500/40 rounded-2xl p-4 space-y-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30">Direct GPIO &amp; MCPWM Breakout</span>
+              <h3 class="text-base font-bold text-white mt-1">J7 — Conn_01x12 (12-Pin GPIO Breakout)</h3>
+              <p class="text-xs text-slate-400">UART0 console (1–2) + 6 consecutive PWM/GPIO nets (3–8) + 4 IO_A..D nets (9–12)</p>
+            </div>
+            <span class="font-mono text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">VERIFIED</span>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+            <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2 text-center">J7 Pinout (Pins 1–6 Left • Pins 7–12 Right)</div>
+            <div id="j7PinoutContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+            <div class="p-2.5 rounded-xl bg-orange-950/30 border border-orange-500/40">
+              <div class="font-bold text-orange-300">J7.3–J7.8 → EE1 VFD Bank (PROPOSED)</div>
+              <p class="text-[11px] text-slate-300 mt-0.5">Six consecutive direct-GPIO nets (<span class="font-mono">GPIO 1, 42, 41, 40, 39, 38</span>); 38/39/40 are <span class="text-emerald-300 font-mono">MEASURED</span> running 20 kHz MCPWM. ⚠ <span class="text-amber-300 font-semibold">Anomaly:</span> J7.3 net <span class="font-mono">IO6</span> is wired to <span class="font-mono">GPIO1</span> (not GPIO6!).</p>
+            </div>
+            <div class="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/40">
+              <div class="font-bold text-purple-300">J7.9–J7.12 → MC2 Trolley vs REII (CONTESTED)</div>
+              <p class="text-[11px] text-slate-300 mt-0.5">Four nets (<span class="font-mono">IO_A..IO_D = GPIO 18, 10, 4, 21</span>) match SysRS IR3's 4 trolley signals (dir, PWM, enc×2), but <span class="font-mono">GPIO 10/18</span> are also REII's primary nRF CE/IRQ candidates.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- J3 & J4 MCP23017 Expanders -->
+        <div id="conn-j3j4" class="bg-slate-900/90 border border-violet-500/40 rounded-2xl p-4 space-y-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30">I2C GPIO Expander @ 0x20</span>
+              <h3 class="text-base font-bold text-white mt-1">J3 (EXP_PortA) &amp; J4 (EXP_PortB) — MCP23017</h3>
+              <p class="text-xs text-slate-400">Address jumpers JP1/JP2/JP3 → GND = 0x20 (MEASURED at boot scan)</p>
+            </div>
+            <span class="font-mono text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">0x20 MEASURED</span>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 overflow-x-auto">
+            <table class="w-full text-xs text-left font-mono">
+              <thead>
+                <tr class="border-b border-slate-800 text-slate-400 text-[11px]">
+                  <th class="py-1.5 px-2">Pin</th>
+                  <th class="py-1.5 px-2 text-violet-300">J3 Net (Port A)</th>
+                  <th class="py-1.5 px-2 text-fuchsia-300">J4 Net (Port B)</th>
+                  <th class="py-1.5 px-2 border-l border-slate-800">Pin</th>
+                  <th class="py-1.5 px-2 text-violet-300">J3 Net (Port A)</th>
+                  <th class="py-1.5 px-2 text-fuchsia-300">J4 Net (Port B)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-900">
+                <tr>
+                  <td class="py-1.5 px-2 text-slate-400">1</td>
+                  <td class="py-1.5 px-2 text-slate-300">GND</td>
+                  <td class="py-1.5 px-2 text-slate-300">GND</td>
+                  <td class="py-1.5 px-2 border-l border-slate-800 text-slate-400">7</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA4</td>
+                  <td class="py-1.5 px-2 text-fuchsia-200">GPB4</td>
+                </tr>
+                <tr class="bg-rose-950/25">
+                  <td class="py-1.5 px-2 text-rose-400 font-bold">2</td>
+                  <td class="py-1.5 px-2 text-rose-300 font-bold">+5V ⚠</td>
+                  <td class="py-1.5 px-2 text-rose-300 font-bold">+5V ⚠</td>
+                  <td class="py-1.5 px-2 border-l border-slate-800 text-slate-400">8</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA5</td>
+                  <td class="py-1.5 px-2 text-fuchsia-200">GPB5</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 text-slate-400">3</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA0</td>
+                  <td class="py-1.5 px-2 text-amber-300">B0_Pin → JP4.3</td>
+                  <td class="py-1.5 px-2 border-l border-slate-800 text-slate-400">9</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA6</td>
+                  <td class="py-1.5 px-2 text-fuchsia-200">GPB6</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 text-slate-400">4</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA1</td>
+                  <td class="py-1.5 px-2 text-fuchsia-200">GPB1</td>
+                  <td class="py-1.5 px-2 border-l border-slate-800 text-slate-400">10</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA7</td>
+                  <td class="py-1.5 px-2 text-fuchsia-200">GPB7</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 text-slate-400">5</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA2</td>
+                  <td class="py-1.5 px-2 text-fuchsia-200">GPB2</td>
+                  <td class="py-1.5 px-2 border-l border-slate-800 text-slate-400">11</td>
+                  <td class="py-1.5 px-2 text-emerald-300">+3.3VP</td>
+                  <td class="py-1.5 px-2 text-emerald-300">+3.3VP</td>
+                </tr>
+                <tr>
+                  <td class="py-1.5 px-2 text-slate-400">6</td>
+                  <td class="py-1.5 px-2 text-violet-200">GPA3</td>
+                  <td class="py-1.5 px-2 text-fuchsia-200">GPB3</td>
+                  <td class="py-1.5 px-2 border-l border-slate-800 text-slate-400">12</td>
+                  <td class="py-1.5 px-2 text-slate-300">GND</td>
+                  <td class="py-1.5 px-2 text-slate-300">GND</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- JP4 Interactive Jumper Switcher -->
+          <div class="p-3 rounded-xl bg-slate-950 border border-violet-500/30 space-y-2">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="text-xs font-bold text-violet-300 font-mono">Solder Jumper JP4 Routing (GPB0 Path)</span>
+              <div class="flex gap-1.5">
+                <button id="jp4Mode12" class="px-2 py-0.5 rounded text-[11px] font-mono bg-violet-500/20 text-violet-200 border border-violet-500/40">Bridge 1–2 (MMC_CD)</button>
+                <button id="jp4Mode23" class="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-300 border border-slate-700">Bridge 2–3 (J4.3 B0_Pin)</button>
+              </div>
+            </div>
+            <p id="jp4StatusText" class="text-xs text-slate-300">
+              <span class="font-mono text-amber-300">JP4 (1=MMC_CD, 2=MCP GPB0, 3=B0_Pin=J4.3):</span> Bridging <span class="font-mono font-semibold">1–2</span> routes microSD card-detect to MCP23017 GPB0 (starter firmware uses no card-detect). Bridging <span class="font-mono font-semibold">2–3</span> brings GPB0 out to header pin <span class="font-mono">J4.3</span>.
+            </p>
+            <p class="text-[11px] text-rose-300">
+              ⚠ <span class="font-semibold">J3/J4 Pin 2 = +5V:</span> Lecture gate requires all pins 0–3 V. Use pins 3–10 (+ 1/11/12 power/GND) only with 3.3 V-tolerant wiring. Candidate landing for <span class="text-purple-300">MC2 brake control (IR4)</span> and <span class="text-pink-300">IR5 5-pin expansion</span>.
+            </p>
+          </div>
+        </div>
+
+        <!-- J6 ADC_Port -->
+        <div id="conn-j6" class="bg-slate-900/90 border border-blue-500/40 rounded-2xl p-4 space-y-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">24-Bit SPI ADC Front-End</span>
+              <h3 class="text-base font-bold text-white mt-1">J6 — ADC_Port (12-Pin, ADS1220 Analog Front End)</h3>
+              <p class="text-xs text-slate-400">1 kΩ + 2.2 nF input filters (R17/18/24/27, C23/24/27/28); C25/C26 for differential use</p>
+            </div>
+            <span class="font-mono text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">ADS1220 OK</span>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+            <div id="j6PinoutContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- 4-Channel Analog Budget Breakdown -->
+          <div class="p-3 rounded-xl bg-blue-950/30 border border-blue-500/40 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-blue-300">§7 ADC Channel Budget (4 Single-Ended Channels Total)</span>
+              <span class="font-mono text-[11px] text-amber-300">4 / 4 Channels Demanded (0 Spare)</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 pt-1">
+              <div class="p-2 rounded bg-slate-900 border border-orange-500/30">
+                <div class="font-mono font-bold text-orange-300">1× AIN (EE1 IR1)</div>
+                <div class="text-[10px] text-slate-400">VFD Current Sense ≤2.048 V</div>
+              </div>
+              <div class="p-2 rounded bg-slate-900 border border-yellow-500/30">
+                <div class="font-mono font-bold text-yellow-300">1× AIN (EE2 IR2)</div>
+                <div class="text-[10px] text-slate-400">Magnet Current ≤2.048 V</div>
+              </div>
+              <div class="p-2 rounded bg-slate-900 border border-purple-500/30">
+                <div class="font-mono font-bold text-purple-300">2× AIN Diff (MC2 IR4)</div>
+                <div class="text-[10px] text-slate-400">Hoist Load Cell (or HX711)</div>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-300">
+              Note: Starter firmware polls <span class="font-mono">AIN0</span> (measured ≈ <span class="font-mono">0.003–0.004 V</span> floating filter input; the comment "onboard potentiometer" in <span class="font-mono">main.c:116</span> is SupaNODE heritage — this board has no pot).
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Power Tree & Other Connectors (J2, J5, J8, J9, uSD) -->
+      <div id="conn-other" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">§3 &amp; §4. Power Tree (Schematic p3, VERIFIED) &amp; Auxiliary Connectors</h3>
+
+        <!-- Visual Power Tree Flow -->
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+          <div class="text-[10px] font-mono uppercase text-slate-400 mb-2">Verified Power Distribution &amp; GPIO47 Load Switch Architecture</div>
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-2.5 items-center text-xs">
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-700">
+              <div class="font-mono font-bold text-slate-200">Inputs: J5 VUSB ∥ J2 5V_EXT</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">J2: Dual AO3401A rev-polarity + F1 1A fuse (500 mA hold)</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-amber-500/30">
+              <div class="font-mono font-bold text-amber-300">U11 LM66200 → +5V Rail</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Ideal-diode OR • Lights <span class="text-slate-200">D7 LED</span> • Goes to J1.7, J3.2, J4.2, J9</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-emerald-500/40">
+              <div class="font-mono font-bold text-emerald-300">U3 TLV75733 → +3.3V Always-On</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Lights <span class="text-slate-200">D1 "3VS" LED</span> • Powers ESP32-S3 + R8/R9 I2C pull-ups</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-cyan-950/40 border border-cyan-500/50">
+              <div class="font-mono font-bold text-cyan-300">U6 TPS22917 (ON = GPIO47)</div>
+              <div class="text-[10px] text-cyan-200/80 mt-0.5">Switched Load Gate • Driven HIGH + 150 ms in <span class="font-mono">app_main</span></div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/50">
+              <div class="font-mono font-bold text-emerald-200">+3.3VP Switched Rail (D2 LED)</div>
+              <div class="text-[10px] text-slate-300 mt-0.5">Feeds J1.8, J3/J4.11, J6.1, ADS1220, MCP23017, RTCC, uSD, AHT20, J8</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Connectors Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="font-mono font-bold text-cyan-300">J5 — USB-C</div>
+            <p class="text-[11px] text-slate-400 mt-1">VBUS→<span class="font-mono">VUSB</span>; D±→<span class="font-mono">CON_D±</span>→U2 USBLC6→GPIO19/20; CC1/CC2 5.1k (R1/R2). Measured flashing + monitor on COM12.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="font-mono font-bold text-amber-300">J2 — External 5V (2-Pin)</div>
+            <p class="text-[11px] text-slate-400 mt-1">Dual AO3401A reverse-polarity protection, F1 1 A (500 mA hold) → <span class="font-mono">5V_EXT</span>. Respect lecture external-5V abuse limit.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="font-mono font-bold text-rose-300">J9 — Power Header (TBD)</div>
+            <p class="text-[11px] text-slate-400 mt-1">Breaks out <span class="font-mono">+3.3VP / +3.3V / +5V / GND</span>. ⚠ <span class="text-rose-300 font-semibold">Pin order not established in this pass (TBD — measure before use).</span></p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="font-mono font-bold text-teal-300">J8 — Display (4-Pin OLED)</div>
+            <p class="text-[11px] text-slate-400 mt-1">VCC=+3.3VP (R47 0Ω; +5V R36 DNP), GND, <span class="font-mono">I2C_SCL</span> (R33 0Ω), <span class="font-mono">I2C_SDA</span> (R34 0Ω). Confirm pin numbering before plug-in. <span class="font-mono">OLED_ENABLED 0</span>.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="font-mono font-bold text-emerald-300">uSD (uSDMMC1)</div>
+            <p class="text-[11px] text-slate-400 mt-1">SPI2 mode: CLK=12, CMD=11, DAT0=13, CD/DAT3=<span class="font-mono">MMC_CS (GPIO2)</span>. Card-detect <span class="font-mono">MMC_CD</span> → JP4. Boot timeout = no card inserted.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: CRANE PACKAGES & PIN BUDGET         -->
+    <!-- ========================================== -->
+    <section id="tab-packages" class="tab-panel hidden space-y-6">
+
+      <!-- Package Requirements vs Physical Board Table (§7) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">§7. Package Routing — Required vs Available (The Open Allocation Problem)</h2>
+            <p class="text-xs text-slate-400">Authority: SysRS §4.1 (IR1–IR5) &amp; Package SoWs vs Physical NWU ESP32-S3 Board Headers</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-lg text-xs font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30">Slide 7: "OPEN — RESOLVE BEFORE THE ICD IS DRAFTED"</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-400 uppercase text-[11px] font-mono bg-slate-950/60">
+                <th class="py-2.5 px-3">Work Package / Demand</th>
+                <th class="py-2.5 px-3">Authority</th>
+                <th class="py-2.5 px-3 text-right">Count</th>
+                <th class="py-2.5 px-3">Speed / Signal Need</th>
+                <th class="py-2.5 px-3">Best-Fit Landing on This Board</th>
+                <th class="py-2.5 px-3">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/70">
+              <tr class="hover:bg-slate-800/40">
+                <td class="py-2.5 px-3 font-semibold text-orange-300">EE1 Gate / PWM</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR1 / SoW EEII I #7</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">6 (+1 res)</td>
+                <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-200 font-mono text-[10px]">YES — PWM (Direct/MCPWM)</span></td>
+                <td class="py-2.5 px-3 font-mono text-slate-200">J7.3–J7.8 (GPIO 1, 42, 41, 40, 39, 38); 38/39/40 MEASURED MCPWM</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[10px]">PROPOSED</span></td>
+              </tr>
+              <tr class="hover:bg-slate-800/40">
+                <td class="py-2.5 px-3 font-semibold text-orange-300">EE1 Current Sense</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR1 / SoW EEII I #7</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">1 ADC ch</td>
+                <td class="py-2.5 px-3 text-slate-400">Analog ≤2.048 V</td>
+                <td class="py-2.5 px-3 font-mono text-slate-200">J6 ANx → ADS1220 (channel TBD)</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[10px]">PROPOSED (ch TBD)</span></td>
+              </tr>
+              <tr class="bg-rose-950/15 hover:bg-rose-950/30">
+                <td class="py-2.5 px-3 font-semibold text-yellow-300">EE2 Magnet PWM</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR2 / SoW EEII II #5</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">1</td>
+                <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-200 font-mono text-[10px]">YES — PWM</span></td>
+                <td class="py-2.5 px-3 text-slate-300">No direct GPIO left after EE1+MC2 ⇒ contested: free <span class="font-mono text-amber-300">GPIO41/42</span> (if EE1 reserve defers), IO-board oscillator, or MCP23017 (I2C-rate-limited)</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-mono text-[10px]">OPEN / TBD</span></td>
+              </tr>
+              <tr class="hover:bg-slate-800/40">
+                <td class="py-2.5 px-3 font-semibold text-yellow-300">EE2 Current Sense</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR2 / SoW EEII II #5</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">1 ADC ch</td>
+                <td class="py-2.5 px-3 text-slate-400">Analog ≤2.048 V</td>
+                <td class="py-2.5 px-3 font-mono text-slate-200">J6 ANx → ADS1220 (channel TBD)</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[10px]">PROPOSED (ch TBD)</span></td>
+              </tr>
+              <tr class="bg-amber-950/15 hover:bg-amber-950/25">
+                <td class="py-2.5 px-3 font-semibold text-purple-300">MC2 Trolley (Dir/PWM/Enc×2)</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR3 / SoW MCTR I #4</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">4</td>
+                <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-200 font-mono text-[10px]">PWM + 2 Fast Quadrature In</span></td>
+                <td class="py-2.5 px-3 font-mono text-slate-200">J7.9–J7.12 (IO_A..IO_D = GPIO 18, 10, 4, 21) — contested with REII nRF</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[10px]">PROPOSED</span></td>
+              </tr>
+              <tr class="hover:bg-slate-800/40">
+                <td class="py-2.5 px-3 font-semibold text-purple-300">MC2 Hoist Load Cell</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR4 / SoW MCTR II #2,3</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">2 AIN (diff)</td>
+                <td class="py-2.5 px-3 text-slate-400">Diff Analog (or HX711 2 GPIO)</td>
+                <td class="py-2.5 px-3 text-slate-300">J6 differential pair ("not yet committed"); HX711 option has <span class="text-rose-300 font-semibold">no spare GPIO</span> under this split</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-mono text-[10px]">TBD</span></td>
+              </tr>
+              <tr class="hover:bg-slate-800/40">
+                <td class="py-2.5 px-3 font-semibold text-purple-300">MC2 Hoist Brake Control</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR4 / SoW MCTR II #5</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">1</td>
+                <td class="py-2.5 px-3 text-slate-400">Slow digital level</td>
+                <td class="py-2.5 px-3 font-mono text-slate-200">MCP23017 J3/J4 candidate</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[10px]">PROPOSED / TBD</span></td>
+              </tr>
+              <tr class="bg-sky-950/20 hover:bg-sky-950/30">
+                <td class="py-2.5 px-3 font-semibold text-sky-300">REII nRF24L01+ (CE / CSN / IRQ)</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">ICD_REII.pdf §1 (Draft)</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">3</td>
+                <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200 font-mono text-[10px]">CE Timing-Sensitive + CSN</span></td>
+                <td class="py-2.5 px-3 text-slate-300"><span class="font-mono text-emerald-300">CSN = GPIO17 (J1.1) ✔</span>; CE/IRQ = <span class="font-mono text-amber-300">GPIO10/18</span> (J7, contested w/ MC2) or <span class="font-mono text-amber-300">CE = GPIO16</span> (RTCC_INT fallback)</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-[10px]">PROPOSED (ICD TBD)</span></td>
+              </tr>
+              <tr class="hover:bg-slate-800/40">
+                <td class="py-2.5 px-3 font-semibold text-pink-300">Expansion Header</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">SysRS IR5</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">5</td>
+                <td class="py-2.5 px-3 text-slate-400">Protocol-agnostic logic</td>
+                <td class="py-2.5 px-3 text-slate-300">Not present as dedicated 5-pin on core board ⇒ MCP23017 J3/J4 remainder or IO-board-derived</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-mono text-[10px]">TBD</span></td>
+              </tr>
+              <tr class="hover:bg-slate-800/40">
+                <td class="py-2.5 px-3 font-semibold text-cyan-300">SPI2 Shared Bus</td>
+                <td class="py-2.5 px-3 font-mono text-slate-400">Schematic p2 / J1</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-200">3</td>
+                <td class="py-2.5 px-3 text-slate-300">High-speed SPI (SCK/MOSI/MISO)</td>
+                <td class="py-2.5 px-3 font-mono text-slate-200">J1 pins 2/3/4 (GPIO 11/12/13 shared) — no extra GPIO needed</td>
+                <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-teal-500/15 text-teal-300 border border-teal-500/30 font-mono text-[10px]">VERIFIED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Interactive Pin Budget Arithmetic & What-If Allocation Simulator -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">§7. Budget Arithmetic Discrepancy</h3>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Free J7 Signal GPIOs:</span>
+              <span class="font-mono font-bold text-cyan-300">7 (GPIO 1, 4, 10, 18, 21, 41, 42)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Active SPWM J7 GPIOs (EE1):</span>
+              <span class="font-mono font-bold text-orange-300">3 (GPIO 38, 39, 40)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Spare SPI2 CS on J1.1:</span>
+              <span class="font-mono font-bold text-sky-300">1 (GPIO 17)</span>
+            </div>
+            <div class="border-t border-slate-800 pt-2 flex justify-between">
+              <span class="text-slate-200 font-semibold">Total Header Signal Pins (J7 + J1.1):</span>
+              <span class="font-mono font-bold text-emerald-300">11 Pins (10 on J7 + 1 on J1)</span>
+            </div>
+            <div class="flex justify-between text-rose-300">
+              <span class="font-semibold">Fast / Direct-GPIO Demand:</span>
+              <span class="font-mono font-bold">~12+ Pins (Shortfall on J7!)</span>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-amber-950/25 border border-amber-500/30 text-xs space-y-1.5">
+            <div class="font-bold text-amber-300">Why Slide 7's Math Cannot Be Reproduced Here:</div>
+            <p class="text-slate-300 leading-relaxed">
+              Slide 7 states <span class="font-mono">"26 committed of 34 usable GPIO… 8 pins margin — 4 free, 4 strapping-reserved"</span>. On this physical board, the listed items sum to 22, and <span class="font-mono">J7</span> exposes only 10 signal GPIOs (plus UART0 on 43/44). Therefore, slow signals must migrate to the <span class="font-mono text-violet-300">MCP23017 (J3/J4)</span> and/or the student IO board, or the package split must change at group ICD decision <span class="font-mono">D-06</span>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive What-If Allocation Simulator -->
+        <div class="lg:col-span-7 bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-4 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider">Interactive D-06 ICD Pin Allocation Explorer</h3>
+              <p class="text-xs text-slate-400">Test the candidate trade-offs described in §7 &amp; <span class="font-mono">docs/27 §3</span> to see how header contention resolves</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Interactive Simulator</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <label class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-2.5 cursor-pointer hover:border-slate-700">
+              <input type="checkbox" id="simOptNrfCe16" class="mt-0.5 rounded border-slate-600 text-cyan-500 focus:ring-cyan-500" />
+              <div>
+                <div class="font-semibold text-sky-300">Use GPIO16 (RTCC_INT) for nRF CE + Poll IRQ</div>
+                <div class="text-[11px] text-slate-400">Frees J7 GPIO10 &amp; GPIO18 for MC2 Trolley (caveat: shares open-drain PCF8563 INT line via R40 0Ω).</div>
+              </div>
+            </label>
+
+            <label class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-2.5 cursor-pointer hover:border-slate-700">
+              <input type="checkbox" id="simOptDeferEe1Res" class="mt-0.5 rounded border-slate-600 text-cyan-500 focus:ring-cyan-500" />
+              <div>
+                <div class="font-semibold text-yellow-300">Keep EE1 to 6 Lines (No J7 Reserve) → Give 1 PWM to EE2</div>
+                <div class="text-[11px] text-slate-400">Wait: EE1 needs 6 lines (J7.3–8 = 6 pins). To free J7.4 (GPIO42) for EE2 Magnet PWM, 1 slow enable/fault line moves to MCP23017.</div>
+              </div>
+            </label>
+
+            <label class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-2.5 cursor-pointer hover:border-slate-700">
+              <input type="checkbox" id="simOptMcpBrakeExp" checked class="mt-0.5 rounded border-slate-600 text-cyan-500 focus:ring-cyan-500" />
+              <div>
+                <div class="font-semibold text-violet-300">Route MC2 Brake (IR4) &amp; 5-Pin Expansion (IR5) to J3/J4</div>
+                <div class="text-[11px] text-slate-400">Uses 6 of the 15+1 MCP23017 I2C expander pins on J3/J4 instead of direct ESP32-S3 GPIOs.</div>
+              </div>
+            </label>
+
+            <label class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-2.5 cursor-pointer hover:border-slate-700">
+              <input type="checkbox" id="simOptAdsLoadCell" checked class="mt-0.5 rounded border-slate-600 text-cyan-500 focus:ring-cyan-500" />
+              <div>
+                <div class="font-semibold text-blue-300">Use J6 ADS1220 Diff Pair for MC2 Load Cell (Not HX711)</div>
+                <div class="text-[11px] text-slate-400">Uses AIN2/AIN3 on J6 (4/4 ADC channels used) so HX711 doesn't demand 2 unavailable digital GPIOs.</div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Simulated Resulting J7 + J1 Allocation Bar -->
+          <div id="simResultBox" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: MASTER GPIO TABLE                   -->
+    <!-- ========================================== -->
+    <section id="tab-master" class="tab-panel hidden space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 rounded-xl p-3">
+        <div>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">§2. Master GPIO Table (U1 = ESP32-S3-WROOM-1U, Schematic p2)</h2>
+          <p class="text-xs text-slate-400">All 36 entries sorted by GPIO, cross-checked against <span class="font-mono">main/main.c:84-126</span> and the 2026-10-15 boot log</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="tableStatusFilter" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+            <option value="ALL">All Statuses (36)</option>
+            <option value="MEASURED">MEASURED in Boot Log</option>
+            <option value="VERIFIED">VERIFIED (Schematic / FW)</option>
+            <option value="PROPOSED">PROPOSED (Candidate)</option>
+            <option value="RESERVED">RESERVED / Strapping / USB</option>
+            <option value="NC">Unusable / NC (No Copper)</option>
+          </select>
+          <select id="tableConnectorFilter" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+            <option value="ALL">All Destinations</option>
+            <option value="J7">J7 (12-Pin Breakout)</option>
+            <option value="J1">J1 (Comms Expander)</option>
+            <option value="ONBOARD">On-Board (I2C/SPI/PWR/LED)</option>
+            <option value="USB">J5 USB-C</option>
+            <option value="NC">Not Routed (NC)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto custom-scroll">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/80 text-slate-400 font-mono text-[11px] uppercase">
+                <th class="py-2.5 px-3">GPIO</th>
+                <th class="py-2.5 px-3">WROOM Pin</th>
+                <th class="py-2.5 px-3">Schematic Net</th>
+                <th class="py-2.5 px-3">Goes To</th>
+                <th class="py-2.5 px-3">Package / Role</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Function / Evidence / Notes</th>
+              </tr>
+            </thead>
+            <tbody id="masterGpioTableBody" class="divide-y divide-slate-800/70">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: BRING-UP & 8 RISK GATES             -->
+    <!-- ========================================== -->
+    <section id="tab-cautions" class="tab-panel hidden space-y-6">
+
+      <!-- Top Row: §5 Bring-Up Status + §6 What Starter Does NOT Prove -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-7 bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">§5. Board Bring-Up Status (MEASURED 2026-10-15)</h2>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[11px] border border-emerald-500/30">Flashed &amp; Running</span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex justify-between gap-4">
+              <span class="font-mono text-slate-400 shrink-0">Build (ESP-IDF v6.1)</span>
+              <span class="text-slate-200 text-right">App <span class="font-mono text-emerald-300">0x4d420 B</span> (70% of 1 MB factory free); bootloader <span class="font-mono">0x5280 B</span> (README v6.0 note stale)</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex justify-between gap-4">
+              <span class="font-mono text-slate-400 shrink-0">Flash / Boot (COM12)</span>
+              <span class="text-slate-200 text-right">Boot <span class="font-mono">2026-10-15 19:22</span>; <span class="font-mono text-cyan-300">EngDes26_start</span> (<span class="font-mono">f465a43-dirty</span>); <span class="font-mono">rst:0x15 USB_UART_CHIP_RESET</span></span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-amber-500/40 flex justify-between gap-4">
+              <span class="font-mono text-amber-300 shrink-0">Chip / Flash Conflict</span>
+              <span class="text-slate-200 text-right"><span class="font-mono text-amber-300 font-bold">SPI Flash Size: 16MB</span> (DIO 80 MHz, rev v0.2) vs SysRS DR5 "WROOM-1 (N8R2)" (8 MB)</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex justify-between gap-4">
+              <span class="font-mono text-slate-400 shrink-0">Peripherals Measured</span>
+              <span class="text-slate-200 text-right">I2C <span class="font-mono text-emerald-300">0x20/0x38/0x51</span> (AHT20 27.7°C / 39.9%RH); ADS1220 OK; SPWM 20 kHz; WS2812B IO48 OK</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex justify-between gap-4">
+              <span class="font-mono text-slate-400 shrink-0">WiFi / PA Protection</span>
+              <span class="text-slate-200 text-right">Never started (ships without WiFi code per <span class="font-mono">main.c:28-37</span> PA-damage gate without external antenna)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">§6. What the Flashed Starter Does NOT Prove</h2>
+            <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono text-[11px] border border-amber-500/30">4 Verification Gaps</span>
+          </div>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <span class="font-bold text-sky-300">1. Zero RF / nRF24L01+ Code on Rig S3:</span> Zero RF24 references exist in <span class="font-mono">main/</span>; REII radio on the S3 is <span class="font-mono text-rose-300 font-semibold">NOT STARTED</span> (<span class="font-mono">docs/27</span>).
+            </li>
+            <li class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <span class="font-bold text-orange-300">2. Zero Package Pin Allocation in Firmware/ICD:</span> VFD, magnet, encoder, brake, and expansion pins do not exist in firmware or signed ICD — all are <span class="font-mono text-amber-300">TBD/PROPOSED</span> (§7).
+            </li>
+            <li class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <span class="font-bold text-teal-300">3. PCF8563 RTCC (0x51) Uninitialised:</span> Answers the I2C bus scan at <span class="font-mono">0x51</span>, but firmware never initialises it — no time-keeping evidence yet.
+            </li>
+            <li class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+              <span class="font-bold text-blue-300">4. "Onboard Potentiometer" Comment is Heritage:</span> <span class="font-mono">main.c:116</span> (<span class="font-mono">ads1220_poll_task</span> AIN0) is SupaNODE heritage — this schematic has <span class="underline">no pot</span>; AIN0 is J6.5 (measured ≈ 3.5 mV floating filter input).
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- §8 Conflicts, Cautions & Open Items (8 Cards) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4">
+        <div>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">§8. Conflicts, Cautions &amp; Open Items (Reported, Not Silently Resolved)</h2>
+          <p class="text-xs text-slate-400">Critical hardware traps, net naming mismatches, and specification discrepancies from Doc 26</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-rose-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-300">1. Net `IO6` Sits on GPIO1 (Not GPIO6!)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">J7.3 Anomaly</span>
+            </div>
+            <p class="text-slate-300">Schematic net <span class="font-mono">IO6</span> is routed to <span class="font-mono font-bold text-white">GPIO1</span> (WROOM pin 39 → J7.3), whereas <span class="font-mono">GPIO6</span> carries <span class="font-mono">PX_INTB</span> (MCP23017 interrupt B). Never assume J7.3 = GPIO6; confirm with board owner.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-amber-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-amber-300">2. Module Variant Conflict (8 MB vs 16 MB)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Contradiction #5</span>
+            </div>
+            <p class="text-slate-300">SysRS DR5 specifies <span class="font-mono">ESP32-S3-WROOM-1 (N8R2)</span> (8 MB flash / 2 MB PSRAM); schematic U1 = <span class="font-mono">WROOM-1U</span> (external antenna); overview says 16 MB flash / 8 MB PSRAM; <span class="font-mono text-emerald-300">measured boot = 16 MB flash</span>. Query lecturer/board owner.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-rose-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-300">3. J1.7 (+5V) Next to J1.8 (+3.3VP)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">Fatal Hardware Risk</span>
+            </div>
+            <p class="text-slate-300">On the 10-pin J1 header, Pin 7 (+5V) is immediately adjacent to Pin 8 (+3.3VP). Plugging +5V into nRF24L01+ VCC destroys the radio module (<span class="font-mono">docs/27 §1</span>). Key harness to Pin 8 only.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-amber-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-amber-300">4. +3.3VP is Firmware-Gated (GPIO47) &amp; Back-Power Path</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Power Rule</span>
+            </div>
+            <p class="text-slate-300">Clearing <span class="font-mono">GPIO47</span> kills +3.3VP (including any radio on J1.8). Meanwhile, I2C pull-ups (R8/R9) sit on always-on <span class="font-mono">+3.3V</span>, creating a back-power path when +3.3VP is off. Rule: keep GPIO47 HIGH whenever peripherals/radio are used.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-amber-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-amber-300">5. GPIO17 (`SPI_xCS` on J1.1) Floats Today</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">SPI2 Bus Init</span>
+            </div>
+            <p class="text-slate-300">Starter firmware never configures <span class="font-mono">GPIO17</span>. Any SPI device attached to J1 sees an undefined CSN until firmware explicitly drives GPIO17 output-high at boot before SPI2 init.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-cyan-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-cyan-300">6. Console UART0 Ambiguity (GPIO 43 / 44)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">J7.1 / J7.2</span>
+            </div>
+            <p class="text-slate-300">Boot log prints <span class="font-mono">"GPIO 44 and 43 are used as console UART I/O pins"</span> yet all monitor output arrived via native USB COM12 (GPIO19/20). Measure whether J7.1/J7.2 carry live UART traffic before touching them.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-rose-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-300">7. Lecture Handling Gates (Course Authority)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">Mandatory</span>
+            </div>
+            <p class="text-slate-300">All pins strictly <span class="font-mono">0–3 V</span>; <span class="underline">no WiFi without external antenna</span> (starter removed WiFi to prevent PA damage); respect external-5V abuse limit; <span class="font-mono">5V (D7)</span> + <span class="font-mono">3VS (D1)</span> LEDs must light or stop immediately.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border-l-4 border-l-purple-500 border border-slate-800 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-purple-300">8. Unsigned Draft ICD Status (`ICD_REII.pdf`)</span>
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">D-09 / D-06</span>
+            </div>
+            <p class="text-slate-300"><span class="font-mono">ICD_REII.pdf</span> is an unsigned draft: "ESP IO header" pins are TBD and it still names an STM32F411 ground station (superseded by NodeMCU-32S per D-08/D-09). Identifying J1 as that header is <span class="font-mono">PROPOSED</span> here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Complete 100% Grounded Master GPIO Dataset from 26_controller_gpio_map.md §2
+    const GPIO_DATA = [
+      { gpio: "0", wroom: "27", net: "ESP_BOOT", goesTo: "SW2 Boot, R14 10k↑, C8", connGroup: "ONBOARD", pkg: ["NC"], role: "Boot Strapping", status: "RESERVED", badge: "RESERVED", detail: "Boot strapping — reserved, do not repurpose.", anomaly: false },
+      { gpio: "1", wroom: "39", net: "IO6", goesTo: "J7.3", connGroup: "J7", pkg: ["EE1", "EXP"], role: "EE1 Gate/PWM 6 or Expansion", status: "PROPOSED", badge: "PROPOSED ⚠", detail: "Free. ⚠ Net-name anomaly: net IO6 sits on GPIO1 (while GPIO6 = PX_INTB). Confirm with board owner before use. PROPOSED candidate (EE1/expansion).", anomaly: true },
+      { gpio: "2", wroom: "38", net: "MMC_CS", goesTo: "microSD CD/DAT3", connGroup: "ONBOARD", pkg: ["ONBOARD"], role: "microSD Chip-Select", status: "MEASURED", badge: "VERIFIED + MEASURED", detail: "microSD chip-select — VERIFIED firmware (2), MEASURED at boot (SD card init timeout after 5 attempts = no card inserted).", anomaly: false },
+      { gpio: "3", wroom: "15", net: "— (NC ×)", goesTo: "not routed", connGroup: "NC", pkg: ["NC"], role: "Strapping (JTAG)", status: "NC", badge: "UNUSABLE (NC)", detail: "Strapping (JTAG source select, schematic note) — unusable, no copper.", anomaly: false },
+      { gpio: "4", wroom: "4", net: "IO_C", goesTo: "J7.11", connGroup: "J7", pkg: ["MC2"], role: "MC2 Trolley (Dir/PWM/Enc)", status: "PROPOSED", badge: "PROPOSED", detail: "Free on J7.11 — PROPOSED candidate for MC2 trolley dir/PWM/encoder (§7).", anomaly: false },
+      { gpio: "5", wroom: "5", net: "PX_RESET", goesTo: "MCP23017 RESET̄ (R41 10k↑ 3.3VP)", connGroup: "ONBOARD", pkg: ["ONBOARD", "EXP"], role: "Expander Reset", status: "VERIFIED", badge: "VERIFIED", detail: "MCP23017 hardware reset (pulled idle high via R41 10k↑ to 3.3VP); not driven by starter firmware.", anomaly: false },
+      { gpio: "6", wroom: "6", net: "PX_INTB", goesTo: "MCP23017 INTB (R43 10k↑ 3.3VP)", connGroup: "ONBOARD", pkg: ["ONBOARD", "EXP"], role: "Expander Interrupt B", status: "VERIFIED", badge: "AVAILABLE (IN)", detail: "MCP23017 interrupt B — available as input (pulled up to 3.3VP). Note: J7.3 net is named IO6 but goes to GPIO1, not GPIO6!", anomaly: false },
+      { gpio: "7", wroom: "7", net: "PX_INTA", goesTo: "MCP23017 INTA (R42 10k↑ 3.3VP)", connGroup: "ONBOARD", pkg: ["ONBOARD", "EXP"], role: "Expander Interrupt A", status: "VERIFIED", badge: "AVAILABLE (IN)", detail: "MCP23017 interrupt A — available as input (pulled up to 3.3VP).", anomaly: false },
+      { gpio: "8", wroom: "12", net: "I2C_SDA", goesTo: "I2C bus: 0x20, 0x38, 0x51, J8, J1.9", connGroup: "J1", pkg: ["ONBOARD", "EXP"], role: "I2C Data Bus", status: "MEASURED", badge: "VERIFIED + MEASURED", detail: "I2C data (R8 3.3k↑ to +3.3V + internal↑) — VERIFIED firmware (8) + MEASURED scan 0x20 (MCP23017), 0x38 (AHT20), 0x51 (PCF8563).", anomaly: false },
+      { gpio: "9", wroom: "17", net: "I2C_SCL", goesTo: "I2C bus; J1.10 (R9 3.3k↑)", connGroup: "J1", pkg: ["ONBOARD", "EXP"], role: "I2C Clock Bus", status: "MEASURED", badge: "VERIFIED + MEASURED", detail: "I2C clock (R9 3.3k↑ to +3.3V + internal↑) — VERIFIED firmware (9) + MEASURED scan.", anomaly: false },
+      { gpio: "10", wroom: "18", net: "IO_B", goesTo: "J7.10", connGroup: "J7", pkg: ["MC2", "REII"], role: "Contested: nRF CE or MC2", status: "PROPOSED", badge: "CONTESTED", detail: "Free on J7.10 — PROPOSED candidate for REII nRF CE OR MC2 trolley signal (contested, see §7 & docs/27 §3).", anomaly: true },
+      { gpio: "11", wroom: "19", net: "SPI_MOSI", goesTo: "SPI2: ADS1220 DIN, uSD CMD, J1.2", connGroup: "J1", pkg: ["ONBOARD", "REII"], role: "SPI2 MOSI (Shared)", status: "MEASURED", badge: "VERIFIED + SHARED", detail: "SPI2 MOSI — VERIFIED firmware (11), shared between on-board ADS1220, microSD, and J1.2 (REII nRF24L01+).", anomaly: false },
+      { gpio: "12", wroom: "20", net: "SPI_CLK", goesTo: "SPI2: ADS1220 SCLK, uSD CLK, J1.3", connGroup: "J1", pkg: ["ONBOARD", "REII"], role: "SPI2 SCK (Shared)", status: "MEASURED", badge: "VERIFIED + SHARED", detail: "SPI2 SCK — VERIFIED firmware (12), shared between ADS1220, microSD, and J1.3.", anomaly: false },
+      { gpio: "13", wroom: "21", net: "SPI_MISO", goesTo: "SPI2: ADS1220 DOUT/DRDȲ, uSD DAT0, J1.4", connGroup: "J1", pkg: ["ONBOARD", "REII"], role: "SPI2 MISO (Shared)", status: "MEASURED", badge: "VERIFIED + SHARED", detail: "SPI2 MISO — VERIFIED firmware (13), shared between ADS1220, microSD, and J1.4.", anomaly: false },
+      { gpio: "14", wroom: "22", net: "ADC_CS", goesTo: "ADS1220 CS (10k↑ 3.3VP)", connGroup: "ONBOARD", pkg: ["ONBOARD", "EE1", "EE2", "MC2"], role: "ADS1220 Chip-Select", status: "MEASURED", badge: "VERIFIED + MEASURED", detail: "ADC chip-select — VERIFIED firmware (14), MEASURED ADS1220 responding with sane register defaults.", anomaly: false },
+      { gpio: "15", wroom: "8", net: "ADC_DRDY", goesTo: "ADS1220 DRDȲ (10k↑ 3.3VP)", connGroup: "ONBOARD", pkg: ["ONBOARD"], role: "ADS1220 Data-Ready", status: "VERIFIED", badge: "VERIFIED", detail: "ADC data-ready (input) — VERIFIED firmware (15).", anomaly: false },
+      { gpio: "16", wroom: "9", net: "RTCC_INT", goesTo: "← PCF8563 INT̄ via R40 0Ω (R39 10k↑ 3.3VP)", connGroup: "ONBOARD", pkg: ["ONBOARD", "REII"], role: "RTC Alarm / nRF CE Fallback", status: "PROPOSED", badge: "FALLBACK CANDIDATE", detail: "RTC alarm; firmware never inits PCF8563 (0x51 responds at scan). PROPOSED nRF-CE fallback — caveat: shares open-drain RTC line.", anomaly: false },
+      { gpio: "17", wroom: "10", net: "SPI_xCS", goesTo: "J1.1", connGroup: "J1", pkg: ["REII"], role: "Spare SPI2 CS (nRF CSN)", status: "PROPOSED", badge: "FLOATS TODAY ⚠", detail: "Spare SPI2 chip-select on J1.1. UNUSED by starter firmware → floats today; must be driven output-high before bus use. PROPOSED nRF CSN (docs/27).", anomaly: true },
+      { gpio: "18", wroom: "11", net: "IO_A", goesTo: "J7.9", connGroup: "J7", pkg: ["MC2", "REII"], role: "Contested: nRF IRQ or MC2", status: "PROPOSED", badge: "CONTESTED", detail: "Free on J7.9 — PROPOSED candidate for REII nRF IRQ OR MC2 trolley signal (contested, §7).", anomaly: true },
+      { gpio: "19", wroom: "13", net: "USB_D-", goesTo: "U2 USBLC6 → J5 USB-C", connGroup: "USB", pkg: ["NC"], role: "Native USB D-", status: "RESERVED", badge: "MEASURED / OFF-LIMITS", detail: "Native USB D- — MEASURED flash + monitor (COM12, rst:0x15 USB_UART_CHIP_RESET). Do not repurpose.", anomaly: false },
+      { gpio: "20", wroom: "14", net: "USB_D+", goesTo: "U2 USBLC6 → J5 USB-C", connGroup: "USB", pkg: ["NC"], role: "Native USB D+", status: "RESERVED", badge: "MEASURED / OFF-LIMITS", detail: "Native USB D+ — MEASURED on COM12. Do not repurpose.", anomaly: false },
+      { gpio: "21", wroom: "23", net: "IO_D", goesTo: "J7.12", connGroup: "J7", pkg: ["MC2", "EXP"], role: "MC2 Trolley / Expansion", status: "PROPOSED", badge: "PROPOSED", detail: "Free on J7.12 — PROPOSED candidate for MC2 trolley or expansion (§7).", anomaly: false },
+      { gpio: "35", wroom: "28", net: "— (NC ×)", goesTo: "not routed", connGroup: "NC", pkg: ["NC"], role: "PSRAM Bracket (NC)", status: "NC", badge: "UNUSABLE (NC)", detail: "PSRAM pin (schematic 'PSRAM' bracket) — not routed, unusable.", anomaly: false },
+      { gpio: "36", wroom: "29", net: "— (NC ×)", goesTo: "not routed", connGroup: "NC", pkg: ["NC"], role: "PSRAM Bracket (NC)", status: "NC", badge: "UNUSABLE (NC)", detail: "PSRAM pin — not routed, unusable.", anomaly: false },
+      { gpio: "37", wroom: "30", net: "— (NC ×)", goesTo: "not routed", connGroup: "NC", pkg: ["NC"], role: "PSRAM Bracket (NC)", status: "NC", badge: "UNUSABLE (NC)", detail: "PSRAM pin — not routed, unusable.", anomaly: false },
+      { gpio: "38", wroom: "31", net: "IO1", goesTo: "J7.8", connGroup: "J7", pkg: ["EE1"], role: "SPWM Phase A (EE1 VFD)", status: "MEASURED", badge: "MEASURED MCPWM", detail: "SPWM phase A — VERIFIED (38) + MEASURED 20000 Hz carrier, 50.0 Hz sine. PROPOSED EE1 gate/PWM bank (§7).", anomaly: false },
+      { gpio: "39", wroom: "32", net: "IO2", goesTo: "J7.7", connGroup: "J7", pkg: ["EE1"], role: "SPWM Phase B (EE1 VFD)", status: "MEASURED", badge: "MEASURED MCPWM", detail: "SPWM phase B — VERIFIED (39) + MEASURED 20 kHz / 50 Hz sine. PROPOSED EE1 gate/PWM bank.", anomaly: false },
+      { gpio: "40", wroom: "33", net: "IO3", goesTo: "J7.6", connGroup: "J7", pkg: ["EE1"], role: "SPWM Phase C (EE1 VFD)", status: "MEASURED", badge: "MEASURED MCPWM", detail: "SPWM phase C — VERIFIED (40) + MEASURED 20 kHz / 50 Hz sine. PROPOSED EE1 gate/PWM bank.", anomaly: false },
+      { gpio: "41", wroom: "34", net: "IO4", goesTo: "J7.5", connGroup: "J7", pkg: ["EE1", "EE2"], role: "EE1 Line 4 / EE2 Magnet?", status: "PROPOSED", badge: "PROPOSED", detail: "Free (MCPWM-capable) on J7.5 — PROPOSED EE1 line 4 / reserve (or contested by EE2 magnet PWM).", anomaly: false },
+      { gpio: "42", wroom: "35", net: "IO5", goesTo: "J7.4", connGroup: "J7", pkg: ["EE1", "EE2"], role: "EE1 Line 5 / EE2 Magnet?", status: "PROPOSED", badge: "PROPOSED", detail: "Free (MCPWM-capable) on J7.4 — PROPOSED EE1 line 5 (or contested by EE2 magnet PWM).", anomaly: false },
+      { gpio: "43", wroom: "37", net: "U0_TXD", goesTo: "J7.1", connGroup: "J7", pkg: ["ONBOARD"], role: "Console UART0 TX", status: "VERIFIED", badge: "UNVERIFIED TRAFFIC", detail: "Console UART0 TX on J7.1. Boot log claims UART0 on 44/43 yet all output arrived on USB COM12 — measure J7.1/J7.2 before use.", anomaly: true },
+      { gpio: "44", wroom: "36", net: "U0_RXD", goesTo: "J7.2", connGroup: "J7", pkg: ["ONBOARD"], role: "Console UART0 RX", status: "VERIFIED", badge: "UNVERIFIED TRAFFIC", detail: "Console UART0 RX on J7.2 — same caveat as GPIO43 (verify before touching).", anomaly: true },
+      { gpio: "45", wroom: "26", net: "— (NC ×)", goesTo: "not routed", connGroup: "NC", pkg: ["NC"], role: "Strapping (VDD_SPI)", status: "NC", badge: "UNUSABLE (NC)", detail: "Strapping (VDD_SPI) — reserved, not routed, unusable.", anomaly: false },
+      { gpio: "46", wroom: "16", net: "— (NC ×)", goesTo: "not routed", connGroup: "NC", pkg: ["NC"], role: "Strapping (ROM Msg)", status: "NC", badge: "UNUSABLE (NC)", detail: "Strapping (BOOT ROM message control) — reserved, not routed, unusable.", anomaly: false },
+      { gpio: "47", wroom: "24", net: "PWR_EN_3V3P", goesTo: "U6 TPS22917 ON → +3.3VP", connGroup: "ONBOARD", pkg: ["ONBOARD", "REII", "EXP"], role: "+3.3VP Peripheral Power Gate", status: "MEASURED", badge: "VERIFIED + CRITICAL", detail: "Peripheral power enable — VERIFIED (47): driven high +150 ms before any bus init. Gates J1.8, J3/J4.11, ADS1220, MCP23017, RTCC, uSD, AHT20, OLED, J6.", anomaly: false },
+      { gpio: "48", wroom: "25", net: "STAT_LED", goesTo: "R32 22Ω → D4 WS2812B DIN", connGroup: "ONBOARD", pkg: ["ONBOARD"], role: "RGB Status LED (WS2812B)", status: "MEASURED", badge: "VERIFIED + RESOLVED", detail: "RGB status LED — VERIFIED (48). Resolves README_TBD.md 'STATUS_LED 48 — TODO vs schematic' open item.", anomaly: false },
+      { gpio: "EN", wroom: "3", net: "ESP32_EN", goesTo: "SW1 Reset, R7 10k↑, C1/C2", connGroup: "ONBOARD", pkg: ["NC"], role: "Module Reset (Not a GPIO)", status: "RESERVED", badge: "MODULE RESET", detail: "Hardware module reset line (SW1 Reset, R7 10k↑, C1/C2) — not a GPIO.", anomaly: false }
+    ];
+
+    // J1 Pinout Data (§3)
+    const J1_PINS = [
+      { leftPin: 1, leftNet: "SPI_xCS", leftGpio: "17", leftTone: "sky", rightPin: 10, rightNet: "I2C_SCL", rightGpio: "9", rightTone: "teal" },
+      { leftPin: 2, leftNet: "SPI_MOSI", leftGpio: "11", leftTone: "cyan", rightPin: 9, rightNet: "I2C_SDA", rightGpio: "8", rightTone: "teal" },
+      { leftPin: 3, leftNet: "SPI_CLK", leftGpio: "12", leftTone: "cyan", rightPin: 8, rightNet: "+3.3VP (Switched=47)", rightGpio: "47", rightTone: "emerald" },
+      { leftPin: 4, leftNet: "SPI_MISO", leftGpio: "13", leftTone: "cyan", rightPin: 7, rightNet: "+5V ⚠ FATAL TO nRF", rightGpio: "", rightTone: "rose" },
+      { leftPin: 5, leftNet: "GND", leftGpio: "", leftTone: "slate", rightPin: 6, rightNet: "GND", rightGpio: "", rightTone: "slate" }
+    ];
+
+    // J7 Pinout Data (§3)
+    const J7_PINS = [
+      { leftPin: 1, leftNet: "U0_TXD", leftGpio: "43", leftNote: "Console", leftTone: "slate", rightPin: 7, rightNet: "IO2", rightGpio: "39", rightNote: "SPWM B (EE1)", rightTone: "orange" },
+      { leftPin: 2, leftNet: "U0_RXD", leftGpio: "44", leftNote: "Console", leftTone: "slate", rightPin: 8, rightNet: "IO1", rightGpio: "38", rightNote: "SPWM A (EE1)", rightTone: "orange" },
+      { leftPin: 3, leftNet: "IO6 ⚠", leftGpio: "1", leftNote: "GPIO1! (EE1)", leftTone: "amber", rightPin: 9, rightNet: "IO_A", rightGpio: "18", rightNote: "MC2 / nRF IRQ", rightTone: "purple" },
+      { leftPin: 4, leftNet: "IO5", leftGpio: "42", leftNote: "Free PWM (EE1/2)", leftTone: "orange", rightPin: 10, rightNet: "IO_B", rightGpio: "10", rightNote: "MC2 / nRF CE", rightTone: "purple" },
+      { leftPin: 5, leftNet: "IO4", leftGpio: "41", leftNote: "Free PWM (EE1/2)", leftTone: "orange", rightPin: 11, rightNet: "IO_C", rightGpio: "4", rightNote: "MC2 Trolley", rightTone: "purple" },
+      { leftPin: 6, leftNet: "IO3", leftGpio: "40", leftNote: "SPWM C (EE1)", leftTone: "orange", rightPin: 12, rightNet: "IO_D", rightGpio: "21", rightNote: "MC2 / Exp", rightTone: "purple" }
+    ];
+
+    // J6 Pinout Data (§3)
+    const J6_PINS = [
+      { leftPin: 1, leftNet: "+3.3VP (Excitation)", rightPin: 7, rightNet: "AN2_In → AIN2 / REFN1" },
+      { leftPin: 2, leftNet: "GNDREF", rightPin: 8, rightNet: "AN3_In → AIN3" },
+      { leftPin: 3, leftNet: "REF_0_P → ADS REFP0", rightPin: 9, rightNet: "GNDREF" },
+      { leftPin: 4, leftNet: "GNDREF", rightPin: 10, rightNet: "REF_0_N → ADS REFN0" },
+      { leftPin: 5, leftNet: "AN0_In → AIN0 / REFP1", rightPin: 11, rightNet: "GNDREF" },
+      { leftPin: 6, leftNet: "AN1_In → AIN1", rightPin: 12, rightNet: "GNDREF" }
+    ];
+
+    let activeTab = "topology";
+    let activePkgFilter = "ALL";
+    let searchQuery = "";
+    let selectedGpioId = "38";
+
+    function showToast(msg) {
+      const banner = document.getElementById("toastBanner");
+      const text = document.getElementById("toastText");
+      text.textContent = msg;
+      banner.classList.remove("hidden");
+      banner.classList.add("flex");
+      setTimeout(() => {
+        banner.classList.add("hidden");
+        banner.classList.remove("flex");
+      }, 2600);
+    }
+
+    function getStatusClasses(status, anomaly) {
+      if (anomaly) return "bg-amber-500/20 text-amber-200 border-amber-500/50";
+      switch (status) {
+        case "MEASURED": return "bg-emerald-500/20 text-emerald-200 border-emerald-500/40";
+        case "VERIFIED": return "bg-teal-500/20 text-teal-200 border-teal-500/40";
+        case "PROPOSED": return "bg-cyan-500/20 text-cyan-200 border-cyan-500/40";
+        case "RESERVED": return "bg-rose-500/15 text-rose-300 border-rose-500/30";
+        case "NC": return "bg-slate-800/80 text-slate-400 border-slate-700";
+        default: return "bg-slate-800 text-slate-300 border-slate-700";
+      }
+    }
+
+    function getPkgBadge(pkgCode) {
+      const map = {
+        EE1: '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-orange-500/20 text-orange-300 border border-orange-500/30">EE1 VFD</span>',
+        EE2: '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">EE2 Mag</span>',
+        MC2: '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">MC2</span>',
+        REII: '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-sky-500/20 text-sky-300 border border-sky-500/30">REII RF</span>',
+        ONBOARD: '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">On-Board</span>',
+        EXP: '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-pink-500/20 text-pink-300 border border-pink-500/30">Exp/I2C</span>',
+        NC: '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">N/A</span>'
+      };
+      return map[pkgCode] || "";
+    }
+
+    function renderInspector(gpioId) {
+      const item = GPIO_DATA.find(g => g.gpio === String(gpioId)) || GPIO_DATA[0];
+      selectedGpioId = item.gpio;
+      const container = document.getElementById("pinInspectorCard");
+      const pkgBadges = item.pkg.map(getPkgBadge).join(" ");
+      const statusCls = getStatusClasses(item.status, item.anomaly);
+
+      container.innerHTML = `
+        <div class="flex items-start justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/50 font-mono font-bold text-base text-cyan-200">
+                ${item.gpio === "EN" ? "PIN EN" : "GPIO " + item.gpio}
+              </span>
+              <span class="font-mono text-xs text-slate-400">WROOM Pin ${item.wroom}</span>
+            </div>
+            <h3 class="text-sm font-bold text-white mt-2">${item.role}</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono border ${statusCls}">${item.badge}</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="text-[10px] font-mono text-slate-400 uppercase">Schematic Net</div>
+            <div class="font-mono font-bold text-slate-100 mt-0.5">${item.net}</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <div class="text-[10px] font-mono text-slate-400 uppercase">Routes To</div>
+            <div class="font-mono font-semibold text-cyan-300 mt-0.5">${item.goesTo}</div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="text-[10px] font-mono text-slate-400 uppercase">Crane Package / Subsystem Tags</div>
+          <div class="flex flex-wrap gap-1.5">${pkgBadges}</div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-950 border ${item.anomaly ? 'border-amber-500/50' : 'border-slate-800'} text-xs space-y-1">
+          <div class="font-semibold ${item.anomaly ? 'text-amber-300' : 'text-slate-300'}">
+            ${item.anomaly ? '⚠ Verification & Contention Note:' : 'Verified Evidence & Function:'}
+          </div>
+          <p class="text-slate-300 leading-relaxed">${item.detail}</p>
+        </div>
+      `;
+    }
+
+    function matchesSearch(item) {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        ("gpio" + item.gpio).toLowerCase().includes(q) ||
+        item.gpio.toLowerCase().includes(q) ||
+        item.net.toLowerCase().includes(q) ||
+        item.goesTo.toLowerCase().includes(q) ||
+        item.role.toLowerCase().includes(q) ||
+        item.detail.toLowerCase().includes(q) ||
+        item.pkg.join(" ").toLowerCase().includes(q)
+      );
+    }
+
+    function renderGpioChipGrid() {
+      const grid = document.getElementById("gpioChipGrid");
+      const filtered = GPIO_DATA.filter(item => {
+        const pkgMatch = activePkgFilter === "ALL" || item.pkg.includes(activePkgFilter);
+        return pkgMatch && matchesSearch(item);
+      });
+
+      document.getElementById("activeFilterCount").textContent =
+        `Showing ${filtered.length} of ${GPIO_DATA.length} U1 entries`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-6 text-center text-xs text-slate-400 bg-slate-950 rounded-xl border border-slate-800">No GPIOs match the current filter/search. Click "All (36)" or clear the search box.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const isSelected = item.gpio === selectedGpioId;
+        const statusCls = getStatusClasses(item.status, item.anomaly);
+        const pkgBadges = item.pkg.map(getPkgBadge).join(" ");
+        return `
+          <button data-gpio-card="${item.gpio}" class="pin-chip text-left p-2.5 rounded-xl bg-slate-950 border ${isSelected ? 'border-cyan-400 ring-1 ring-cyan-400/50' : 'border-slate-800 hover:border-slate-600'} flex flex-col justify-between gap-1.5">
+            <div class="flex items-center justify-between gap-1 w-full">
+              <span class="font-mono font-bold text-xs ${item.status === 'NC' ? 'text-slate-500' : 'text-white'}">
+                ${item.gpio === "EN" ? "EN" : "GPIO " + item.gpio}
+              </span>
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-mono border ${statusCls} truncate max-w-[110px]">
+                ${item.badge}
+              </span>
+            </div>
+            <div class="font-mono text-[11px] ${item.anomaly ? 'text-amber-300 font-semibold' : 'text-cyan-300'} truncate">
+              ${item.net} <span class="text-slate-500">→</span> <span class="text-slate-300">${item.goesTo}</span>
+            </div>
+            <div class="flex items-center justify-between gap-1 pt-1 border-t border-slate-900">
+              <span class="text-[10px] text-slate-400 truncate">${item.role}</span>
+              <div class="flex gap-0.5 shrink-0">${pkgBadges}</div>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-gpio-card]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          renderInspector(btn.getAttribute("data-gpio-card"));
+          renderGpioChipGrid();
+        });
+      });
+    }
+
+    function renderConnectors() {
+      // J1
+      const j1El = document.getElementById("j1PinoutContainer");
+      j1El.innerHTML = J1_PINS.map(row => `
+        <div data-conn-gpio="${row.leftGpio}" class="cursor-pointer p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-sky-500/50 flex items-center justify-between text-xs">
+          <span class="font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Pin ${row.leftPin}</span>
+          <span class="font-mono font-semibold text-sky-300">${row.leftNet}</span>
+          <span class="font-mono text-[10px] text-slate-400">${row.leftGpio ? 'GPIO ' + row.leftGpio : '—'}</span>
+        </div>
+        <div data-conn-gpio="${row.rightGpio}" class="cursor-pointer p-2 rounded-lg ${row.rightPin === 7 ? 'bg-rose-950/50 border-rose-500/60' : 'bg-slate-900 border-slate-800'} border hover:border-sky-500/50 flex items-center justify-between text-xs">
+          <span class="font-mono text-[10px] text-slate-400">${row.rightGpio ? 'GPIO ' + row.rightGpio : '—'}</span>
+          <span class="font-mono font-semibold ${row.rightPin === 7 ? 'text-rose-300' : row.rightPin === 8 ? 'text-emerald-300' : 'text-teal-300'}">${row.rightNet}</span>
+          <span class="font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Pin ${row.rightPin}</span>
+        </div>
+      `).join("");
+
+      // J7
+      const j7El = document.getElementById("j7PinoutContainer");
+      j7El.innerHTML = J7_PINS.map(row => `
+        <div data-conn-gpio="${row.leftGpio}" class="cursor-pointer p-2 rounded-lg bg-slate-900 border ${row.leftPin === 3 ? 'border-amber-500/50' : 'border-slate-800'} hover:border-orange-400 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">J7.${row.leftPin}</span>
+            <span class="font-mono font-bold text-orange-300">${row.leftNet}</span>
+          </div>
+          <div class="text-right">
+            <span class="font-mono text-white font-semibold">GPIO ${row.leftGpio}</span>
+            <div class="text-[10px] text-slate-400">${row.leftNote}</div>
+          </div>
+        </div>
+        <div data-conn-gpio="${row.rightGpio}" class="cursor-pointer p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-purple-400 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">J7.${row.rightPin}</span>
+            <span class="font-mono font-bold ${row.rightPin <= 8 ? 'text-orange-300' : 'text-purple-300'}">${row.rightNet}</span>
+          </div>
+          <div class="text-right">
+            <span class="font-mono text-white font-semibold">GPIO ${row.rightGpio}</span>
+            <div class="text-[10px] text-slate-400">${row.rightNote}</div>
+          </div>
+        </div>
+      `).join("");
+
+      // J6
+      const j6El = document.getElementById("j6PinoutContainer");
+      j6El.innerHTML = J6_PINS.map(row => `
+        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
+          <span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">J6.${row.leftPin}</span>
+          <span class="${row.leftPin === 1 ? 'text-emerald-300 font-bold' : row.leftNet.startsWith('AN') ? 'text-blue-300 font-bold' : 'text-slate-300'}">${row.leftNet}</span>
+        </div>
+        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs font-mono">
+          <span class="${row.rightNet.startsWith('AN') ? 'text-blue-300 font-bold' : 'text-slate-300'}">${row.rightNet}</span>
+          <span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">J6.${row.rightPin}</span>
+        </div>
+      `).join("");
+
+      document.querySelectorAll("[data-conn-gpio]").forEach(el => {
+        el.addEventListener("click", () => {
+          const g = el.getAttribute("data-conn-gpio");
+          if (g) {
+            renderInspector(g);
+            showToast(`Selected GPIO ${g} in Inspector (Tab 1)`);
+          }
+        });
+      });
+    }
+
+    function renderMasterTable() {
+      const tbody = document.getElementById("masterGpioTableBody");
+      const statusVal = document.getElementById("tableStatusFilter").value;
+      const connVal = document.getElementById("tableConnectorFilter").value;
+
+      const rows = GPIO_DATA.filter(item => {
+        const sMatch = statusVal === "ALL" || item.status === statusVal;
+        const cMatch = connVal === "ALL" || item.connGroup === connVal;
+        return sMatch && cMatch && matchesSearch(item);
+      });
+
+      tbody.innerHTML = rows.map(item => {
+        const statusCls = getStatusClasses(item.status, item.anomaly);
+        const pkgBadges = item.pkg.map(getPkgBadge).join(" ");
+        return `
+          <tr data-row-gpio="${item.gpio}" class="hover:bg-slate-800/50 cursor-pointer transition ${item.anomaly ? 'bg-amber-950/15' : ''}">
+            <td class="py-2.5 px-3 font-mono font-bold text-white">${item.gpio === "EN" ? "EN" : "GPIO " + item.gpio}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-400">${item.wroom}</td>
+            <td class="py-2.5 px-3 font-mono font-semibold text-cyan-300">${item.net}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-200">${item.goesTo}</td>
+            <td class="py-2.5 px-3"><div class="flex flex-wrap gap-1">${pkgBadges}</div></td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-mono border ${statusCls}">${item.badge}</span></td>
+            <td class="py-2.5 px-3 text-slate-300 max-w-md">${item.detail}</td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.querySelectorAll("[data-row-gpio]").forEach(row => {
+        row.addEventListener("click", () => {
+          const g = row.getAttribute("data-row-gpio");
+          renderInspector(g);
+          showToast(`Selected ${g === 'EN' ? 'EN' : 'GPIO ' + g}`);
+        });
+      });
+    }
+
+    function updateSimulator() {
+      const ce16 = document.getElementById("simOptNrfCe16").checked;
+      const ee2Share = document.getElementById("simOptDeferEe1Res").checked;
+      const mcpBrake = document.getElementById("simOptMcpBrakeExp").checked;
+      const adsLoadCell = document.getElementById("simOptAdsLoadCell").checked;
+
+      const box = document.getElementById("simResultBox");
+      const conflicts = [];
+
+      if (!ce16) {
+        conflicts.push("J7.9/J7.10 (GPIO 18/10) are double-booked between MC2 Trolley (IR3) and REII nRF24L01+ CE/IRQ.");
+      }
+      if (!ee2Share) {
+        conflicts.push("EE2 Magnet PWM (IR2) has no direct PWM GPIO on J7 (all 6 J7.3–J7.8 pins are taken by EE1's 6 gate/PWM lines).");
+      }
+      if (!mcpBrake) {
+        conflicts.push("MC2 Brake (1 pin) + IR5 Expansion (5 pins) demand 6 direct GPIOs that do not exist on J7.");
+      }
+      if (!adsLoadCell) {
+        conflicts.push("HX711 Load Cell alternative demands 2 digital GPIOs (SCK/DOUT), which has no spare header pins.");
+      }
+
+      const resolved = conflicts.length === 0;
+
+      box.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase font-mono ${resolved ? 'text-emerald-300' : 'text-amber-300'}">
+            ${resolved ? '✔ Candidate Zero-Conflict Pin Map Achieved (Pending D-06 ICD Sign-Off)' : `⚠ ${conflicts.length} Pin Contention(s) Active Under Current Selection`}
+          </span>
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded ${resolved ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
+            ${resolved ? '10/10 J7 Pins Assigned Cleanly' : 'Over-Subscribed'}
+          </span>
+        </div>
+        ${conflicts.length > 0 ? `
+          <ul class="text-xs text-rose-200 list-disc pl-4 space-y-1">
+            ${conflicts.map(c => `<li>${c}</li>`).join("")}
+          </ul>
+        ` : `
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
+            <div class="p-2 rounded bg-slate-900 border border-orange-500/30">
+              <div class="font-bold text-orange-300">J7.3–J7.8 (6 Pins)</div>
+              <div class="text-[11px] text-slate-300 font-mono">EE1 (5 PWM + MCP23017 slow EN) + EE2 Magnet PWM on GPIO42</div>
+            </div>
+            <div class="p-2 rounded bg-slate-900 border border-purple-500/30">
+              <div class="font-bold text-purple-300">J7.9–J7.12 (4 Pins)</div>
+              <div class="text-[11px] text-slate-300 font-mono">MC2 Trolley Dir, PWM, Enc A, Enc B on GPIO 18, 10, 4, 21</div>
+            </div>
+            <div class="p-2 rounded bg-slate-900 border border-sky-500/30">
+              <div class="font-bold text-sky-300">J1 + On-Board</div>
+              <div class="text-[11px] text-slate-300 font-mono">REII CSN=17 (J1.1), CE=16 (RTCC_INT), Brake+IR5 on J3/J4</div>
+            </div>
+          </div>
+        `}
+      `;
+    }
+
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+      document.getElementById("tab-" + tabId).classList.remove("hidden");
+
+      document.querySelectorAll(".nav-tab").forEach(btn => {
+        if (btn.getAttribute("data-tab") === tabId) {
+          btn.classList.add("border-cyan-400", "text-cyan-300");
+          btn.classList.remove("border-transparent", "text-slate-400");
+        } else {
+          btn.classList.remove("border-cyan-400", "text-cyan-300");
+          btn.classList.add("border-transparent", "text-slate-400");
+        }
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderInspector("38");
+      renderGpioChipGrid();
+      renderConnectors();
+      renderMasterTable();
+      updateSimulator();
+
+      // Tab buttons
+      document.querySelectorAll(".nav-tab").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.getAttribute("data-tab")));
+      });
+
+      // Package filter buttons
+      document.querySelectorAll(".pkg-filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activePkgFilter = btn.getAttribute("data-pkg");
+          document.querySelectorAll(".pkg-filter-btn").forEach(b => {
+            b.classList.remove("bg-cyan-500/20", "text-cyan-200", "border-cyan-500/50");
+          });
+          btn.classList.add("bg-cyan-500/20", "text-cyan-200", "border-cyan-500/50");
+          renderGpioChipGrid();
+        });
+      });
+
+      // Diagram package jump buttons
+      document.querySelectorAll(".pkg-jump-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const pkg = btn.getAttribute("data-pkg");
+          activePkgFilter = pkg;
+          renderGpioChipGrid();
+          const firstMatch = GPIO_DATA.find(g => g.pkg.includes(pkg));
+          if (firstMatch) renderInspector(firstMatch.gpio);
+        });
+      });
+
+      // Diagram GPIO triggers
+      document.querySelectorAll(".gpio-trigger").forEach(el => {
+        el.addEventListener("click", () => {
+          const g = el.getAttribute("data-select-gpio");
+          renderInspector(g);
+          renderGpioChipGrid();
+        });
+      });
+
+      // Connector jump buttons
+      document.querySelectorAll(".conn-jump-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          switchTab("connectors");
+        });
+      });
+
+      // Connector scroll buttons
+      document.querySelectorAll(".conn-scroll-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const target = document.getElementById(btn.getAttribute("data-scroll-conn"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+
+      // Tab jump links
+      document.querySelectorAll(".tab-jump-link").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.getAttribute("data-OpenTab")));
+      });
+
+      // KPI quick filter cards
+      document.querySelectorAll(".kpi-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const mode = card.getAttribute("data-quick-filter");
+          if (mode === "EXPANDER" || mode === "ADC") {
+            switchTab("connectors");
+            return;
+          }
+          if (mode === "CONTESTED") {
+            switchTab("packages");
+            return;
+          }
+          switchTab("topology");
+          if (mode === "COMMITTED") activePkgFilter = "ONBOARD";
+          else if (mode === "FREE_HEADER") activePkgFilter = "ALL";
+          else if (mode === "UNUSABLE") activePkgFilter = "NC";
+          renderGpioChipGrid();
+        });
+      });
+
+      // JP4 Toggle
+      const jp4Btn12 = document.getElementById("jp4Mode12");
+      const jp4Btn23 = document.getElementById("jp4Mode23");
+      const jp4Text = document.getElementById("jp4StatusText");
+      jp4Btn12.addEventListener("click", () => {
+        jp4Btn12.className = "px-2 py-0.5 rounded text-[11px] font-mono bg-violet-500/20 text-violet-200 border border-violet-500/40";
+        jp4Btn23.className = "px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-300 border border-slate-700";
+        jp4Text.innerHTML = `<span class="font-mono text-emerald-300">Active Mode: JP4 1–2 Bridged (MMC_CD):</span> MCP23017 <span class="font-mono">GPB0</span> is connected to microSD card-detect (<span class="font-mono">MMC_CD</span>). J4.3 (<span class="font-mono">B0_Pin</span>) is disconnected.`;
+      });
+      jp4Btn23.addEventListener("click", () => {
+        jp4Btn23.className = "px-2 py-0.5 rounded text-[11px] font-mono bg-violet-500/20 text-violet-200 border border-violet-500/40";
+        jp4Btn12.className = "px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-300 border border-slate-700";
+        jp4Text.innerHTML = `<span class="font-mono text-amber-300">Active Mode: JP4 2–3 Bridged (J4.3 B0_Pin):</span> MCP23017 <span class="font-mono">GPB0</span> is routed out to external expansion header pin <span class="font-mono">J4.3</span>, giving 16 full expander GPIOs across J3/J4.`;
+      });
+
+      // Simulator checkboxes
+      ["simOptNrfCe16", "simOptDeferEe1Res", "simOptMcpBrakeExp", "simOptAdsLoadCell"].forEach(id => {
+        document.getElementById(id).addEventListener("change", updateSimulator);
+      });
+
+      // Master table dropdown filters
+      document.getElementById("tableStatusFilter").addEventListener("change", renderMasterTable);
+      document.getElementById("tableConnectorFilter").addEventListener("change", renderMasterTable);
+
+      // Search input
+      const searchInput = document.getElementById("globalSearchInput");
+      const clearBtn = document.getElementById("clearSearchBtn");
+      searchInput.addEventListener("input", e => {
+        searchQuery = e.target.value.trim();
+        clearBtn.classList.toggle("hidden", !searchQuery);
+        renderGpioChipGrid();
+        renderMasterTable();
+      });
+      clearBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchQuery = "";
+        clearBtn.classList.add("hidden");
+        renderGpioChipGrid();
+        renderMasterTable();
+      });
+
+      // Copy CSV
+      document.getElementById("copySummaryBtn").addEventListener("click", () => {
+        const header = "GPIO,WROOM_Pin,Schematic_Net,Goes_To,Packages,Status,Detail\n";
+        const csv = header + GPIO_DATA.map(r =>
+          `"${r.gpio}","${r.wroom}","${r.net}","${r.goesTo}","${r.pkg.join('/')}","${r.badge}","${r.detail.replace(/"/g, '""')}"`
+        ).join("\n");
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(csv).then(() => showToast("Copied 36-row Master GPIO CSV to clipboard!"));
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = csv;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            showToast("Copied 36-row Master GPIO CSV to clipboard!");
+          }
+        } catch (err) {
+          showToast("Copy completed");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
