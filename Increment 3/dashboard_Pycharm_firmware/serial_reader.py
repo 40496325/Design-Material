@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """
-REII Dashboard Serial Reader — reads groundstation USB-CDC (COM12 @ 115200).
-
-Parses the groundstation's newline-terminated serial output:
-  ECHO,<text>
-  PONG,<ok>,<ms>
-  OK,app_ch=77,2M,PA_MAX,ARC5,ARD500
-  ACK,<ok>,payload=<64 hex chars>   <- 32-byte ACK-payload telemetry
-  ERR,<message>
-  READY
-  # REII groundstation v...
-
-Emits parsed events via a callback supplied by the caller.
+REII Dashboard Serial Reader — reads Groundstation USB-CDC (COM10 @ 115200).
 """
 
 from __future__ import annotations
@@ -25,15 +14,13 @@ try:
     import serial
     import serial.tools.list_ports
 except ImportError:
-    serial = None  # type: ignore[assignment]
+    serial = None
 
-from protocol import UplinkFrame, MAGIC_UPLINK, PAYLOAD_SIZE
+from protocol import UplinkFrame
 
 
 class SerialReader:
-    """Blocking serial reader that parses groundstation lines and dispatches callbacks."""
-
-    _ACK_PAYLOAD_RE = re.compile(r"^ACK,(\d),payload=([0-9A-Fa-f]{64})$")
+    _ACK_RE = re.compile(r"^ACK,(\d),payload=(.*)$")
     _PONG_RE = re.compile(r"^PONG,(\d),(\d+)$")
     _ECHO_RE = re.compile(r"^ECHO,(.*)$")
 
@@ -51,8 +38,8 @@ class SerialReader:
 
     def start(self) -> bool:
         try:
-            self._ser = serial.Serial(self.port, self.baud, timeout=0.2)
-            time.sleep(0.5)
+            self._ser = serial.Serial(self.port, self.baud, timeout=0.1)
+            time.sleep(0.3)
             self._ser.reset_input_buffer()
         except serial.SerialException as exc:
             print(f"[SerialReader] cannot open {self.port}: {exc}")
@@ -92,33 +79,39 @@ class SerialReader:
     def _dispatch(self, text: str) -> None:
         event: dict = {"raw": text, "ts": time.time()}
 
-        m = self._ACK_PAYLOAD_RE.match(text)
+        m = self._ACK_RE.match(text)
         if m:
             ok = int(m.group(1))
-            hex_payload = m.group(2)
-            event["type"] = "ack_payload"
-            event["ok"] = ok
-            try:
-                payload = bytes.fromhex(hex_payload)
-                frame = UplinkFrame.unpack(payload)
-                event["frame"] = {
-                    "magic": frame.magic,
-                    "seq_ack": frame.seq_ack,
-                    "trolley_pos_m": frame.trolley_pos_m,
-                    "hoist_pos_m": frame.hoist_pos_m,
-                    "trolley_vel_m_s": frame.trolley_vel_m_s,
-                    "hoist_vel_m_s": frame.hoist_vel_m_s,
-                    "load_kg": frame.load_kg,
-                    "vfd_current_A": frame.vfd_current_A,
-                    "temp_c": frame.temp_c,
-                    "magnet_status": frame.magnet_status,
-                    "error_code": frame.error_code,
-                    "fault_flags": frame.fault_flags,
-                    "system_health": frame.system_health,
-                }
-                self._last_uplink = frame
-            except ValueError as exc:
-                event["parse_error"] = str(exc)
+            payload_str = m.group(2).strip()
+            if ok == 1 and len(payload_str) == 64 and payload_str != "none":
+                event["type"] = "ack_payload"
+                event["ok"] = 1
+                try:
+                    payload = bytes.fromhex(payload_str)
+                    frame = UplinkFrame.unpack(payload)
+                    event["frame"] = {
+                        "magic": frame.magic,
+                        "seq_ack": frame.seq_ack,
+                        "trolley_pos_m": frame.trolley_pos_m,
+                        "hoist_pos_m": frame.hoist_pos_m,
+                        "trolley_vel_m_s": frame.trolley_vel_m_s,
+                        "hoist_vel_m_s": frame.hoist_vel_m_s,
+                        "load_kg": frame.load_kg,
+                        "vfd_current_A": frame.vfd_current_A,
+                        "magnet_current_A": frame.magnet_current_A,
+                        "magnet_status": frame.magnet_status,
+                        "error_code": frame.error_code,
+                        "fault_flags": frame.fault_flags,
+                        "system_health": frame.system_health,
+                    }
+                    self._last_uplink = frame
+                except Exception as exc:
+                    event["parse_error"] = str(exc)
+            else:
+                event["type"] = "ack_status"
+                event["ok"] = ok
+                event["has_payload"] = False
+
             if self.on_line:
                 self.on_line(event)
             return
@@ -149,11 +142,7 @@ class SerialReader:
         elif text.startswith("#"):
             event["type"] = "banner"
         else:
-            event["type"] = "unknown"
+            event["type"] = "raw"
 
         if self.on_line:
             self.on_line(event)
-
-    @property
-    def last_uplink(self) -> Optional[UplinkFrame]:
-        return self._last_uplink

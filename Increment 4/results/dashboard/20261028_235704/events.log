@@ -1,0 +1,11 @@
+23:57:04.591 [info] Listening to the crane console on COM12
+23:57:04.595 [info] Crane load cell: load tare done
+23:57:04.656 [info] Link connecting: checking ground station on COM10
+23:57:05.358 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+23:57:05.358 [info] Link running
+23:57:05.474 [info] Crane set over USB to channel 77, power LOW
+23:57:05.539 [fault] Fault raised: Wireless timeout (error code 8)
+23:57:05.603 [info] Fault cleared: Wireless timeout
+23:58:34.048 [info] Radio power change to HIGH queued
+23:58:34.175 [info] Radio power HIGH (-6 dBm): ground station set, crane set over USB
+23:59:47.136 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

@@ -1,0 +1,16 @@
+00:00:31.393 [info] Listening to the crane console on COM12
+00:00:31.394 [warn] Crane rebooted - setting it to channel 77, power LOW
+00:00:31.394 [info] Crane load cell: load tare done
+00:00:31.456 [info] Link connecting: checking ground station on COM10
+00:00:32.219 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+00:00:32.219 [info] Link running
+00:00:32.346 [info] Crane set over USB to channel 77, power LOW
+00:00:32.410 [fault] Fault raised: Wireless timeout (error code 8)
+00:00:32.473 [info] Fault cleared: Wireless timeout
+00:00:39.647 [info] Channel change 77 -> 80 (2480 MHz) queued
+00:00:39.791 [info] Channel 77 -> 80 (2480 MHz): crane switched over USB, ground station switched - checking the link
+00:00:39.842 [info] Channel 80 confirmed: the crane is answering
+00:00:53.105 [info] Channel change 80 -> 77 (2477 MHz) queued
+00:00:53.155 [info] Channel 80 -> 77 (2477 MHz): crane switched over USB, ground station switched - checking the link
+00:00:53.207 [info] Channel 77 confirmed: the crane is answering
+00:00:59.095 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

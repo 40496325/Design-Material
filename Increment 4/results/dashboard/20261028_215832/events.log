@@ -1,0 +1,170 @@
+21:58:32.111 [info] Listening to the crane console on COM12
+21:58:32.177 [info] Link connecting: checking ground station on COM10
+21:58:32.782 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+21:58:32.782 [info] Link running
+21:58:32.844 [fault] Fault raised: Wireless timeout (error code 8)
+22:02:00.224 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:02:00.225 [info] Dashboard page is back - controls re-enabled
+22:02:18.219 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:02:18.224 [info] Dashboard page is back - controls re-enabled
+22:02:20.218 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:02:20.221 [info] Dashboard page is back - controls re-enabled
+22:02:37.702 [info] Ping queued
+22:02:39.531 [info] Ping queued
+22:02:45.334 [info] Ping queued
+22:02:53.497 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+22:02:53.571 [crane] Crane applied seq=174,flags=01,trolley=0,hoist=0,magnet=0,segment=0
+22:02:56.508 [info] Soft stop released
+22:02:56.611 [crane] Crane applied seq=227,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:02:57.575 [crane] Crane applied seq=244,flags=00,trolley=0,hoist=0,magnet=1,segment=0
+22:02:58.708 [crane] Crane applied seq=8,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:02:59.942 [crane] Crane applied seq=30,flags=00,trolley=0,hoist=0,magnet=1,segment=0
+22:03:01.642 [crane] Crane applied seq=59,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:03:13.309 [crane] Crane applied seq=8,flags=00,trolley=-1,hoist=0,magnet=0,segment=1
+22:03:13.374 [crane] Crane applied seq=9,flags=00,trolley=-3,hoist=0,magnet=0,segment=2
+22:03:13.425 [fault] Fault raised: Rail limit (error code 4)
+22:03:13.428 [crane] Crane applied seq=10,flags=00,trolley=-8,hoist=0,magnet=0,segment=3
+22:03:13.489 [crane] Crane applied seq=11,flags=00,trolley=-12,hoist=0,magnet=0,segment=4
+22:03:13.543 [crane] Crane applied seq=12,flags=00,trolley=-18,hoist=0,magnet=0,segment=5
+22:03:13.608 [crane] Crane applied seq=13,flags=00,trolley=-24,hoist=0,magnet=0,segment=6
+22:03:13.674 [crane] Crane applied seq=14,flags=00,trolley=-30,hoist=0,magnet=0,segment=7
+22:03:13.730 [crane] Crane applied seq=15,flags=00,trolley=-37,hoist=0,magnet=0,segment=8
+22:03:13.791 [crane] Crane applied seq=16,flags=00,trolley=-42,hoist=0,magnet=0,segment=9
+22:03:13.792 [crane] Crane applied seq=17,flags=00,trolley=-47,hoist=0,magnet=0,segment=10
+22:03:13.856 [crane] Crane applied seq=18,flags=00,trolley=-51,hoist=0,magnet=0,segment=11
+22:03:13.908 [crane] Crane applied seq=19,flags=00,trolley=-55,hoist=0,magnet=0,segment=12
+22:03:13.965 [crane] Crane applied seq=20,flags=00,trolley=-57,hoist=0,magnet=0,segment=13
+22:03:14.022 [crane] Crane applied seq=21,flags=00,trolley=-58,hoist=0,magnet=0,segment=14
+22:03:14.088 [crane] Crane applied seq=22,flags=00,trolley=-59,hoist=0,magnet=0,segment=15
+22:03:14.149 [crane] Crane applied seq=23,flags=00,trolley=-60,hoist=0,magnet=0,segment=0
+22:03:15.774 [crane] Crane applied seq=50,flags=00,trolley=-59,hoist=0,magnet=0,segment=17
+22:03:15.840 [crane] Crane applied seq=51,flags=00,trolley=-57,hoist=0,magnet=0,segment=18
+22:03:15.891 [crane] Crane applied seq=52,flags=00,trolley=-52,hoist=0,magnet=0,segment=19
+22:03:15.952 [crane] Crane applied seq=53,flags=00,trolley=-48,hoist=0,magnet=0,segment=20
+22:03:16.007 [crane] Crane applied seq=54,flags=00,trolley=-42,hoist=0,magnet=0,segment=21
+22:03:16.057 [crane] Crane applied seq=55,flags=00,trolley=-36,hoist=0,magnet=0,segment=22
+22:03:16.125 [crane] Crane applied seq=56,flags=00,trolley=-31,hoist=0,magnet=0,segment=23
+22:03:16.188 [crane] Crane applied seq=57,flags=00,trolley=-25,hoist=0,magnet=0,segment=24
+22:03:16.241 [crane] Crane applied seq=58,flags=00,trolley=-18,hoist=0,magnet=0,segment=25
+22:03:16.292 [crane] Crane applied seq=59,flags=00,trolley=-13,hoist=0,magnet=0,segment=26
+22:03:16.356 [crane] Crane applied seq=60,flags=00,trolley=-9,hoist=0,magnet=0,segment=27
+22:03:16.424 [crane] Crane applied seq=61,flags=00,trolley=-5,hoist=0,magnet=0,segment=28
+22:03:16.424 [crane] Crane applied seq=62,flags=00,trolley=-3,hoist=0,magnet=0,segment=29
+22:03:16.476 [crane] Crane applied seq=63,flags=00,trolley=-2,hoist=0,magnet=0,segment=30
+22:03:16.541 [crane] Crane applied seq=64,flags=00,trolley=-1,hoist=0,magnet=0,segment=31
+22:03:16.606 [crane] Crane applied seq=65,flags=00,trolley=0,hoist=0,magnet=0,segment=32
+22:03:16.656 [crane] Crane applied seq=66,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:03:16.757 [info] Fault cleared: Rail limit
+22:03:19.543 [crane] Crane applied seq=115,flags=00,trolley=-1,hoist=0,magnet=0,segment=33
+22:03:19.594 [crane] Crane applied seq=116,flags=00,trolley=-4,hoist=0,magnet=0,segment=34
+22:03:19.657 [fault] Fault raised: Rail limit (error code 4)
+22:03:19.657 [crane] Crane applied seq=117,flags=00,trolley=-7,hoist=0,magnet=0,segment=35
+22:03:19.723 [crane] Crane applied seq=118,flags=00,trolley=-13,hoist=0,magnet=0,segment=36
+22:03:19.774 [crane] Crane applied seq=119,flags=00,trolley=-20,hoist=0,magnet=0,segment=37
+22:03:19.827 [crane] Crane applied seq=120,flags=00,trolley=-25,hoist=0,magnet=0,segment=38
+22:03:19.891 [crane] Crane applied seq=121,flags=00,trolley=-30,hoist=0,magnet=0,segment=39
+22:03:19.956 [crane] Crane applied seq=122,flags=00,trolley=-36,hoist=0,magnet=0,segment=40
+22:03:20.009 [crane] Crane applied seq=123,flags=00,trolley=-43,hoist=0,magnet=0,segment=41
+22:03:20.075 [crane] Crane applied seq=124,flags=00,trolley=-48,hoist=0,magnet=0,segment=42
+22:03:20.125 [crane] Crane applied seq=125,flags=00,trolley=-53,hoist=0,magnet=0,segment=43
+22:03:20.191 [crane] Crane applied seq=126,flags=00,trolley=-55,hoist=0,magnet=0,segment=44
+22:03:20.257 [crane] Crane applied seq=127,flags=00,trolley=-57,hoist=0,magnet=0,segment=45
+22:03:20.321 [crane] Crane applied seq=128,flags=00,trolley=-59,hoist=0,magnet=0,segment=46
+22:03:20.373 [crane] Crane applied seq=129,flags=00,trolley=-59,hoist=0,magnet=0,segment=0
+22:03:20.425 [crane] Crane applied seq=130,flags=00,trolley=-60,hoist=0,magnet=0,segment=0
+22:03:20.952 [crane] Crane applied seq=139,flags=00,trolley=-58,hoist=0,magnet=0,segment=49
+22:03:21.008 [crane] Crane applied seq=140,flags=00,trolley=-55,hoist=0,magnet=0,segment=50
+22:03:21.072 [crane] Crane applied seq=141,flags=00,trolley=-51,hoist=0,magnet=0,segment=51
+22:03:21.137 [crane] Crane applied seq=142,flags=00,trolley=-45,hoist=0,magnet=0,segment=52
+22:03:21.187 [crane] Crane applied seq=143,flags=00,trolley=-38,hoist=0,magnet=0,segment=53
+22:03:21.242 [crane] Crane applied seq=144,flags=00,trolley=-33,hoist=0,magnet=0,segment=54
+22:03:21.307 [crane] Crane applied seq=145,flags=00,trolley=-28,hoist=0,magnet=0,segment=55
+22:03:21.376 [crane] Crane applied seq=146,flags=00,trolley=-21,hoist=0,magnet=0,segment=56
+22:03:21.441 [crane] Crane applied seq=147,flags=00,trolley=-15,hoist=0,magnet=0,segment=57
+22:03:21.506 [crane] Crane applied seq=148,flags=00,trolley=-8,hoist=0,magnet=0,segment=58
+22:03:21.576 [crane] Crane applied seq=149,flags=00,trolley=-2,hoist=0,magnet=0,segment=59
+22:03:21.636 [crane] Crane applied seq=150,flags=00,trolley=5,hoist=0,magnet=0,segment=60
+22:03:21.691 [crane] Crane applied seq=151,flags=00,trolley=11,hoist=0,magnet=0,segment=61
+22:03:21.753 [info] Fault cleared: Rail limit
+22:03:21.753 [crane] Crane applied seq=152,flags=00,trolley=17,hoist=0,magnet=0,segment=62
+22:03:21.807 [crane] Crane applied seq=153,flags=00,trolley=23,hoist=0,magnet=0,segment=63
+22:03:21.872 [crane] Crane applied seq=154,flags=00,trolley=28,hoist=0,magnet=0,segment=64
+22:03:21.872 [crane] Crane applied seq=155,flags=00,trolley=34,hoist=0,magnet=0,segment=65
+22:03:21.988 [crane] Crane applied seq=156,flags=00,trolley=40,hoist=0,magnet=0,segment=66
+22:03:22.042 [crane] Crane applied seq=157,flags=00,trolley=47,hoist=0,magnet=0,segment=67
+22:03:22.107 [crane] Crane applied seq=158,flags=00,trolley=51,hoist=0,magnet=0,segment=68
+22:03:22.173 [crane] Crane applied seq=159,flags=00,trolley=55,hoist=0,magnet=0,segment=69
+22:03:22.224 [crane] Crane applied seq=160,flags=00,trolley=57,hoist=0,magnet=0,segment=70
+22:03:22.287 [crane] Crane applied seq=161,flags=00,trolley=59,hoist=0,magnet=0,segment=71
+22:03:22.349 [crane] Crane applied seq=162,flags=00,trolley=59,hoist=0,magnet=0,segment=72
+22:03:22.406 [crane] Crane applied seq=163,flags=00,trolley=60,hoist=0,magnet=0,segment=0
+22:03:27.874 [crane] Crane applied seq=2,flags=00,trolley=59,hoist=0,magnet=0,segment=74
+22:03:27.940 [crane] Crane applied seq=3,flags=00,trolley=56,hoist=0,magnet=0,segment=75
+22:03:27.992 [crane] Crane applied seq=4,flags=00,trolley=52,hoist=0,magnet=0,segment=76
+22:03:28.057 [crane] Crane applied seq=5,flags=00,trolley=48,hoist=1,magnet=0,segment=78
+22:03:28.108 [crane] Crane applied seq=6,flags=00,trolley=41,hoist=4,magnet=0,segment=80
+22:03:28.158 [crane] Crane applied seq=7,flags=00,trolley=36,hoist=7,magnet=0,segment=82
+22:03:28.225 [crane] Crane applied seq=8,flags=00,trolley=31,hoist=11,magnet=0,segment=84
+22:03:28.292 [crane] Crane applied seq=9,flags=00,trolley=25,hoist=18,magnet=0,segment=86
+22:03:28.347 [crane] Crane applied seq=10,flags=00,trolley=18,hoist=25,magnet=0,segment=88
+22:03:28.401 [crane] Crane applied seq=11,flags=00,trolley=12,hoist=30,magnet=0,segment=90
+22:03:28.457 [crane] Crane applied seq=12,flags=00,trolley=8,hoist=36,magnet=0,segment=92
+22:03:28.520 [crane] Crane applied seq=13,flags=00,trolley=5,hoist=41,magnet=0,segment=94
+22:03:28.574 [crane] Crane applied seq=14,flags=00,trolley=3,hoist=48,magnet=0,segment=96
+22:03:28.638 [crane] Crane applied seq=15,flags=00,trolley=1,hoist=52,magnet=0,segment=98
+22:03:28.692 [crane] Crane applied seq=16,flags=00,trolley=1,hoist=55,magnet=0,segment=100
+22:03:28.757 [crane] Crane applied seq=17,flags=00,trolley=0,hoist=57,magnet=0,segment=102
+22:03:28.809 [crane] Crane applied seq=18,flags=00,trolley=0,hoist=58,magnet=0,segment=103
+22:03:28.874 [crane] Crane applied seq=19,flags=00,trolley=0,hoist=60,magnet=0,segment=104
+22:03:28.925 [crane] Crane applied seq=20,flags=00,trolley=0,hoist=60,magnet=0,segment=105
+22:03:28.991 [crane] Crane applied seq=21,flags=00,trolley=0,hoist=60,magnet=0,segment=0
+22:03:31.642 [crane] Crane applied seq=67,flags=00,trolley=0,hoist=59,magnet=0,segment=106
+22:03:31.650 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+22:03:31.705 [crane] Crane applied seq=68,flags=00,trolley=0,hoist=57,magnet=0,segment=107
+22:03:31.756 [crane] Crane applied seq=69,flags=01,trolley=0,hoist=0,magnet=0,segment=0
+22:03:33.248 [info] Soft stop released
+22:03:33.355 [crane] Crane applied seq=97,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:03:33.826 [crane] Crane applied seq=105,flags=00,trolley=0,hoist=1,magnet=0,segment=108
+22:03:33.891 [crane] Crane applied seq=106,flags=00,trolley=0,hoist=4,magnet=0,segment=109
+22:03:33.942 [crane] Crane applied seq=107,flags=00,trolley=0,hoist=8,magnet=0,segment=110
+22:03:34.000 [crane] Crane applied seq=108,flags=00,trolley=0,hoist=13,magnet=0,segment=111
+22:03:34.057 [crane] Crane applied seq=109,flags=00,trolley=0,hoist=19,magnet=0,segment=112
+22:03:34.126 [crane] Crane applied seq=110,flags=00,trolley=0,hoist=24,magnet=0,segment=113
+22:03:34.187 [crane] Crane applied seq=111,flags=00,trolley=0,hoist=31,magnet=0,segment=114
+22:03:34.241 [crane] Crane applied seq=112,flags=00,trolley=0,hoist=37,magnet=0,segment=115
+22:03:34.302 [crane] Crane applied seq=113,flags=00,trolley=0,hoist=43,magnet=0,segment=116
+22:03:34.357 [crane] Crane applied seq=114,flags=00,trolley=0,hoist=48,magnet=0,segment=117
+22:03:34.423 [crane] Crane applied seq=115,flags=00,trolley=0,hoist=52,magnet=0,segment=118
+22:03:34.474 [crane] Crane applied seq=116,flags=00,trolley=0,hoist=56,magnet=0,segment=119
+22:03:34.542 [crane] Crane applied seq=117,flags=00,trolley=0,hoist=58,magnet=0,segment=120
+22:03:34.608 [crane] Crane applied seq=118,flags=00,trolley=0,hoist=59,magnet=0,segment=121
+22:03:34.673 [crane] Crane applied seq=119,flags=00,trolley=0,hoist=60,magnet=0,segment=122
+22:03:34.737 [crane] Crane applied seq=120,flags=00,trolley=0,hoist=60,magnet=0,segment=0
+22:03:35.857 [crane] Crane applied seq=139,flags=00,trolley=0,hoist=59,magnet=0,segment=123
+22:03:35.922 [crane] Crane applied seq=140,flags=00,trolley=0,hoist=56,magnet=0,segment=124
+22:03:35.976 [crane] Crane applied seq=141,flags=00,trolley=0,hoist=51,magnet=0,segment=125
+22:03:36.041 [crane] Crane applied seq=142,flags=00,trolley=0,hoist=46,magnet=0,segment=126
+22:03:36.042 [crane] Crane applied seq=143,flags=00,trolley=0,hoist=41,magnet=0,segment=127
+22:03:36.147 [crane] Crane applied seq=144,flags=00,trolley=0,hoist=34,magnet=0,segment=128
+22:03:36.212 [crane] Crane applied seq=145,flags=00,trolley=0,hoist=29,magnet=0,segment=129
+22:03:36.274 [crane] Crane applied seq=146,flags=00,trolley=0,hoist=22,magnet=0,segment=130
+22:03:36.325 [crane] Crane applied seq=147,flags=00,trolley=0,hoist=16,magnet=0,segment=131
+22:03:36.389 [crane] Crane applied seq=148,flags=00,trolley=0,hoist=11,magnet=0,segment=132
+22:03:36.446 [crane] Crane applied seq=149,flags=00,trolley=0,hoist=7,magnet=0,segment=133
+22:03:36.506 [crane] Crane applied seq=150,flags=00,trolley=0,hoist=4,magnet=0,segment=134
+22:03:36.575 [crane] Crane applied seq=151,flags=00,trolley=0,hoist=2,magnet=0,segment=135
+22:03:36.639 [crane] Crane applied seq=152,flags=00,trolley=0,hoist=2,magnet=0,segment=136
+22:03:36.691 [crane] Crane applied seq=153,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:03:36.757 [crane] Crane applied seq=154,flags=00,trolley=0,hoist=0,magnet=1,segment=0
+22:03:38.042 [crane] Crane applied seq=176,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:03:39.824 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+22:03:39.937 [crane] Crane applied seq=209,flags=01,trolley=0,hoist=0,magnet=0,segment=0
+22:03:40.493 [info] Soft stop released
+22:03:40.514 [info] Soft stop released
+22:03:40.523 [crane] Crane applied seq=220,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:03:40.535 [info] Soft stop released
+22:03:41.624 [crane] Crane applied seq=239,flags=10,trolley=0,hoist=0,magnet=0,segment=0
+22:03:42.524 [crane] Crane applied seq=254,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:03:44.591 [crane] Crane applied seq=34,flags=04,trolley=0,hoist=0,magnet=0,segment=0
+22:03:47.641 [crane] Crane applied seq=86,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:05:20.353 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

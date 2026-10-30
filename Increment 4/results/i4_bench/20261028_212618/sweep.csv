@@ -1,0 +1,3 @@
+run_id,profile,pa,n,acked,per_pct,rig_received,ack_lost,never_arrived,rtt_min_ms,rtt_avg_ms,rtt_max_ms,retries_total,retries_max,tlm_valid,result
+20261028_212618,STATIC,LOW,200,200,0.0,200,0,0,0.657,0.709,2.269,8,2,,PASS
+20261028_212618,ICD,LOW,200,200,0.0,200,0,0,0.682,0.818,3.992,5,4,199,PASS

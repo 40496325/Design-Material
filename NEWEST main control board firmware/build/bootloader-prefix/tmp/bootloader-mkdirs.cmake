@@ -10,18 +10,18 @@ if(NOT EXISTS "C:/esp/v6.1/esp-idf/components/bootloader/subproject")
   file(MAKE_DIRECTORY "C:/esp/v6.1/esp-idf/components/bootloader/subproject")
 endif()
 file(MAKE_DIRECTORY
-  "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader"
-  "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix"
-  "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/tmp"
-  "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp"
-  "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src"
-  "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp"
+  "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader"
+  "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix"
+  "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/tmp"
+  "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp"
+  "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src"
+  "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
+    file(MAKE_DIRECTORY "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
 endif()

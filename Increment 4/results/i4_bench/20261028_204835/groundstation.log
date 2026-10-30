@@ -1,0 +1,21 @@
+20:48:35.707 ets Jul 29 2019 12:21:46
+20:48:35.707 
+20:48:35.708 rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)
+20:48:35.771 configsip: 0, SPIWP:0xee
+20:48:35.771 clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+20:48:35.771 mode:DIO, clock div:2
+20:48:35.771 load:0x3fff0030,len:1184
+20:48:35.771 load:0x40078000,len:13232
+20:48:35.771 load:0x40080400,len:3028
+20:48:35.771 entry 0x400805e4
+20:48:36.471 
+20:48:36.471 # REII groundstation v4.0.0 board=NodeMCU-32S app_ch=77 ctrl_ch=80 (Increment 4)
+20:48:36.471 radio.begin() FAILED - check 3V3, CE GPIO4, CSN GPIO5, SCK 18, MISO 19, MOSI 23
+20:48:36.471 GS,LINK,mode=APP,ch=77,rate=2M,pa=LOW,arc=5,ard_us=500,profile=ICD,payload=dyn32+ackpl32,tx_to=REII2,radio=NOT_RESPONDING
+20:48:36.471 READY
+20:48:36.473 >>> INFO
+20:48:36.534 
+20:48:36.534 # REII groundstation v4.0.0 board=NodeMCU-32S app_ch=77 ctrl_ch=80 (Increment 4)
+20:48:36.534 GS,LINK,mode=APP,ch=77,rate=2M,pa=LOW,arc=5,ard_us=500,profile=ICD,payload=dyn32+ackpl32,tx_to=REII2,radio=NOT_RESPONDING
+20:48:36.534 GS,STATS,sent=0,acked=0,failed=0,tlm=0,next_seq=0
+20:48:36.534 OK,INFO

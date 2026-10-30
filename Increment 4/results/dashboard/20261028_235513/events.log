@@ -1,0 +1,12 @@
+23:55:13.951 [info] Listening to the crane console on COM12
+23:55:14.017 [info] Link connecting: checking ground station on COM10
+23:55:14.733 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+23:55:14.733 [info] Link running
+23:55:14.828 [info] Crane set over USB to channel 77, power LOW
+23:55:14.860 [fault] Fault raised: Wireless timeout (error code 8)
+23:55:14.924 [info] Fault cleared: Wireless timeout
+23:55:31.502 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+23:55:31.609 [crane] Crane applied seq=33,flags=01,trolley=0,hoist=0,magnet=0,segment=0
+23:55:40.495 [info] Soft stop released
+23:55:40.591 [crane] Crane applied seq=188,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+23:55:43.750 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

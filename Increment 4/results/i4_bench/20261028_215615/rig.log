@@ -1,0 +1,278 @@
+21:56:15.836 IG,HB,up=110,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.836 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.836 I (112234) main: AHT20: 27.00 degC, 33.13 %RH
+21:56:15.836 I (115143) main: ADS1220 AIN0: 0.0036 V
+21:56:15.836 RIG,HB,up=115,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.836 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.836 I (117318) main: AHT20: 26.97 degC, 33.19 %RH
+21:56:15.836 RIG,HB,up=120,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.836 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.836 I (121184) main: ADS1220 AIN0: 0.0034 V
+21:56:15.836 I (122402) main: AHT20: 26.98 degC, 33.21 %RH
+21:56:15.836 RIG,HB,up=125,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.838 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.838 I (127225) main: ADS1220 AIN0: 0.0036 V
+21:56:15.838 I (127486) main: AHT20: 26.99 degC, 33.28 %RH
+21:56:15.838 RIG,HB,up=130,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.838 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.838 I (132571) main: AHT20: 26.98 degC, 33.27 %RH
+21:56:15.838 I (133266) main: ADS1220 AIN0: 0.0035 V
+21:56:15.838 RIG,HB,up=135,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.838 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.838 I (137655) main: AHT20: 26.98 degC, 33.30 %RH
+21:56:15.839 I (139307) main: ADS1220 AIN0: 0.0035 V
+21:56:15.839 RIG,HB,up=140,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.839 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.839 I (142739) main: AHT20: 26.98 degC, 33.28 %RH
+21:56:15.839 I (145348) main: ADS1220 AIN0: 0.0036 V
+21:56:15.839 RIG,HB,up=145,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.839 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.839 I (147823) main: AHT20: 26.98 degC, 33.20 %RH
+21:56:15.839 RIG,HB,up=150,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.839 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.839 I (151388) main: ADS1220 AIN0: 0.0035 V
+21:56:15.839 I (152907) main: AHT20: 26.97 degC, 33.20 %RH
+21:56:15.839 RIG,HB,up=155,frames=3,pings=3,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:15.839 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:15.839 I (157429) main: ADS1220 AIN0: 0.0035 V
+21:56:16.939 >>> INFO
+21:56:16.949 I (157991) main: AHT20: 26.95 degC, RIG,INFO,fw=4.1.0,name=REII crane rig (Increment 4),variant=nRF24L01+,probe=OK,setup_aw=03,spi_hz=4000000,csn=GPIO17(J1.1),sck=GPIO12,mosi=GPIO11,miso=GPIO13,pwr=GPIO47(+3.3VP J1.8)
+21:56:16.949 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:56:17.015 RIG,REGS,CONFIG=0F,EN_AA=03,EN_RXADDR=02,SETUP_AW=03,SETUP_RETR=15,RF_CH=77,RF_SETUP=0B,STATUS=0E,FIFO=01,RX_PW_P1=32,DYNPD=03,FEATURE=06
+21:56:17.015 RIG,ADDR,RX_ADDR_P1=0x3249494552('REII2'),TX_ADDR=0x3149494552,RX_ADDR_P0=0x3149494552
+21:56:17.015 RIG,STATS,up=269,frames=4,pings=4,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:17.015 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:17.015 OK,INFO
+21:56:17.647 I (269889) main: AHT20: 26.91 degC, 32.41 %RH
+21:56:17.763 >>> MODE APP
+21:56:17.836 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:56:17.836 OK,MODE,APP,cfg_errors=0
+21:56:17.838 >>> PROFILE ICD
+21:56:17.899 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:56:17.900 OK,PROFILE,ICD,cfg_errors=0
+21:56:17.902 >>> PA LOW
+21:56:17.962 OK,PA,LOW,cfg_errors=0
+21:56:17.966 >>> LOG 1
+21:56:18.026 OK,LOG,1
+21:56:18.030 >>> CLEAR
+21:56:18.090 OK,CLEAR
+21:56:18.203 RIG,HB,up=270,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:18.203 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:18.222 >>> STATS
+21:56:18.267 RIG,STATS,up=270,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:18.268 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:18.268 OK,STATS
+21:56:18.330 RIG,RX,1,1,0,32,1,0
+21:56:18.391 RIG,RX,2,1,1,32,1,0
+21:56:18.441 RIG,RX,3,1,2,32,1,0
+21:56:18.506 RIG,RX,4,1,3,32,1,0
+21:56:18.573 RIG,RX,5,1,4,32,1,0
+21:56:18.639 RIG,RX,6,1,5,32,1,0
+21:56:18.691 RIG,RX,7,1,6,32,1,0
+21:56:18.836 RIG,RX,8,1,7,32,1,0
+21:56:18.889 RIG,RX,9,1,8,32,1,0
+21:56:18.953 RIG,RX,10,1,9,32,1,0
+21:56:19.016 RIG,RX,11,1,10,32,1,0
+21:56:19.074 RIG,RX,12,1,11,32,1,0
+21:56:19.138 RIG,RX,13,1,12,32,1,0
+21:56:19.201 RIG,RX,14,1,13,32,1,0
+21:56:19.264 RIG,RX,15,1,14,32,1,0
+21:56:19.317 RIG,RX,16,1,15,32,1,0
+21:56:19.371 RIG,RX,17,1,16,32,1,0
+21:56:19.425 RIG,RX,18,1,17,32,1,0
+21:56:19.489 RIG,RX,19,1,18,32,1,0
+21:56:19.542 RIG,RX,20,1,19,32,1,0
+21:56:19.607 RIG,RX,21,1,20,32,1,0
+21:56:19.658 RIG,RX,22,1,21,32,1,0
+21:56:19.720 RIG,RX,23,1,22,32,1,0
+21:56:19.785 RIG,RX,24,1,23,32,1,0
+21:56:19.848 RIG,RX,25,1,24,32,1,0
+21:56:19.906 RIG,RX,26,1,25,32,1,0
+21:56:19.964 RIG,RX,27,1,26,32,1,0
+21:56:19.964 I (272207) main: ADS1220 AIN0: 0.0035 V
+21:56:20.028 RIG,RX,28,1,27,32,1,0
+21:56:20.090 RIG,RX,29,1,28,32,1,0
+21:56:20.153 RIG,RX,30,1,29,32,1,0
+21:56:20.207 RIG,RX,31,1,30,32,1,0
+21:56:20.273 RIG,RX,32,1,31,32,1,0
+21:56:20.325 RIG,RX,33,1,32,32,1,0
+21:56:20.388 RIG,RX,34,1,33,32,1,0
+21:56:20.454 RIG,RX,35,1,34,32,1,0
+21:56:20.517 RIG,RX,36,1,35,32,1,0
+21:56:20.578 RIG,RX,37,1,36,32,1,0
+21:56:20.641 RIG,RX,38,1,37,32,1,0
+21:56:20.703 RIG,RX,39,1,38,32,1,0
+21:56:20.765 RIG,RX,40,1,39,32,1,0
+21:56:20.829 RIG,RX,41,1,40,32,1,0
+21:56:20.881 RIG,RX,42,1,41,32,1,0
+21:56:20.940 RIG,RX,43,1,42,32,1,0
+21:56:20.991 RIG,RX,44,1,43,32,1,0
+21:56:21.047 RIG,RX,45,1,44,32,1,0
+21:56:21.106 RIG,RX,46,1,45,32,1,0
+21:56:21.160 RIG,RX,47,1,46,32,1,0
+21:56:21.211 RIG,RX,48,1,47,32,1,0
+21:56:21.277 RIG,RX,49,1,48,32,1,0
+21:56:21.330 RIG,RX,50,1,49,32,1,0
+21:56:21.386 RIG,RX,51,1,50,32,1,0
+21:56:21.441 RIG,RX,52,1,51,32,1,0
+21:56:21.506 RIG,RX,53,1,52,32,1,0
+21:56:21.568 RIG,RX,54,1,53,32,1,0
+21:56:21.624 RIG,RX,55,1,54,32,1,0
+21:56:21.688 RIG,RX,56,1,55,32,1,0
+21:56:21.740 RIG,RX,57,1,56,32,1,0
+21:56:21.804 RIG,RX,58,1,57,32,1,0
+21:56:21.855 RIG,RX,59,1,58,32,1,0
+21:56:21.910 RIG,RX,60,1,59,32,1,0
+21:56:21.965 RIG,RX,61,1,60,32,1,0
+21:56:22.017 RIG,RX,62,1,61,32,1,0
+21:56:22.075 RIG,RX,63,1,62,32,1,0
+21:56:22.137 RIG,RX,64,1,63,32,1,0
+21:56:22.195 RIG,RX,65,1,64,32,1,0
+21:56:22.256 RIG,RX,66,1,65,32,1,0
+21:56:22.308 RIG,RX,67,1,66,32,1,0
+21:56:22.372 RIG,RX,68,1,67,32,1,0
+21:56:22.424 RIG,RX,69,1,68,32,1,0
+21:56:22.474 RIG,RX,70,1,69,32,1,0
+21:56:22.538 RIG,RX,71,1,70,32,1,0
+21:56:22.602 RIG,RX,72,1,71,32,1,0
+21:56:22.664 RIG,RX,73,1,72,32,1,0
+21:56:22.723 RIG,RX,74,1,73,32,1,0
+21:56:22.723 I (274974) main: AHT20: 26.89 degC, 32.40 %RH
+21:56:22.788 RIG,RX,75,1,74,32,1,0
+21:56:22.840 RIG,RX,76,1,75,32,1,0
+21:56:22.905 RIG,RX,77,1,76,32,1,0
+21:56:22.967 RIG,RX,78,1,77,32,1,0
+21:56:23.023 RIG,RX,79,1,78,32,1,0
+21:56:23.086 RIG,RX,80,1,79,32,1,0
+21:56:23.142 RIG,RX,81,1,80,32,1,0
+21:56:23.192 RIG,RX,82,1,81,32,1,0
+21:56:23.193 RIG,HB,up=275,frames=82,pings=82,moves=0,bad=0,dups=0,period_frames=82,link=OK,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:23.193 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:23.256 RIG,RX,83,1,82,32,1,0
+21:56:23.312 RIG,RX,84,1,83,32,1,0
+21:56:23.371 RIG,RX,85,1,84,32,1,0
+21:56:23.435 RIG,RX,86,1,85,32,1,0
+21:56:23.498 RIG,RX,87,1,86,32,1,0
+21:56:23.562 RIG,RX,88,1,87,32,1,0
+21:56:23.625 RIG,RX,89,1,88,32,1,0
+21:56:23.689 RIG,RX,90,1,89,32,1,0
+21:56:23.743 RIG,RX,91,1,90,32,1,0
+21:56:23.795 RIG,RX,92,1,91,32,1,0
+21:56:23.845 RIG,RX,93,1,92,32,1,0
+21:56:23.910 RIG,RX,94,1,93,32,1,0
+21:56:23.973 RIG,RX,95,1,94,32,1,0
+21:56:24.023 RIG,RX,96,1,95,32,1,0
+21:56:24.075 RIG,RX,97,1,96,32,1,0
+21:56:24.140 RIG,RX,98,1,97,32,1,0
+21:56:24.191 RIG,RX,99,1,98,32,1,0
+21:56:24.242 RIG,RX,100,1,99,32,1,0
+21:56:24.305 RIG,RX,101,1,100,32,1,0
+21:56:24.355 RIG,RX,102,1,101,32,1,0
+21:56:24.406 RIG,RX,103,1,102,32,1,0
+21:56:24.458 RIG,RX,104,1,103,32,1,0
+21:56:24.519 RIG,RX,105,1,104,32,1,0
+21:56:24.572 RIG,RX,106,1,105,32,1,0
+21:56:24.625 RIG,RX,107,1,106,32,1,0
+21:56:24.675 RIG,RX,108,1,107,32,1,0
+21:56:24.740 RIG,RX,109,1,108,32,1,0
+21:56:24.804 RIG,RX,110,1,109,32,1,0
+21:56:24.868 RIG,RX,111,1,110,32,1,0
+21:56:24.932 RIG,RX,112,1,111,32,1,0
+21:56:24.995 RIG,RX,113,1,112,32,1,0
+21:56:25.059 RIG,RX,114,1,113,32,1,0
+21:56:25.111 RIG,RX,115,1,114,32,1,0
+21:56:25.172 RIG,RX,116,1,115,32,1,0
+21:56:25.224 RIG,RX,117,1,116,32,1,0
+21:56:25.276 RIG,RX,118,1,117,32,1,0
+21:56:25.330 RIG,RX,119,1,118,32,1,0
+21:56:25.395 RIG,RX,120,1,119,32,1,0
+21:56:25.456 RIG,RX,121,1,120,32,1,0
+21:56:25.519 RIG,RX,122,1,121,32,1,0
+21:56:25.582 RIG,RX,123,1,122,32,1,0
+21:56:25.640 RIG,RX,124,1,123,32,1,0
+21:56:25.691 RIG,RX,125,1,124,32,1,0
+21:56:25.743 RIG,RX,126,1,125,32,1,0
+21:56:25.793 RIG,RX,127,1,126,32,1,0
+21:56:25.843 RIG,RX,128,1,127,32,1,0
+21:56:25.893 RIG,RX,129,1,128,32,1,0
+21:56:25.945 RIG,RX,130,1,129,32,1,0
+21:56:26.002 RIG,RX,131,1,130,32,1,0
+21:56:26.003 I (278248) main: ADS1220 AIN0: 0.0035 V
+21:56:26.057 RIG,RX,132,1,131,32,1,0
+21:56:26.108 RIG,RX,133,1,132,32,1,0
+21:56:26.158 RIG,RX,134,1,133,32,1,0
+21:56:26.223 RIG,RX,135,1,134,32,1,0
+21:56:26.288 RIG,RX,136,1,135,32,1,0
+21:56:26.341 RIG,RX,137,1,136,32,1,0
+21:56:26.405 RIG,RX,138,1,137,32,1,0
+21:56:26.469 RIG,RX,139,1,138,32,1,0
+21:56:26.532 RIG,RX,140,1,139,32,1,0
+21:56:26.595 RIG,RX,141,1,140,32,1,0
+21:56:26.659 RIG,RX,142,1,141,32,1,0
+21:56:26.722 RIG,RX,143,1,142,32,1,0
+21:56:26.785 RIG,RX,144,1,143,32,1,0
+21:56:26.849 RIG,RX,145,1,144,32,1,0
+21:56:26.912 RIG,RX,146,1,145,32,1,0
+21:56:26.974 RIG,RX,147,1,146,32,1,0
+21:56:27.037 RIG,RX,148,1,147,32,1,0
+21:56:27.101 RIG,RX,149,1,148,32,1,0
+21:56:27.165 RIG,RX,150,1,149,32,1,0
+21:56:27.229 RIG,RX,151,1,150,32,1,0
+21:56:27.293 RIG,RX,152,1,151,32,1,0
+21:56:27.357 RIG,RX,153,1,152,32,1,0
+21:56:27.421 RIG,RX,154,1,153,32,1,0
+21:56:27.484 RIG,RX,155,1,154,32,1,0
+21:56:27.547 RIG,RX,156,1,155,32,1,0
+21:56:27.611 RIG,RX,157,1,156,32,1,0
+21:56:27.674 RIG,RX,158,1,157,32,1,0
+21:56:27.739 RIG,RX,159,1,158,32,1,0
+21:56:27.802 RIG,RX,160,1,159,32,1,0
+21:56:27.803 I (280058) main: AHT20: 26.91 degC, 32.46 %RH
+21:56:27.867 RIG,RX,161,1,160,32,1,0
+21:56:27.932 RIG,RX,162,1,161,32,1,0
+21:56:27.997 RIG,RX,163,1,162,32,1,0
+21:56:28.061 RIG,RX,164,1,163,32,1,0
+21:56:28.125 RIG,RX,165,1,164,32,1,0
+21:56:28.189 RIG,RX,166,1,165,32,1,0
+21:56:28.189 RIG,HB,up=280,frames=166,pings=166,moves=0,bad=0,dups=0,period_frames=84,link=OK,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0,tlm=MODEL
+21:56:28.189 RIG,TLM,source=MODEL,trolley_pos=0,hoist_pos=0,trolley_vel=0,hoist_vel=0,load_x10=0,magnet=0,brake=1,vfd=0,overload=0,rail_limit=0,timeout_latched=1
+21:56:28.252 RIG,RX,167,1,166,32,1,0
+21:56:28.315 RIG,RX,168,1,167,32,1,0
+21:56:28.379 RIG,RX,169,1,168,32,1,0
+21:56:28.443 RIG,RX,170,1,169,32,1,0
+21:56:28.507 RIG,RX,171,1,170,32,1,0
+21:56:28.571 RIG,RX,172,1,171,32,1,0
+21:56:28.635 RIG,RX,173,1,172,32,1,0
+21:56:28.698 RIG,RX,174,1,173,32,1,0
+21:56:28.763 RIG,RX,175,1,174,32,1,0
+21:56:28.827 RIG,RX,176,1,175,32,1,0
+21:56:28.891 RIG,RX,177,1,176,32,1,0
+21:56:28.955 RIG,RX,178,1,177,32,1,0
+21:56:29.018 RIG,RX,179,1,178,32,1,0
+21:56:29.083 RIG,RX,180,1,179,32,1,0
+21:56:29.147 RIG,RX,181,1,180,32,1,0
+21:56:29.211 RIG,RX,182,1,181,32,1,0
+21:56:29.274 RIG,RX,183,1,182,32,1,0
+21:56:29.338 RIG,RX,184,1,183,32,1,0
+21:56:29.403 RIG,RX,185,1,184,32,1,0
+21:56:29.467 RIG,RX,186,1,185,32,1,0
+21:56:29.530 RIG,RX,187,1,186,32,1,0
+21:56:29.593 RIG,RX,188,1,187,32,1,0
+21:56:29.656 RIG,RX,189,1,188,32,1,0
+21:56:29.719 RIG,RX,190,1,189,32,1,0
+21:56:29.783 RIG,RX,191,1,190,32,1,0
+21:56:29.846 RIG,RX,192,1,191,32,1,0
+21:56:29.912 RIG,RX,193,1,192,32,1,0
+21:56:29.976 RIG,RX,194,1,193,32,1,0
+21:56:30.040 RIG,RX,195,1,194,32,1,0
+21:56:30.104 RIG,RX,196,1,195,32,1,0
+21:56:30.168 RIG,RX,197,1,196,32,1,0
+21:56:30.232 RIG,RX,198,1,197,32,1,0
+21:56:30.295 RIG,RX,199,1,198,32,1,0
+21:56:30.359 RIG,RX,200,1,199,32,1,0
+21:56:30.806 RIG,WARN,link lost (no frame for 500 ms) - safe hold
+21:56:30.871 >>> PROFILE ICD
+21:56:30.935 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:56:30.935 OK,PROFILE,ICD,cfg_errors=0
+21:56:30.937 >>> PA LOW
+21:56:30.998 OK,PA,LOW,cfg_errors=0

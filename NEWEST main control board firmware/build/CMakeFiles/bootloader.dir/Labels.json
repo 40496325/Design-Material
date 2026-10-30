@@ -2,34 +2,34 @@
 	"sources" : 
 	[
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/CMakeFiles/bootloader"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/CMakeFiles/bootloader"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/CMakeFiles/bootloader.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/CMakeFiles/bootloader.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/CMakeFiles/bootloader-complete.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/CMakeFiles/bootloader-complete.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
 		},
 		{
-			"file" : "D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+			"file" : "D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
 		}
 	],
 	"target" : 

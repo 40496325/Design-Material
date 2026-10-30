@@ -1,24 +1,11 @@
 #include <Arduino.h>
 #include <string.h>
-
 #include <WiFi.h>
 #include <esp_bt.h>
 
 #include "groundstation.h"
 
-// REII ESP groundstation dongle — NodeMCU-32S + nRF24L01+ PA+LNA.
-// Serial (USB, 115200, newline terminated):
-//   INFO            dump nRF24 registers (printPrettyDetails)
-//   PING            control-link round trip vs peer (PONG,ok,ms)
-//   APP             switch to application baseline ch77/2M (PROVISIONAL link config)
-//   CTRL            back to control-link fallback ch80
-//   CMD <hex32B>    send 32-byte downlink on app config, report ACK + ACK-payload (hex)
-//   ECHO <text>     USB-CDC echo (bring-up step 1, isolates USB before RF)
-//   HELP            command list
-//
-// Bring-up order (D-05 adapted for ESP): ECHO -> INFO -> PING -> APP smoke -> CMD loopback.
-// Wiring: 3.3V only, 10uF+100nF at module, antenna before power, SPI <= 4 MHz Dupont,
-// PA_LOW below ~2 m (LNA saturation). See docs/04_rf_baseline.md.
+#define GROUNDSTATION_VERSION "1.0.0"
 
 namespace {
 
@@ -83,7 +70,44 @@ void handleLine(char* line) {
     return;
   }
   if (!strcmp(tok, "HELP")) {
-    Serial.println(F("CMDS: INFO PING APP CTRL CMD<hex64> ECHO<text> HELP"));
+    Serial.println(F("CMDS: INFO PING APP CTRL CMD<hex64> ECHO<text> CARRIER[ms] RPD[ms] PA<0-3> HELP"));
+  } else if (!strcmp(tok, "CARRIER")) {
+    // DIAG: transmit an unmodulated carrier on ch77 so the crane's RPD counter
+    // (heartbeat 'rpd_hits') proves whether its receiver hears this radio at all.
+    char* arg = strtok(nullptr, " ");
+    uint32_t ms = arg ? (uint32_t)atol(arg) : 5000;
+    if (ms < 100) ms = 100;
+    if (ms > 30000) ms = 30000;
+    Serial.print(F("OK,carrier_on,ch=")); Serial.print(gs::APP_CHANNEL);
+    Serial.print(F(",ms=")); Serial.println(ms);
+    gs::radio.stopListening();
+    gs::radio.startConstCarrier(RF24_PA_MAX, gs::APP_CHANNEL);
+    delay(ms);
+    gs::radio.stopConstCarrier();
+    gs::restoreAppConfig();
+    Serial.println(F("OK,carrier_off"));
+  } else if (!strcmp(tok, "RPD")) {
+    // DIAG: count how often this radio detects > -64 dBm on ch77 (ambient / Wi-Fi check).
+    char* arg = strtok(nullptr, " ");
+    uint32_t ms = arg ? (uint32_t)atol(arg) : 2000;
+    if (ms > 30000) ms = 30000;
+    gs::radio.startListening();
+    uint32_t hits = 0, samples = 0;
+    const uint32_t t0 = millis();
+    while (millis() - t0 < ms) {
+      delayMicroseconds(500);
+      if (gs::radio.testRPD()) hits++;
+      samples++;
+    }
+    Serial.print(F("RPD,")); Serial.print(hits); Serial.print('/'); Serial.println(samples);
+  } else if (!strcmp(tok, "PA")) {
+    // DIAG: 0=MIN 1=LOW 2=HIGH 3=MAX. PA+LNA modules saturate each other at <1 m on MAX.
+    char* arg = strtok(nullptr, " ");
+    int lvl = arg ? atoi(arg) : 3;
+    if (lvl < 0) lvl = 0;
+    if (lvl > 3) lvl = 3;
+    gs::radio.setPALevel((rf24_pa_dbm_e)lvl);
+    Serial.print(F("OK,pa=")); Serial.println(lvl);
   } else if (!strcmp(tok, "ECHO")) {
     char* rest = strtok(nullptr, "");
     Serial.print(F("ECHO,"));
@@ -91,7 +115,7 @@ void handleLine(char* line) {
   } else if (!strcmp(tok, "INFO")) {
     gs::radio.printPrettyDetails();
   } else if (!strcmp(tok, "CTRL")) {
-     gs::applyControlConfig();
+    gs::applyControlConfig();
     Serial.println(F("OK,ctrl_ch=80"));
   } else if (!strcmp(tok, "APP")) {
     gs::applyAppConfig();
@@ -99,11 +123,17 @@ void handleLine(char* line) {
   } else if (!strcmp(tok, "PING")) {
     uint8_t ping[gs::PAYLOAD_SIZE];
     memset(ping, 0, sizeof(ping));
-    ping[0] = 0xA5;  // matches bench MAGIC_CMD
-    ping[1] = 0x01;  // CMD_PING
+    ping[0] = 0xA5;
+    ping[1] = 0x01;
     gs::radio.stopListening();
     const uint32_t t0 = millis();
     const bool ok = gs::radio.write(ping, sizeof(ping));
+    uint8_t ack[gs::PAYLOAD_SIZE];
+    bool hasAck = false;
+    if (ok && gs::radio.isAckPayloadAvailable()) {
+      gs::radio.read(&ack, sizeof(ack));
+      hasAck = true;
+    }
     gs::radio.startListening();
     Serial.print(F("PONG,"));
     Serial.print(ok ? 1 : 0);
@@ -159,7 +189,6 @@ void setup() {
 
 void loop() {
   if (readSerialLine(s_line, sizeof(s_line))) handleLine(s_line);
-  // Drain stale RX frames so they never confuse the next command.
   while (gs::radio.available()) {
     uint8_t junk[gs::PAYLOAD_SIZE];
     gs::radio.read(junk, sizeof(junk));

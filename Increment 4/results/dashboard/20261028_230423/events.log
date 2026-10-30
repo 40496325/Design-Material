@@ -1,0 +1,10 @@
+23:04:23.782 [info] Listening to the crane console on COM12
+23:04:23.849 [info] Link connecting: checking ground station on COM10
+23:04:24.440 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+23:04:24.440 [info] Link running
+23:04:24.503 [fault] Fault raised: Wireless timeout (error code 8)
+23:04:39.387 [info] Fault reset sent
+23:04:39.493 [crane] Crane applied seq=3,flags=02,trolley=0,hoist=0,magnet=0,segment=0
+23:04:39.557 [info] Fault cleared: Wireless timeout
+23:04:39.786 [crane] Crane applied seq=8,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+23:13:52.109 [info] Ping queued

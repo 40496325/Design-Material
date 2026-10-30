@@ -1,0 +1,17 @@
+{
+  "findings": [
+    "Crane receiver heard NO energy on any channel: crane nRF receive path is dead, or CE is not reaching the module (check the CE jumper on J3.3 / J7.10).",
+    "GS did not hear the crane's carrier (RPD 228/8585): crane transmitter or CE path at fault, or the radios are too far apart.",
+    "Crane did not hear the GS carrier (RPD 0/3549): crane receiver / CE at fault, or GS transmitter dead."
+  ],
+  "gs_scan_total": 69,
+  "rig_scan_total": 0,
+  "crane_to_gs_rpd": [
+    228,
+    8585
+  ],
+  "gs_to_crane_rpd": [
+    0,
+    3549
+  ]
+}

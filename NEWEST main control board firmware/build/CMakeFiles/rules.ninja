@@ -2417,7 +2417,7 @@ rule C_STATIC_LIBRARY_LINKER____idf_main_
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "C:\Program Files\CMake\bin\cmake.exe" --regenerate-during-build -S"D:\DESIGN GIT\REII_Cline_Project_Context_Verified_New\NEWEST_EngDes26_start main rig micro" -B"D:\DESIGN GIT\REII_Cline_Project_Context_Verified_New\NEWEST_EngDes26_start main rig micro\build"
+  command = "C:\Program Files\CMake\bin\cmake.exe" --regenerate-during-build -S"D:\DESIGN GIT\Design-Material\NEWEST main control board firmware" -B"D:\DESIGN GIT\Design-Material\NEWEST main control board firmware\build"
   description = Re-running CMake...
   generator = 1
 

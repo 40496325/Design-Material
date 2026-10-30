@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REII crane console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <h1>REII crane console</h1>
+    <p class="sub">Group 13 gantry crane, wireless link on channel 77 at 2 Mbps (ICD IF10.0)</p>
+  </div>
+  <div class="linkbar" aria-live="polite">
+    <span id="linkState" class="chip chip-wait">Starting</span>
+    <dl class="linkstats">
+      <div><dt>Loss</dt><dd id="statPer">–</dd></div>
+      <div><dt>Round trip</dt><dd id="statRtt">–</dd></div>
+      <div><dt>Retries</dt><dd id="statArc">–</dd></div>
+      <div><dt>Commands</dt><dd id="statSent">–</dd></div>
+      <div><dt>Radio</dt><dd id="statPa">–</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="panel gantry-panel" aria-label="Crane position">
+    <div id="linkBanner" class="banner" hidden></div>
+    <svg id="gantry" viewBox="0 0 1000 380" role="img" aria-label="Side view of the gantry crane">
+      <defs>
+        <pattern id="hazard" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="24" height="24" class="hz-a"/>
+          <rect width="12" height="24" class="hz-b"/>
+        </pattern>
+      </defs>
+      <line class="floor" x1="10" y1="350" x2="990" y2="350"/>
+      <rect class="leg" x="34" y="44" width="22" height="306"/>
+      <rect class="leg" x="944" y="44" width="22" height="306"/>
+      <rect class="beam" x="24" y="30" width="952" height="26"/>
+      <rect id="stopL" class="endstop" x="56" y="56" width="8" height="18"/>
+      <rect id="stopR" class="endstop" x="936" y="56" width="8" height="18"/>
+      <g id="trolley">
+        <rect class="trolley" x="-44" y="56" width="88" height="34" rx="3"/>
+        <circle class="wheel" cx="-26" cy="56" r="7"/>
+        <circle class="wheel" cx="26" cy="56" r="7"/>
+        <path id="dirL" class="dir" d="M -56 73 l 10 -8 v 16 z"/>
+        <path id="dirR" class="dir" d="M 56 73 l -10 -8 v 16 z"/>
+        <line id="cable" class="cable" x1="0" y1="90" x2="0" y2="200"/>
+        <g id="hook">
+          <rect id="magnet" class="magnet" x="-34" y="0" width="68" height="22" rx="4"/>
+          <g id="loadBox" hidden>
+            <rect class="load" x="-46" y="24" width="92" height="30" rx="2"/>
+            <text id="loadText" class="load-text" x="0" y="44" text-anchor="middle">0 kg</text>
+          </g>
+        </g>
+      </g>
+      <text id="posLabel" class="axis-label" x="500" y="374" text-anchor="middle">–</text>
+    </svg>
+
+    <div class="readouts">
+      <div class="readout"><span class="r-label">Trolley position</span><span class="r-val"><b id="tPos">–</b> m</span></div>
+      <div class="readout"><span class="r-label">Trolley speed</span><span class="r-val"><b id="tVel">–</b> m/s</span></div>
+      <div class="readout"><span class="r-label">Hook height</span><span class="r-val"><b id="hPos">–</b> m</span></div>
+      <div class="readout"><span class="r-label">Hoist speed</span><span class="r-val"><b id="hVel">–</b> mm/s</span></div>
+      <div class="readout readout-load">
+        <span class="r-label">Load</span><span class="r-val"><b id="load">–</b> kg</span>
+        <div class="loadbar" aria-hidden="true"><i id="loadBar"></i><em title="20 kg overload limit"></em></div>
+        <small id="loadCheck" class="loadcheck"></small>
+        <div id="loadTools" class="loadtools" hidden>
+          <button type="button" data-action="load_tare" title="Re-zero with the hook unloaded">Tare</button>
+          <input id="calKg" type="number" min="0.05" max="50" step="0.001" placeholder="known kg" aria-label="Known mass in kg">
+          <button type="button" id="calBtn" title="Hang the known mass, then calibrate">Calibrate</button>
+        </div>
+      </div>
+      <div class="readout"><span class="r-label">Hoist drive current</span><span class="r-val"><b id="vfdI">–</b> A</span></div>
+      <div class="readout"><span class="r-label">Magnet</span><span class="r-val"><b id="magI">–</b> A <small id="magS"></small></span></div>
+      <div class="readout"><span class="r-label">Telemetry age</span><span class="r-val"><b id="tlmAge">–</b> s</span></div>
+    </div>
+  </section>
+
+  <div class="side">
+  <aside class="panel controls" aria-label="Operator controls">
+    <button id="softStop" class="stop" type="button">Soft stop</button>
+    <p class="hint">Soft stop is a software command. The red E-stop on the crane cuts the power.</p>
+
+    <div class="axis">
+      <div class="axis-head"><label for="trolley">Trolley</label><output id="trolleyOut">0 %</output></div>
+      <input id="trolley" type="range" min="-100" max="100" step="1" value="0">
+      <div class="axis-ends"><span>Left</span><span class="axis-cmd">Sent to crane <b id="trolleyCmd">0</b> %</span><span>Right</span></div>
+    </div>
+    <div class="axis">
+      <div class="axis-head"><label for="hoist">Hoist</label><output id="hoistOut">0 %</output></div>
+      <input id="hoist" type="range" min="-100" max="100" step="1" value="0">
+      <div class="axis-ends"><span>Down</span><span class="axis-cmd">Sent to crane <b id="hoistCmd">0</b> %</span><span>Up</span></div>
+    </div>
+    <label class="check"><input id="holdToRun" type="checkbox" checked> Return to zero when released</label>
+
+    <div class="toggles">
+      <label class="switch"><input id="magnetOn" type="checkbox"><span>Energise magnet</span></label>
+      <label class="switch"><input id="holdBrake" type="checkbox"><span>Hold hoist brake</span></label>
+      <label class="switch"><input id="autoMode" type="checkbox"><span>Auto mode</span></label>
+    </div>
+
+    <div class="buttons">
+      <button type="button" data-action="reset">Reset faults</button>
+      <button type="button" data-action="zero">Zero position</button>
+      <button type="button" data-action="ping">Ping crane</button>
+    </div>
+    <fieldset class="radioset">
+      <legend>Radio link</legend>
+      <label class="select"><span>Power</span>
+        <select id="pa" aria-describedby="radioState">
+          <option value="LOW" selected>Low (−12 dBm), bench</option>
+          <option value="HIGH">High (−6 dBm)</option>
+        </select>
+      </label>
+      <label class="select"><span>Channel</span>
+        <select id="channel" aria-describedby="radioState">
+          <option value="77" selected>77 · 2477 MHz, ICD default</option>
+        </select>
+      </label>
+      <small id="radioState" class="radiostate"></small>
+    </fieldset>
+    <p class="keys">Keys: ← → trolley, ↑ ↓ hoist (60 % while held), M magnet, Space soft stop.</p>
+  </aside>
+  <section class="panel log" aria-label="Event log">
+    <h2>Event log</h2>
+    <ol id="events"></ol>
+  </section>
+  </div>
+
+  <section class="panel status" aria-label="Faults and status">
+    <h2>Faults <span id="errCode" class="errcode">code 0</span></h2>
+    <ul id="faults" class="lamps"></ul>
+    <h2>Crane status</h2>
+    <ul id="health" class="lamps"></ul>
+    <p id="rigInfo" class="logdir"></p>
+  </section>
+
+  <section class="panel frames" aria-label="Last radio frames">
+    <h2>Last frames on air</h2>
+    <div class="frame">
+      <div class="frame-head"><span>Command to crane (Table 33)</span><span id="downMeta"></span></div>
+      <div id="downStrip" class="strip"></div>
+      <div id="downFields" class="fields"></div>
+    </div>
+    <div class="frame">
+      <div class="frame-head"><span>Telemetry from crane, in the ACK (Table 34)</span><span id="upMeta"></span></div>
+      <div id="upStrip" class="strip"></div>
+      <div id="upFields" class="fields"></div>
+    </div>
+  </section>
+
+  <section class="panel history" aria-label="Last 30 seconds">
+    <h2>Last 30 seconds</h2>
+    <canvas id="chart" height="180"></canvas>
+    <div class="legend"><span class="lg lg-t">Trolley position</span><span class="lg lg-h">Hook height</span><span class="lg lg-l">Load</span></div>
+    <p id="logDir" class="logdir"></p>
+  </section>
+
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>

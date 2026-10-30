@@ -1,0 +1,251 @@
+22:09:35.212 [info] Listening to the crane console on COM12
+22:09:35.278 [info] Link connecting: checking ground station on COM10
+22:09:35.927 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+22:09:35.927 [info] Link running
+22:09:35.991 [fault] Fault raised: Wireless timeout (error code 8)
+22:10:07.741 [crane] Crane applied seq=34,flags=00,trolley=0,hoist=0,magnet=1,segment=0
+22:10:15.307 [crane] Crane applied seq=166,flags=10,trolley=0,hoist=0,magnet=1,segment=0
+22:10:18.592 [crane] Crane applied seq=224,flags=14,trolley=0,hoist=0,magnet=1,segment=0
+22:10:19.641 [crane] Crane applied seq=242,flags=10,trolley=0,hoist=0,magnet=1,segment=0
+22:10:21.791 [crane] Crane applied seq=23,flags=10,trolley=0,hoist=0,magnet=0,segment=0
+22:10:22.256 [crane] Crane applied seq=32,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:10:25.677 [crane] Crane applied seq=91,flags=00,trolley=2,hoist=0,magnet=0,segment=1
+22:10:25.740 [crane] Crane applied seq=92,flags=00,trolley=4,hoist=0,magnet=0,segment=2
+22:10:25.807 [crane] Crane applied seq=93,flags=00,trolley=9,hoist=0,magnet=0,segment=3
+22:10:25.864 [crane] Crane applied seq=94,flags=00,trolley=15,hoist=0,magnet=0,segment=4
+22:10:25.925 [crane] Crane applied seq=95,flags=00,trolley=21,hoist=0,magnet=0,segment=5
+22:10:25.975 [crane] Crane applied seq=96,flags=00,trolley=27,hoist=0,magnet=0,segment=6
+22:10:26.039 [crane] Crane applied seq=97,flags=00,trolley=32,hoist=0,magnet=0,segment=7
+22:10:26.092 [crane] Crane applied seq=98,flags=00,trolley=38,hoist=0,magnet=0,segment=8
+22:10:26.151 [crane] Crane applied seq=99,flags=00,trolley=44,hoist=0,magnet=0,segment=9
+22:10:26.207 [crane] Crane applied seq=100,flags=00,trolley=49,hoist=0,magnet=0,segment=10
+22:10:26.258 [crane] Crane applied seq=101,flags=00,trolley=53,hoist=0,magnet=0,segment=11
+22:10:26.325 [crane] Crane applied seq=102,flags=00,trolley=56,hoist=0,magnet=0,segment=12
+22:10:26.375 [crane] Crane applied seq=103,flags=00,trolley=57,hoist=0,magnet=0,segment=13
+22:10:26.441 [crane] Crane applied seq=104,flags=00,trolley=59,hoist=0,magnet=0,segment=14
+22:10:26.493 [crane] Crane applied seq=105,flags=00,trolley=59,hoist=0,magnet=0,segment=15
+22:10:26.557 [crane] Crane applied seq=106,flags=00,trolley=60,hoist=0,magnet=0,segment=0
+22:10:28.109 [fault] Fault raised: Rail limit (error code 4)
+22:10:31.541 [crane] Crane applied seq=192,flags=00,trolley=59,hoist=0,magnet=0,segment=17
+22:10:31.607 [crane] Crane applied seq=193,flags=00,trolley=57,hoist=0,magnet=0,segment=18
+22:10:31.608 [crane] Crane applied seq=194,flags=00,trolley=54,hoist=0,magnet=0,segment=19
+22:10:31.676 [crane] Crane applied seq=195,flags=00,trolley=49,hoist=0,magnet=0,segment=20
+22:10:31.741 [crane] Crane applied seq=196,flags=00,trolley=43,hoist=0,magnet=0,segment=21
+22:10:31.807 [crane] Crane applied seq=197,flags=00,trolley=36,hoist=0,magnet=0,segment=22
+22:10:31.858 [crane] Crane applied seq=198,flags=00,trolley=30,hoist=0,magnet=0,segment=23
+22:10:31.923 [crane] Crane applied seq=199,flags=00,trolley=25,hoist=0,magnet=0,segment=24
+22:10:31.976 [crane] Crane applied seq=200,flags=00,trolley=18,hoist=0,magnet=0,segment=25
+22:10:32.041 [crane] Crane applied seq=201,flags=00,trolley=13,hoist=0,magnet=0,segment=26
+22:10:32.108 [crane] Crane applied seq=202,flags=00,trolley=9,hoist=0,magnet=0,segment=27
+22:10:32.176 [crane] Crane applied seq=203,flags=00,trolley=5,hoist=0,magnet=0,segment=28
+22:10:32.238 [crane] Crane applied seq=204,flags=00,trolley=3,hoist=0,magnet=0,segment=29
+22:10:32.292 [crane] Crane applied seq=205,flags=00,trolley=2,hoist=0,magnet=0,segment=30
+22:10:32.342 [crane] Crane applied seq=206,flags=00,trolley=0,hoist=0,magnet=0,segment=31
+22:10:32.407 [crane] Crane applied seq=207,flags=00,trolley=0,hoist=0,magnet=0,segment=32
+22:10:32.472 [crane] Crane applied seq=208,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:10:32.473 [info] Fault cleared: Rail limit
+22:10:38.357 [crane] Crane applied seq=55,flags=00,trolley=-1,hoist=0,magnet=0,segment=33
+22:10:38.409 [crane] Crane applied seq=56,flags=00,trolley=-4,hoist=0,magnet=0,segment=34
+22:10:38.475 [crane] Crane applied seq=57,flags=00,trolley=-7,hoist=0,magnet=0,segment=35
+22:10:38.525 [crane] Crane applied seq=58,flags=00,trolley=-13,hoist=0,magnet=0,segment=36
+22:10:38.591 [crane] Crane applied seq=59,flags=00,trolley=-19,hoist=0,magnet=0,segment=37
+22:10:38.657 [crane] Crane applied seq=60,flags=00,trolley=-25,hoist=0,magnet=0,segment=38
+22:10:38.715 [crane] Crane applied seq=61,flags=00,trolley=-32,hoist=0,magnet=0,segment=39
+22:10:38.775 [crane] Crane applied seq=62,flags=00,trolley=-38,hoist=0,magnet=0,segment=40
+22:10:38.838 [crane] Crane applied seq=63,flags=00,trolley=-43,hoist=0,magnet=0,segment=41
+22:10:38.889 [crane] Crane applied seq=64,flags=00,trolley=-49,hoist=0,magnet=0,segment=42
+22:10:38.957 [crane] Crane applied seq=65,flags=00,trolley=-53,hoist=0,magnet=0,segment=43
+22:10:39.009 [crane] Crane applied seq=66,flags=00,trolley=-56,hoist=0,magnet=0,segment=44
+22:10:39.075 [crane] Crane applied seq=67,flags=00,trolley=-58,hoist=0,magnet=0,segment=45
+22:10:39.141 [crane] Crane applied seq=68,flags=00,trolley=-59,hoist=0,magnet=0,segment=46
+22:10:39.206 [crane] Crane applied seq=69,flags=00,trolley=-60,hoist=0,magnet=0,segment=0
+22:10:40.717 [crane] Crane applied seq=95,flags=00,trolley=-58,hoist=0,magnet=0,segment=48
+22:10:40.774 [crane] Crane applied seq=96,flags=00,trolley=-55,hoist=0,magnet=0,segment=49
+22:10:40.825 [crane] Crane applied seq=97,flags=00,trolley=-51,hoist=0,magnet=0,segment=50
+22:10:40.879 [crane] Crane applied seq=98,flags=00,trolley=-46,hoist=0,magnet=0,segment=51
+22:10:40.930 [crane] Crane applied seq=99,flags=00,trolley=-40,hoist=0,magnet=0,segment=52
+22:10:40.987 [crane] Crane applied seq=100,flags=00,trolley=-35,hoist=0,magnet=0,segment=53
+22:10:41.049 [crane] Crane applied seq=101,flags=00,trolley=-30,hoist=0,magnet=0,segment=54
+22:10:41.108 [crane] Crane applied seq=102,flags=00,trolley=-24,hoist=0,magnet=0,segment=55
+22:10:41.159 [crane] Crane applied seq=103,flags=00,trolley=-18,hoist=0,magnet=0,segment=56
+22:10:41.225 [crane] Crane applied seq=104,flags=00,trolley=-13,hoist=0,magnet=0,segment=57
+22:10:41.291 [crane] Crane applied seq=105,flags=00,trolley=-6,hoist=0,magnet=0,segment=58
+22:10:41.292 [crane] Crane applied seq=106,flags=00,trolley=-1,hoist=0,magnet=0,segment=59
+22:10:41.351 [crane] Crane applied seq=107,flags=00,trolley=5,hoist=0,magnet=0,segment=60
+22:10:41.407 [crane] Crane applied seq=108,flags=00,trolley=11,hoist=0,magnet=0,segment=61
+22:10:41.472 [crane] Crane applied seq=109,flags=00,trolley=17,hoist=0,magnet=0,segment=62
+22:10:41.524 [crane] Crane applied seq=110,flags=00,trolley=22,hoist=0,magnet=0,segment=63
+22:10:41.640 [crane] Crane applied seq=111,flags=00,trolley=29,hoist=0,magnet=0,segment=64
+22:10:41.691 [crane] Crane applied seq=112,flags=00,trolley=36,hoist=0,magnet=0,segment=65
+22:10:41.744 [crane] Crane applied seq=113,flags=00,trolley=41,hoist=0,magnet=0,segment=66
+22:10:41.809 [crane] Crane applied seq=114,flags=00,trolley=46,hoist=0,magnet=0,segment=67
+22:10:41.873 [crane] Crane applied seq=115,flags=00,trolley=51,hoist=0,magnet=0,segment=68
+22:10:41.925 [crane] Crane applied seq=116,flags=00,trolley=55,hoist=0,magnet=0,segment=69
+22:10:41.975 [crane] Crane applied seq=117,flags=00,trolley=57,hoist=0,magnet=0,segment=70
+22:10:42.040 [crane] Crane applied seq=118,flags=00,trolley=58,hoist=0,magnet=0,segment=71
+22:10:42.097 [crane] Crane applied seq=119,flags=00,trolley=59,hoist=0,magnet=0,segment=72
+22:10:42.160 [crane] Crane applied seq=120,flags=00,trolley=60,hoist=0,magnet=0,segment=0
+22:10:43.557 [crane] Crane applied seq=144,flags=00,trolley=58,hoist=0,magnet=0,segment=74
+22:10:43.609 [crane] Crane applied seq=145,flags=00,trolley=56,hoist=0,magnet=0,segment=75
+22:10:43.666 [crane] Crane applied seq=146,flags=00,trolley=52,hoist=0,magnet=0,segment=76
+22:10:43.719 [crane] Crane applied seq=147,flags=00,trolley=47,hoist=0,magnet=0,segment=77
+22:10:43.770 [crane] Crane applied seq=148,flags=00,trolley=42,hoist=0,magnet=0,segment=78
+22:10:43.826 [crane] Crane applied seq=149,flags=00,trolley=37,hoist=0,magnet=0,segment=79
+22:10:43.891 [crane] Crane applied seq=150,flags=00,trolley=31,hoist=0,magnet=0,segment=80
+22:10:43.957 [crane] Crane applied seq=151,flags=00,trolley=25,hoist=0,magnet=0,segment=81
+22:10:44.008 [crane] Crane applied seq=152,flags=00,trolley=18,hoist=0,magnet=0,segment=82
+22:10:44.072 [crane] Crane applied seq=153,flags=00,trolley=13,hoist=0,magnet=0,segment=83
+22:10:44.137 [crane] Crane applied seq=154,flags=00,trolley=7,hoist=0,magnet=0,segment=84
+22:10:44.189 [crane] Crane applied seq=155,flags=00,trolley=0,hoist=0,magnet=0,segment=85
+22:10:44.240 [crane] Crane applied seq=156,flags=00,trolley=-5,hoist=0,magnet=0,segment=86
+22:10:44.292 [crane] Crane applied seq=157,flags=00,trolley=-10,hoist=0,magnet=0,segment=87
+22:10:44.358 [crane] Crane applied seq=158,flags=00,trolley=-15,hoist=0,magnet=0,segment=88
+22:10:44.409 [crane] Crane applied seq=159,flags=00,trolley=-22,hoist=0,magnet=0,segment=89
+22:10:44.473 [crane] Crane applied seq=160,flags=00,trolley=-27,hoist=0,magnet=0,segment=90
+22:10:44.528 [crane] Crane applied seq=161,flags=00,trolley=-33,hoist=0,magnet=0,segment=91
+22:10:44.579 [crane] Crane applied seq=162,flags=00,trolley=-39,hoist=0,magnet=0,segment=92
+22:10:44.637 [crane] Crane applied seq=163,flags=00,trolley=-44,hoist=0,magnet=0,segment=93
+22:10:44.692 [crane] Crane applied seq=164,flags=00,trolley=-49,hoist=0,magnet=0,segment=94
+22:10:44.743 [crane] Crane applied seq=165,flags=00,trolley=-53,hoist=0,magnet=0,segment=95
+22:10:44.802 [crane] Crane applied seq=166,flags=00,trolley=-56,hoist=0,magnet=0,segment=96
+22:10:44.858 [crane] Crane applied seq=167,flags=00,trolley=-58,hoist=0,magnet=0,segment=97
+22:10:44.917 [crane] Crane applied seq=168,flags=00,trolley=-59,hoist=0,magnet=0,segment=98
+22:10:44.974 [crane] Crane applied seq=169,flags=00,trolley=-59,hoist=0,magnet=0,segment=99
+22:10:45.037 [crane] Crane applied seq=170,flags=00,trolley=-60,hoist=0,magnet=0,segment=0
+22:10:47.492 [crane] Crane applied seq=212,flags=00,trolley=-59,hoist=0,magnet=0,segment=101
+22:10:47.543 [crane] Crane applied seq=213,flags=00,trolley=-56,hoist=0,magnet=0,segment=102
+22:10:47.606 [crane] Crane applied seq=214,flags=00,trolley=-53,hoist=0,magnet=0,segment=103
+22:10:47.676 [crane] Crane applied seq=215,flags=00,trolley=-47,hoist=0,magnet=0,segment=104
+22:10:47.739 [crane] Crane applied seq=216,flags=00,trolley=-40,hoist=0,magnet=0,segment=105
+22:10:47.792 [crane] Crane applied seq=217,flags=00,trolley=-33,hoist=0,magnet=0,segment=106
+22:10:47.856 [crane] Crane applied seq=218,flags=00,trolley=-28,hoist=0,magnet=0,segment=107
+22:10:47.907 [crane] Crane applied seq=219,flags=00,trolley=-22,hoist=0,magnet=0,segment=108
+22:10:47.975 [crane] Crane applied seq=220,flags=00,trolley=-17,hoist=0,magnet=0,segment=109
+22:10:48.036 [crane] Crane applied seq=221,flags=00,trolley=-11,hoist=0,magnet=0,segment=110
+22:10:48.091 [crane] Crane applied seq=222,flags=00,trolley=-7,hoist=0,magnet=0,segment=111
+22:10:48.143 [crane] Crane applied seq=223,flags=00,trolley=-4,hoist=0,magnet=0,segment=112
+22:10:48.208 [crane] Crane applied seq=224,flags=00,trolley=-2,hoist=0,magnet=0,segment=113
+22:10:48.271 [crane] Crane applied seq=225,flags=00,trolley=-2,hoist=0,magnet=0,segment=114
+22:10:48.323 [crane] Crane applied seq=226,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:10:48.490 [crane] Crane applied seq=229,flags=00,trolley=0,hoist=1,magnet=0,segment=116
+22:10:48.545 [crane] Crane applied seq=230,flags=00,trolley=0,hoist=4,magnet=0,segment=117
+22:10:48.607 [crane] Crane applied seq=231,flags=00,trolley=0,hoist=8,magnet=0,segment=118
+22:10:48.658 [crane] Crane applied seq=232,flags=00,trolley=0,hoist=14,magnet=0,segment=119
+22:10:48.723 [crane] Crane applied seq=233,flags=00,trolley=0,hoist=19,magnet=0,segment=120
+22:10:48.787 [crane] Crane applied seq=234,flags=00,trolley=0,hoist=25,magnet=0,segment=121
+22:10:48.850 [crane] Crane applied seq=235,flags=00,trolley=0,hoist=32,magnet=0,segment=122
+22:10:48.909 [crane] Crane applied seq=236,flags=00,trolley=0,hoist=38,magnet=0,segment=123
+22:10:48.973 [crane] Crane applied seq=237,flags=00,trolley=0,hoist=44,magnet=0,segment=124
+22:10:49.024 [crane] Crane applied seq=238,flags=00,trolley=0,hoist=50,magnet=0,segment=125
+22:10:49.089 [crane] Crane applied seq=239,flags=00,trolley=0,hoist=53,magnet=0,segment=126
+22:10:49.142 [crane] Crane applied seq=240,flags=00,trolley=0,hoist=56,magnet=0,segment=127
+22:10:49.192 [crane] Crane applied seq=241,flags=00,trolley=0,hoist=58,magnet=0,segment=128
+22:10:49.255 [crane] Crane applied seq=242,flags=00,trolley=0,hoist=59,magnet=0,segment=129
+22:10:49.307 [crane] Crane applied seq=243,flags=00,trolley=0,hoist=60,magnet=0,segment=130
+22:10:49.358 [crane] Crane applied seq=244,flags=00,trolley=0,hoist=60,magnet=0,segment=0
+22:10:51.140 [crane] Crane applied seq=19,flags=00,trolley=0,hoist=59,magnet=0,segment=131
+22:10:51.191 [crane] Crane applied seq=20,flags=00,trolley=0,hoist=56,magnet=0,segment=132
+22:10:51.257 [crane] Crane applied seq=21,flags=00,trolley=0,hoist=52,magnet=0,segment=133
+22:10:51.257 [crane] Crane applied seq=22,flags=00,trolley=0,hoist=48,magnet=0,segment=134
+22:10:51.325 [crane] Crane applied seq=23,flags=00,trolley=0,hoist=43,magnet=0,segment=135
+22:10:51.382 [crane] Crane applied seq=24,flags=00,trolley=0,hoist=36,magnet=0,segment=136
+22:10:51.443 [crane] Crane applied seq=25,flags=00,trolley=0,hoist=31,magnet=0,segment=137
+22:10:51.506 [crane] Crane applied seq=26,flags=00,trolley=0,hoist=26,magnet=0,segment=138
+22:10:51.557 [crane] Crane applied seq=27,flags=00,trolley=0,hoist=20,magnet=0,segment=139
+22:10:51.617 [crane] Crane applied seq=28,flags=00,trolley=0,hoist=14,magnet=0,segment=140
+22:10:51.680 [crane] Crane applied seq=29,flags=00,trolley=0,hoist=8,magnet=0,segment=141
+22:10:51.741 [crane] Crane applied seq=30,flags=00,trolley=0,hoist=3,magnet=0,segment=142
+22:10:51.792 [crane] Crane applied seq=31,flags=00,trolley=0,hoist=-3,magnet=0,segment=143
+22:10:51.857 [crane] Crane applied seq=32,flags=00,trolley=0,hoist=-9,magnet=0,segment=144
+22:10:51.921 [crane] Crane applied seq=33,flags=00,trolley=0,hoist=-15,magnet=0,segment=145
+22:10:51.983 [crane] Crane applied seq=34,flags=00,trolley=0,hoist=-22,magnet=0,segment=146
+22:10:52.043 [crane] Crane applied seq=35,flags=00,trolley=0,hoist=-27,magnet=0,segment=147
+22:10:52.107 [crane] Crane applied seq=36,flags=00,trolley=0,hoist=-32,magnet=0,segment=148
+22:10:52.170 [crane] Crane applied seq=37,flags=00,trolley=0,hoist=-39,magnet=0,segment=149
+22:10:52.226 [crane] Crane applied seq=38,flags=00,trolley=0,hoist=-45,magnet=0,segment=150
+22:10:52.291 [crane] Crane applied seq=39,flags=00,trolley=0,hoist=-50,magnet=0,segment=151
+22:10:52.343 [crane] Crane applied seq=40,flags=00,trolley=0,hoist=-54,magnet=0,segment=152
+22:10:52.406 [crane] Crane applied seq=41,flags=00,trolley=0,hoist=-56,magnet=0,segment=153
+22:10:52.471 [crane] Crane applied seq=42,flags=00,trolley=0,hoist=-58,magnet=0,segment=154
+22:10:52.525 [crane] Crane applied seq=43,flags=00,trolley=0,hoist=-59,magnet=0,segment=155
+22:10:52.579 [crane] Crane applied seq=44,flags=00,trolley=0,hoist=-59,magnet=0,segment=0
+22:10:52.638 [crane] Crane applied seq=45,flags=00,trolley=0,hoist=-60,magnet=0,segment=0
+22:10:53.675 [crane] Crane applied seq=63,flags=00,trolley=0,hoist=-59,magnet=0,segment=158
+22:10:53.725 [crane] Crane applied seq=64,flags=00,trolley=0,hoist=-56,magnet=0,segment=159
+22:10:53.788 [crane] Crane applied seq=65,flags=00,trolley=0,hoist=-53,magnet=0,segment=160
+22:10:53.840 [crane] Crane applied seq=66,flags=00,trolley=0,hoist=-47,magnet=0,segment=161
+22:10:53.891 [crane] Crane applied seq=67,flags=00,trolley=0,hoist=-42,magnet=0,segment=162
+22:10:53.957 [crane] Crane applied seq=68,flags=00,trolley=0,hoist=-36,magnet=0,segment=163
+22:10:54.008 [crane] Crane applied seq=69,flags=00,trolley=0,hoist=-30,magnet=0,segment=164
+22:10:54.058 [crane] Crane applied seq=70,flags=00,trolley=0,hoist=-25,magnet=0,segment=165
+22:10:54.116 [crane] Crane applied seq=71,flags=00,trolley=0,hoist=-20,magnet=0,segment=166
+22:10:54.174 [crane] Crane applied seq=72,flags=00,trolley=0,hoist=-14,magnet=0,segment=167
+22:10:54.225 [crane] Crane applied seq=73,flags=00,trolley=0,hoist=-9,magnet=0,segment=168
+22:10:54.290 [crane] Crane applied seq=74,flags=00,trolley=0,hoist=-6,magnet=0,segment=169
+22:10:54.341 [crane] Crane applied seq=75,flags=00,trolley=0,hoist=-3,magnet=0,segment=170
+22:10:54.395 [crane] Crane applied seq=76,flags=00,trolley=0,hoist=-2,magnet=0,segment=171
+22:10:54.457 [crane] Crane applied seq=77,flags=00,trolley=0,hoist=-1,magnet=0,segment=172
+22:10:54.522 [crane] Crane applied seq=78,flags=00,trolley=0,hoist=-1,magnet=0,segment=173
+22:10:54.575 [crane] Crane applied seq=79,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:11:01.474 [crane] Crane applied seq=199,flags=00,trolley=0,hoist=0,magnet=1,segment=0
+22:11:02.607 [crane] Crane applied seq=219,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:11:04.642 [crane] Crane applied seq=254,flags=00,trolley=0,hoist=0,magnet=1,segment=0
+22:11:06.709 [crane] Crane applied seq=34,flags=00,trolley=0,hoist=0,magnet=0,segment=0
+22:13:40.215 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:13:40.219 [info] Dashboard page is back - controls re-enabled
+22:13:59.213 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:13:59.216 [info] Dashboard page is back - controls re-enabled
+22:14:02.213 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:14:02.217 [info] Dashboard page is back - controls re-enabled
+22:14:13.212 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:14:13.215 [info] Dashboard page is back - controls re-enabled
+22:14:17.247 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:14:32.213 [info] Dashboard page is back - controls re-enabled
+22:14:33.233 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:15:32.230 [info] Dashboard page is back - controls re-enabled
+22:15:33.258 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:16:32.221 [info] Dashboard page is back - controls re-enabled
+22:16:33.229 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:17:32.208 [info] Dashboard page is back - controls re-enabled
+22:17:32.721 [warn] Link lost: 10 commands in a row without an ACK - check the crane
+22:17:33.209 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:17:37.544 [info] Dashboard page is back - controls re-enabled
+22:17:47.151 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:17:47.212 [info] Dashboard page is back - controls re-enabled
+22:18:07.219 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:18:07.228 [info] Dashboard page is back - controls re-enabled
+22:18:15.219 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:18:15.222 [info] Dashboard page is back - controls re-enabled
+22:18:25.217 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:18:25.223 [info] Dashboard page is back - controls re-enabled
+22:18:37.217 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:18:37.223 [info] Dashboard page is back - controls re-enabled
+22:18:46.237 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:19:32.218 [info] Dashboard page is back - controls re-enabled
+22:19:33.223 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:20:32.219 [info] Dashboard page is back - controls re-enabled
+22:20:33.247 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:21:32.210 [info] Dashboard page is back - controls re-enabled
+22:21:33.230 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:22:32.211 [info] Dashboard page is back - controls re-enabled
+22:22:33.230 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:23:32.210 [info] Dashboard page is back - controls re-enabled
+22:23:33.242 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:24:32.217 [info] Dashboard page is back - controls re-enabled
+22:24:33.263 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:25:32.223 [info] Dashboard page is back - controls re-enabled
+22:25:33.235 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:26:32.218 [info] Dashboard page is back - controls re-enabled
+22:26:33.227 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:27:32.222 [info] Dashboard page is back - controls re-enabled
+22:27:33.246 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:28:32.212 [info] Dashboard page is back - controls re-enabled
+22:28:33.239 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:29:32.209 [info] Dashboard page is back - controls re-enabled
+22:29:33.259 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:30:32.221 [info] Dashboard page is back - controls re-enabled
+22:30:33.257 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:31:32.211 [info] Dashboard page is back - controls re-enabled
+22:31:33.273 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+22:32:32.222 [info] Dashboard page is back - controls re-enabled
+22:32:33.278 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

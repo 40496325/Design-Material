@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """
-REII Dashboard Backend — Flask + SocketIO (Architecture A1, decision D-10).
-
-Reads groundstation USB-CDC serial (COM12 @ 115200), parses the 32-byte ICD
-protocol (PROVISIONAL per D-01), and broadcasts telemetry + command status to
-WebSocket clients. Accepts command frames from the browser and forwards them
-to the groundstation as 32-byte downlink packets (hex via `CMD <hex>`).
-
-Run:
-    cd project_sources/03_increment_3/dashboard
-    pip install -r requirements.txt
-    python app.py
-    # then open http://localhost:5000 in a browser
+REII Dashboard Backend — Flask + SocketIO with background telemetry poller.
 """
 
 from __future__ import annotations
@@ -27,10 +16,8 @@ from flask_socketio import SocketIO, emit
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from protocol import (  # noqa: E402
-    DownlinkFrame, MAGIC_DOWNLINK, TYPE_CMD, PAYLOAD_SIZE, make_downlink,
-)
-from serial_reader import SerialReader  # noqa: E402
+from protocol import make_downlink
+from serial_reader import SerialReader
 
 GS_PORT = os.environ.get("REII_GS_PORT", "COM10")
 GS_BAUD = int(os.environ.get("REII_GS_BAUD", "115200"))
@@ -44,9 +31,20 @@ serial_reader: Optional[SerialReader] = None
 reader_lock = threading.Lock()
 
 latest_telemetry: dict = {}
-last_command: dict = {}
+current_ctrl: dict = {
+    "estop": False,
+    "reset": False,
+    "manual": True,
+    "trolley": 0,
+    "hoist": 0,
+    "magnet": 0,
+}
+ctrl_lock = threading.Lock()
+
 seq_counter = 0
 seq_lock = threading.Lock()
+poll_thread: Optional[threading.Thread] = None
+stop_poll = threading.Event()
 
 
 def next_seq() -> int:
@@ -63,25 +61,55 @@ def on_serial_event(event: dict) -> None:
     if etype == "ack_payload":
         latest_telemetry = event.get("frame", {})
         latest_telemetry["ts"] = event.get("ts")
+        latest_telemetry["link_ok"] = True
         socketio.emit("telemetry", latest_telemetry)
+    elif etype == "ack_status":
+        ok = event.get("ok", 0)
+        socketio.emit("link_status", {"link_ok": bool(ok)})
     elif etype == "pong":
         socketio.emit("pong", {"ok": event.get("ok"), "rtt_ms": event.get("rtt_ms")})
-    elif etype == "echo":
-        socketio.emit("echo", {"text": event.get("text")})
     elif etype == "ready":
         socketio.emit("status", {"status": "ready"})
-    elif etype == "ok":
-        socketio.emit("status", {"status": "ok", "detail": event.get("raw")})
-    elif etype == "error":
-        socketio.emit("status", {"status": "error", "detail": event.get("raw")})
-    elif etype == "banner":
-        socketio.emit("banner", {"text": event.get("raw")})
+    elif etype in ("ok", "error"):
+        socketio.emit("status", {"status": etype, "detail": event.get("raw")})
     else:
         socketio.emit("raw", {"text": event.get("raw")})
 
 
+def transmit_current_command():
+    with ctrl_lock:
+        frame = make_downlink(
+            seq=next_seq(),
+            estop=current_ctrl["estop"],
+            reset=current_ctrl["reset"],
+            manual=current_ctrl["manual"],
+            trolley=current_ctrl["trolley"],
+            hoist=current_ctrl["hoist"],
+            magnet=current_ctrl["magnet"],
+        )
+        if current_ctrl["reset"]:
+            current_ctrl["reset"] = False
+
+    hex_frame = frame.pack().hex()
+    if serial_reader and serial_reader._ser and serial_reader._ser.is_open:
+        try:
+            cmd = f"CMD {hex_frame}\n"
+            serial_reader._ser.write(cmd.encode("ascii"))
+            serial_reader._ser.flush()
+        except Exception as exc:
+            print(f"[app] serial write error: {exc}")
+
+
+def telemetry_poll_loop():
+    """Poll the crane at 5 Hz to continuously pull live telemetry via ACK payloads."""
+    while not stop_poll.is_set():
+        if serial_reader and serial_reader._ser and serial_reader._ser.is_open:
+            transmit_current_command()
+        time.sleep(0.2)
+
+
 def start_serial_reader() -> bool:
-    global serial_reader
+    global serial_reader, poll_thread
     with reader_lock:
         if serial_reader is not None:
             return True
@@ -89,12 +117,19 @@ def start_serial_reader() -> bool:
         if not serial_reader.start():
             serial_reader = None
             return False
-        print(f"[app] serial reader started on {GS_PORT}")
+
+        stop_poll.clear()
+        poll_thread = threading.Thread(target=telemetry_poll_loop, daemon=True)
+        poll_thread.start()
+        print(f"[app] serial reader and poller started on {GS_PORT}")
         return True
 
 
 def stop_serial_reader() -> None:
-    global serial_reader
+    global serial_reader, poll_thread
+    stop_poll.set()
+    if poll_thread and poll_thread.is_alive():
+        poll_thread.join(timeout=1.0)
     with reader_lock:
         if serial_reader is not None:
             serial_reader.stop()
@@ -122,78 +157,29 @@ def api_status():
 
 @socketio.on("connect")
 def on_connect():
-    print(f"[app] client connected: {request.sid}")
     emit("connected", {"status": "ok", "port": GS_PORT})
     if latest_telemetry:
         emit("telemetry", latest_telemetry)
 
 
-@socketio.on("disconnect")
-def on_disconnect():
-    print(f"[app] client disconnected: {request.sid}")
-
-
-@socketio.on("start_reader")
-def on_start_reader():
-    ok = start_serial_reader()
-    emit("reader_started", {"ok": ok, "port": GS_PORT})
-
-
-@socketio.on("stop_reader")
-def on_stop_reader():
-    stop_serial_reader()
-    emit("reader_stopped", {"ok": True})
-
-
 @socketio.on("command")
 def on_command(data):
-    """Receive a command from the browser and forward to groundstation via CMD hex."""
-    global last_command
-    try:
-        estop = bool(data.get("estop", False))
-        reset = bool(data.get("reset", False))
-        manual = bool(data.get("manual", True))
-        trolley = int(data.get("trolley", 0))
-        hoist = int(data.get("hoist", 0))
-        magnet = int(data.get("magnet", 0))
+    with ctrl_lock:
+        if "estop" in data:
+            current_ctrl["estop"] = bool(data["estop"])
+        if "reset" in data:
+            current_ctrl["reset"] = bool(data["reset"])
+        if "manual" in data:
+            current_ctrl["manual"] = bool(data["manual"])
+        if "trolley" in data:
+            current_ctrl["trolley"] = max(-128, min(127, int(data["trolley"])))
+        if "hoist" in data:
+            current_ctrl["hoist"] = max(-128, min(127, int(data["hoist"])))
+        if "magnet" in data:
+            current_ctrl["magnet"] = 1 if data["magnet"] else 0
 
-        trolley = max(-128, min(127, trolley))
-        hoist = max(-128, min(127, hoist))
-        magnet = max(0, min(255, magnet))
-
-        frame = make_downlink(
-            seq=next_seq(), estop=estop, reset=reset, manual=manual,
-            trolley=trolley, hoist=hoist, magnet=magnet,
-        )
-        hex_frame = frame.pack().hex()
-
-        last_command = {
-            "seq": frame.seq,
-            "estop": estop,
-            "reset": reset,
-            "manual": manual,
-            "trolley": trolley,
-            "hoist": hoist,
-            "magnet": magnet,
-            "hex": hex_frame,
-            "ts": time.time(),
-        }
-
-        if serial_reader and serial_reader._ser and serial_reader._ser.is_open:
-            cmd = f"CMD {hex_frame}\n"
-            serial_reader._ser.write(cmd.encode("ascii"))
-            serial_reader._ser.flush()
-            emit("command_sent", {"ok": True, "seq": frame.seq, "hex": hex_frame})
-        else:
-            emit("command_sent", {"ok": False, "error": "serial not open"})
-
-    except Exception as exc:
-        emit("command_sent", {"ok": False, "error": str(exc)})
-
-
-@socketio.on("get_telemetry")
-def on_get_telemetry():
-    emit("telemetry", latest_telemetry if latest_telemetry else {"status": "no_data"})
+    transmit_current_command()
+    emit("command_sent", {"ok": True})
 
 
 if __name__ == "__main__":

@@ -2,5 +2,5 @@
 -fno-builtin-memcpy
 -fno-builtin-memset
 -fno-builtin-bzero
-"-specs=D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/specs/picolibc.specs"
+"-specs=D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/specs/picolibc.specs"
 -fno-rtti

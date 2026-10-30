@@ -1,0 +1,27 @@
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+
+# Carried over from SupaNODE bring-up: with SDIO support on (the default),
+# sdmmc_card_init() sends CMD52 (SDIO reset) before CMD0, and a plain SD/MMC
+# card answers it with a bit pattern the driver's IO-command R1 parser
+# doesn't recognize as "not an IO card, ignore" - aborting init before CMD0
+# ever runs. Disabling SDIO support skips that CMD52 preflight entirely.
+CONFIG_SD_ENABLE_SDIO_SUPPORT=n
+
+# The SPWM timer callback calls mcpwm_comparator_set_compare_value() from ISR
+# context at the 20kHz carrier rate, continuously - not just at boot. This
+# keeps that control function itself IRAM-resident so it stays callable even
+# on the rare cycle where flash cache is briefly disabled (e.g. an NVS write).
+CONFIG_MCPWM_CTRL_FUNC_IN_IRAM=y
+
+# ---------------------------------------------------------------------------
+# REII Increment 4 additions
+# ---------------------------------------------------------------------------
+# COM12 is the ESP32-S3's built-in USB Serial/JTAG port. Make it the PRIMARY
+# console so it accepts typed commands (as the default "secondary" console it
+# is output-only, which is why typing into the monitor timed out before).
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+
+# 1 ms scheduler tick: the radio task polls the nRF24 STATUS/FIFO every tick
+# (IRQ is not wired per ICD Table 31). The default 100 Hz would mean 10 ms.
+CONFIG_FREERTOS_HZ=1000

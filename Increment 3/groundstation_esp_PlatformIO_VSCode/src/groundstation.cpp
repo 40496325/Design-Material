@@ -1,5 +1,4 @@
 #include "groundstation.h"
-
 #include <SPI.h>
 #include <WiFi.h>
 #include <esp_bt.h>
@@ -39,14 +38,21 @@ void applyAppConfig() {
   radio.enableDynamicPayloads();
   radio.enableAckPayload();
   radio.setDataRate(APP_RATE);
-  radio.setChannel(APP_CHANNEL);  // also resets PLOS_CNT
+  radio.setChannel(APP_CHANNEL);
   radio.setPALevel(APP_PA);
   radio.setAutoAck(true);
-  // ARD steps of 250 us + 250 us base: 500 us -> delay steps = 1.
-  radio.setRetries(1, APP_ARC);
+  radio.setRetries(1, APP_ARC); // ARD 500 us (step=1), ARC 5
   radio.flush_rx();
   radio.flush_tx();
   radio.startListening();
+}
+
+// DIAG: full restore after startConstCarrier() (it disables CRC/auto-ACK/retries).
+void restoreAppConfig() {
+  radio.powerUp();
+  delay(5);
+  radioCommon();
+  applyAppConfig();
 }
 
 void applyControlConfig() {
@@ -57,8 +63,7 @@ void applyControlConfig() {
   radio.setChannel(CTRL_CHANNEL);
   radio.setPALevel(RF24_PA_MAX);
   radio.setAutoAck(true);
-  // 1500 us -> delay steps = 5.
-  radio.setRetries(5, CTRL_ARC);
+  radio.setRetries(5, CTRL_ARC); // ARD 1500 us (step=5), ARC 15
   radio.flush_rx();
   radio.flush_tx();
   radio.startListening();

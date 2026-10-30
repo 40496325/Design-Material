@@ -1,0 +1,113 @@
+{
+  "run_id": "20261028_212705",
+  "gs_port": "COM10",
+  "rig_port": "COM12",
+  "limits": {
+    "per_pct": 5.0,
+    "rtt_max_ms": 4.15
+  },
+  "gates": [
+    {
+      "id": "G1",
+      "title": "Crane radio (ESP32-S3, J1 + CE)",
+      "pass": true,
+      "detail": [
+        "OK   SPI probe OK (nRF24L01+), SETUP_AW=03",
+        "OK   CE high (J7.10=1, J3.3=1, paths J3.3(MCP GPA0)+J7.10(GPIO10))",
+        "     RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0",
+        "     RIG,REGS,CONFIG=0F,EN_AA=03,EN_RXADDR=02,SETUP_AW=03,SETUP_RETR=15,RF_CH=77,RF_SETUP=0A,STATUS=0E,FIFO=01,RX_PW_P1=32,DYNPD=03,FEATURE=06",
+        "     RIG,ADDR,RX_ADDR_P1=0x3249494552('REII2'),TX_ADDR=0x3149494552,RX_ADDR_P0=0x3149494552",
+        "OK   listening on 'REII2'"
+      ]
+    },
+    {
+      "id": "G2",
+      "title": "Ground station radio (NodeMCU-32S)",
+      "pass": true,
+      "detail": [
+        "OK   radio.begin() OK",
+        "OK   isPVariant=1 (nRF24L01+)",
+        "     GS,LINK,mode=APP,ch=77,rate=2M,pa=LOW,arc=5,ard_us=500,profile=ICD,payload=dyn32+ackpl32,tx_to=REII2,radio=OK"
+      ]
+    },
+    {
+      "id": "G3",
+      "title": "Both ends set to profile STATIC, APP mode, PA LOW",
+      "pass": true,
+      "detail": [
+        "OK   GS mode=APP,ch=77,rate=2M,pa=LOW,arc=5,ard_us=500,profile=STATIC,payload=static32,tx_to=REII2,radio=OK",
+        "OK   crane profile=STATIC ch=77 pa=LOW config=0F"
+      ]
+    },
+    {
+      "id": "G4",
+      "title": "Smoke STATIC PA LOW",
+      "pass": true,
+      "detail": [
+        "     PER 0.0 % (limit 5.0), RTT max 3.065 ms (limit 4.15), crane received 200, ACK lost 0, never arrived 0"
+      ]
+    },
+    {
+      "id": "G3",
+      "title": "Both ends set to profile ICD, APP mode, PA LOW",
+      "pass": true,
+      "detail": [
+        "OK   GS mode=APP,ch=77,rate=2M,pa=LOW,arc=5,ard_us=500,profile=ICD,payload=dyn32+ackpl32,tx_to=REII2,radio=OK",
+        "OK   crane profile=ICD ch=77 pa=LOW config=0F"
+      ]
+    },
+    {
+      "id": "G4",
+      "title": "Smoke ICD PA LOW",
+      "pass": true,
+      "detail": [
+        "     PER 0.0 % (limit 5.0), RTT max 2.384 ms (limit 4.15), crane received 200, ACK lost 0, never arrived 0",
+        "     199/200 ACKs carried a valid 0x81 telemetry frame; 197 of them echo the previous round's seq (the ACK payload is pre-loaded, so it answers the command before this one)"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "20261028_212705",
+      "profile": "STATIC",
+      "pa": "LOW",
+      "n": 200,
+      "acked": 200,
+      "per_pct": 0.0,
+      "rig_received": 200,
+      "ack_lost": 0,
+      "never_arrived": 0,
+      "rtt_min_ms": 0.656,
+      "rtt_avg_ms": 0.728,
+      "rtt_max_ms": 3.065,
+      "retries_total": 13,
+      "retries_max": 3,
+      "tlm_valid": null,
+      "tlm_note": null,
+      "result": "PASS",
+      "duration_s": 13.9
+    },
+    {
+      "run_id": "20261028_212705",
+      "profile": "ICD",
+      "pa": "LOW",
+      "n": 200,
+      "acked": 200,
+      "per_pct": 0.0,
+      "rig_received": 200,
+      "ack_lost": 0,
+      "never_arrived": 0,
+      "rtt_min_ms": 0.676,
+      "rtt_avg_ms": 0.811,
+      "rtt_max_ms": 2.384,
+      "retries_total": 3,
+      "retries_max": 2,
+      "tlm_valid": 199,
+      "tlm_note": "199/200 ACKs carried a valid 0x81 telemetry frame; 197 of them echo the previous round's seq (the ACK payload is pre-loaded, so it answers the command before this one)",
+      "result": "PASS",
+      "duration_s": 13.1
+    }
+  ],
+  "diagnosis": null,
+  "overall": "PASS"
+}

@@ -13,8 +13,8 @@ end
 
 # Load bootloader symbols
 set confirm off
-    add-symbol-file D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader/bootloader.elf
+    add-symbol-file D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader/bootloader.elf
 set confirm on
 
 # Load application symbols
-file D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/EngDes26_start.elf
+file D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/EngDes26_start.elf

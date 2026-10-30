@@ -1,0 +1,219 @@
+ *  Executing task: C:\Users\Uni\.platformio\penv\Scripts\platformio.exe run 
+
+Processing groundstation_nodemcu32s (platform: espressif32; board: nodemcu-32s; framework: arduino)
+----------------------------------------------------------------------------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/nodemcu-32s.html
+PLATFORM: Espressif 32 (7.1.1) > NodeMCU-32S
+HARDWARE: ESP32 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.41100.260830 (4.11.0) 
+ - toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 34 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RF24 @ 1.6.2
+|-- SPI @ 2.0.0
+|-- WiFi @ 2.0.0
+Building in release mode
+Compiling .pio\build\groundstation_nodemcu32s\src\main.cpp.o
+Building .pio\build\groundstation_nodemcu32s\bootloader.bin
+Generating partitions .pio\build\groundstation_nodemcu32s\partitions.bin
+Compiling .pio\build\groundstation_nodemcu32s\lib113\SPI\SPI.cpp.o
+esptool.py v4.11.0
+Creating esp32 image...
+Merged 1 ELF section
+Successfully created esp32 image.
+Compiling .pio\build\groundstation_nodemcu32s\lib7a6\RF24\RF24.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFi.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiAP.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiClient.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiGeneric.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiMulti.cpp.o
+Archiving .pio\build\groundstation_nodemcu32s\lib113\libSPI.a
+Archiving .pio\build\groundstation_nodemcu32s\lib7a6\libRF24.a
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiSTA.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiScan.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiServer.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\lib396\WiFi\WiFiUdp.cpp.o
+Indexing .pio\build\groundstation_nodemcu32s\lib113\libSPI.a
+Indexing .pio\build\groundstation_nodemcu32s\lib7a6\libRF24.a
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\Esp.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\FirmwareMSC.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\FunctionalInterrupt.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\HWCDC.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\HardwareSerial.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\IPAddress.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\IPv6Address.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\MD5Builder.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\Print.cpp.o
+Archiving .pio\build\groundstation_nodemcu32s\lib396\libWiFi.a
+Indexing .pio\build\groundstation_nodemcu32s\lib396\libWiFi.a
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\Stream.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\StreamString.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\Tone.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\USB.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\USBCDC.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\USBMSC.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\WMath.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\WString.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\base64.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\cbuf.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-adc.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-bt.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-cpu.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-dac.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-gpio.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-i2c-slave.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-i2c.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-ledc.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-matrix.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-misc.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-psram.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-rgb-led.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-rmt.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-sigmadelta.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-spi.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-time.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-timer.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-tinyusb.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-touch.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\esp32-hal-uart.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\firmware_msc_fat.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\libb64\cdecode.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\libb64\cencode.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\main.cpp.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\stdlib_noniso.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\wiring_pulse.c.o
+Compiling .pio\build\groundstation_nodemcu32s\FrameworkArduino\wiring_shift.c.o
+Archiving .pio\build\groundstation_nodemcu32s\libFrameworkArduino.a
+Indexing .pio\build\groundstation_nodemcu32s\libFrameworkArduino.a
+Linking .pio\build\groundstation_nodemcu32s\firmware.elf
+Retrieving maximum program size .pio\build\groundstation_nodemcu32s\firmware.elf
+Checking size .pio\build\groundstation_nodemcu32s\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  14.6% (used 47740 bytes from 327680 bytes)
+Flash: [=======   ]  66.4% (used 869953 bytes from 1310720 bytes)
+Building .pio\build\groundstation_nodemcu32s\firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_image(__env__)} --flash_size 4MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio\build\groundstation_nodemcu32s\firmware.bin
+esptool.py v4.11.0
+Creating esp32 image...
+Merged 27 ELF sections
+Successfully created esp32 image.
+=========================================================== [SUCCESS] Took 36.99 seconds ===========================================================
+ *  Terminal will be reused by tasks, press any key to close it. 
+
+ *  Executing task: C:\Users\Uni\.platformio\penv\Scripts\platformio.exe run --target upload --upload-port COM10 
+
+Processing groundstation_nodemcu32s (platform: espressif32; board: nodemcu-32s; framework: arduino)
+-------------------------------------------------------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/nodemcu-32s.html
+PLATFORM: Espressif 32 (7.1.1) > NodeMCU-32S
+HARDWARE: ESP32 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.41100.260830 (4.11.0) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 34 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- RF24 @ 1.6.2
+|-- SPI @ 2.0.0
+|-- WiFi @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio\build\groundstation_nodemcu32s\firmware.elf
+Checking size .pio\build\groundstation_nodemcu32s\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  14.6% (used 47740 bytes from 327680 bytes)
+Flash: [=======   ]  66.4% (used 869953 bytes from 1310720 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: COM10
+Uploading .pio\build\groundstation_nodemcu32s\firmware.bin
+esptool.py v4.11.0
+Serial port COM10
+Connecting.............................
+Chip is ESP32-D0WD-V3 (revision v3.1)
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+Crystal is 40MHz
+MAC: ec:e3:34:19:c0:d4
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00001000 to 0x00005fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x000e5fff...
+SHA digest in image updated
+Compressed 17536 bytes to 12202...
+Writing at 0x00001000... (100 %)
+Wrote 17536 bytes (12202 compressed) at 0x00001000 in 0.4 seconds (effective 360.6 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 146...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (146 compressed) at 0x00008000 in 0.0 seconds (effective 1228.9 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 47...
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.0 seconds (effective 1749.8 kbit/s)...
+Hash of data verified.
+Compressed 876528 bytes to 569843...
+Writing at 0x00010000... (2 %)
+Writing at 0x0001c1cd... (5 %)
+Writing at 0x00025f60... (8 %)
+Writing at 0x00032849... (11 %)
+Writing at 0x00037ef9... (14 %)
+Writing at 0x0003d602... (17 %)
+Writing at 0x00042d24... (20 %)
+Writing at 0x00047f79... (22 %)
+Writing at 0x0004d2ef... (25 %)
+Writing at 0x000524b1... (28 %)
+Writing at 0x00057758... (31 %)
+Writing at 0x0005ca74... (34 %)
+Writing at 0x000621dd... (37 %)
+Writing at 0x000681c1... (40 %)
+Writing at 0x0006e0f4... (42 %)
+Writing at 0x00074064... (45 %)
+Writing at 0x000798fa... (48 %)
+Writing at 0x0007eb1d... (51 %)
+Writing at 0x000847ef... (54 %)
+Writing at 0x00089ff4... (57 %)
+Writing at 0x0008f14d... (60 %)
+Writing at 0x00094515... (62 %)
+Writing at 0x0009985e... (65 %)
+Writing at 0x0009eeb4... (68 %)
+Writing at 0x000a46ed... (71 %)
+Writing at 0x000aa43f... (74 %)
+Writing at 0x000afd58... (77 %)
+Writing at 0x000b56a7... (80 %)
+Writing at 0x000bef56... (82 %)
+Writing at 0x000c5da5... (85 %)
+Writing at 0x000cb4de... (88 %)
+Writing at 0x000d0ed3... (91 %)
+Writing at 0x000d642e... (94 %)
+Writing at 0x000dc2d1... (97 %)
+Writing at 0x000e1788... (100 %)
+Wrote 876528 bytes (569843 compressed) at 0x00010000 in 13.5 seconds (effective 520.5 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+================================================ [SUCCESS] Took 26.01 seconds ================================================
+ *  Terminal will be reused by tasks, press any key to close it. 

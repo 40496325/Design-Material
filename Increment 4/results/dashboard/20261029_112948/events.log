@@ -1,0 +1,1 @@
+11:29:48.605 [warn] Link port_error: cannot open COM10: could not open port 'COM10': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)

@@ -1,0 +1,231 @@
+21:04:32.433 IG,HB,up=30,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.434 I (30594) main: ADS1220 AIN0: 0.0035 V
+21:04:32.434 I (31033) main: AHT20: 26.11 degC, 32.91 %RH
+21:04:32.434 RIG,HB,up=35,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.434 I (36117) main: AHT20: 26.17 degC, 32.93 %RH
+21:04:32.434 I (36635) main: ADS1220 AIN0: 0.0034 V
+21:04:32.434 RIG,HB,up=40,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (41201) main: AHT20: 26.18 degC, 32.78 %RH
+21:04:32.442 I (42675) main: ADS1220 AIN0: 0.0035 V
+21:04:32.442 RIG,HB,up=45,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (46285) main: AHT20: 26.20 degC, 32.72 %RH
+21:04:32.442 I (48715) main: ADS1220 AIN0: 0.0035 V
+21:04:32.442 RIG,HB,up=50,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (51369) main: AHT20: 26.24 degC, 32.69 %RH
+21:04:32.442 I (54755) main: ADS1220 AIN0: 0.0034 V
+21:04:32.442 RIG,HB,up=55,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (56453) main: AHT20: 26.28 degC, 32.63 %RH
+21:04:32.442 RIG,HB,up=60,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (60795) main: ADS1220 AIN0: 0.0034 V
+21:04:32.442 I (61537) main: AHT20: 26.31 degC, 32.65 %RH
+21:04:32.442 RIG,HB,up=65,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (66621) main: AHT20: 26.32 degC, 32.50 %RH
+21:04:32.442 I (66836) main: ADS1220 AIN0: 0.0035 V
+21:04:32.442 RIG,HB,up=70,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (71705) main: AHT20: 26.34 degC, 32.50 %RH
+21:04:32.442 I (72876) main: ADS1220 AIN0: 0.0035 V
+21:04:32.442 RIG,HB,up=75,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:32.442 I (76789) main: AHT20: 26.43 degC, 32.43 %RH
+21:04:32.442 I (78916) main: ADS1220 AIN0: 0.0034 V
+21:04:32.495 RIG,HB,up=80,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:33.388 I (81873) main: AHT20: 26.42 degC, 32.34 %RH
+21:04:33.535 >>> INFO
+21:04:33.545 RIG,INFO,fw=4.0.0,name=REII crane rig (Increment 4),variant=nRF24L01+,probe=OK,setup_aw=03,spi_hz=4000000,csn=GPIO17(J1.1),sck=GPIO12,mosi=GPIO11,miso=GPIO13,pwr=GPIO47(+3.3VP J1.8)
+21:04:33.545 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:04:33.610 RIG,REGS,CONFIG=0F,EN_AA=03,EN_RXADDR=02,SETUP_AW=03,SETUP_RETR=15,RF_CH=77,RF_SETUP=0A,STATUS=0E,FIFO=01,RX_PW_P1=32,DYNPD=03,FEATURE=06
+21:04:33.610 RIG,ADDR,RX_ADDR_P1=0x3249494552('REII2'),TX_ADDR=0x3149494552,RX_ADDR_P0=0x3149494552
+21:04:33.610 RIG,STATS,up=81,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:33.610 OK,INFO
+21:04:33.852 >>> MODE APP
+21:04:33.862 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:04:33.863 OK,MODE,APP,cfg_errors=0
+21:04:33.868 >>> PROFILE STATIC
+21:04:33.925 RIG,LINK,profile=STATIC,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=static32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:04:33.925 OK,PROFILE,STATIC,cfg_errors=0
+21:04:33.927 >>> PA LOW
+21:04:33.989 OK,PA,LOW,cfg_errors=0
+21:04:33.991 >>> LOG 1
+21:04:34.052 OK,LOG,1
+21:04:34.054 >>> CLEAR
+21:04:34.115 OK,CLEAR
+21:04:34.263 >>> STATS
+21:04:34.304 RIG,STATS,up=82,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=STATIC,mode=APP,ch=77,pa=LOW,status=0E,fifo=11,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:34.304 OK,STATS
+21:04:36.457 I (84956) main: ADS1220 AIN0: 0.0035 V
+21:04:36.965 RIG,HB,up=85,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=STATIC,mode=APP,ch=77,pa=LOW,status=0E,fifo=11,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:38.486 I (86957) main: AHT20: 26.46 degC, 32.27 %RH
+21:04:41.968 RIG,HB,up=90,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=STATIC,mode=APP,ch=77,pa=LOW,status=0E,fifo=11,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:42.540 I (90997) main: ADS1220 AIN0: 0.0035 V
+21:04:43.555 I (92041) main: AHT20: 26.47 degC, 32.22 %RH
+21:04:46.963 RIG,HB,up=95,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=STATIC,mode=APP,ch=77,pa=LOW,status=0E,fifo=11,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:48.553 I (97038) main: ADS1220 AIN0: 0.0035 V
+21:04:48.616 I (97125) main: AHT20: 26.50 degC, 32.23 %RH
+21:04:49.446 >>> SCAN 20
+21:04:49.494 RIG,SCAN_START,passes=20
+21:04:51.076 RIG,SCAN,0,0,20
+21:04:51.076 RIG,SCAN,1,0,20
+21:04:51.076 RIG,SCAN,2,0,20
+21:04:51.076 RIG,SCAN,3,0,20
+21:04:51.076 RIG,SCAN,4,0,20
+21:04:51.076 RIG,SCAN,5,0,20
+21:04:51.076 RIG,SCAN,6,0,20
+21:04:51.076 RIG,SCAN,7,0,20
+21:04:51.076 RIG,SCAN,8,0,20
+21:04:51.076 RIG,SCAN,9,0,20
+21:04:51.076 RIG,SCAN,10,0,20
+21:04:51.076 RIG,SCAN,11,0,20
+21:04:51.076 RIG,SCAN,12,0,20
+21:04:51.076 RIG,SCAN,13,0,20
+21:04:51.076 RIG,SCAN,14,0,20
+21:04:51.077 RIG,SCAN,15,0,20
+21:04:51.077 RIG,SCAN,16,0,20
+21:04:51.077 RIG,SCAN,17,0,20
+21:04:51.077 RIG,SCAN,18,0,20
+21:04:51.077 RIG,SCAN,19,0,20
+21:04:51.077 RIG,SCAN,20,0,20
+21:04:51.077 RIG,SCAN,21,0,20
+21:04:51.077 RIG,SCAN,22,0,20
+21:04:51.077 RIG,SCAN,23,0,20
+21:04:51.077 RIG,SCAN,24,0,20
+21:04:51.077 RIG,SCAN,25,0,20
+21:04:51.077 RIG,SCAN,26,0,20
+21:04:51.077 RIG,SCAN,27,0,20
+21:04:51.077 RIG,SCAN,28,0,20
+21:04:51.084 RIG,SCAN,29,0,20
+21:04:51.084 RIG,SCAN,30,0,20
+21:04:51.084 RIG,SCAN,31,0,20
+21:04:51.084 RIG,SCAN,32,0,20
+21:04:51.084 RIG,SCAN,33,0,20
+21:04:51.084 RIG,SCAN,34,0,20
+21:04:51.084 RIG,SCAN,35,0,20
+21:04:51.084 RIG,SCAN,36,0,20
+21:04:51.084 RIG,SCAN,37,0,20
+21:04:51.084 RIG,SCAN,38,0,20
+21:04:51.084 RIG,SCAN,39,0,20
+21:04:51.084 RIG,SCAN,40,0,20
+21:04:51.084 RIG,SCAN,41,0,20
+21:04:51.084 RIG,SCAN,42,0,20
+21:04:51.084 RIG,SCAN,43,0,20
+21:04:51.084 RIG,SCAN,44,0,20
+21:04:51.085 RIG,SCAN,45,0,20
+21:04:51.085 RIG,SCAN,46,0,20
+21:04:51.085 RIG,SCAN,47,0,20
+21:04:51.085 RIG,SCAN,48,0,20
+21:04:51.085 RIG,SCAN,49,0,20
+21:04:51.085 RIG,SCAN,50,0,20
+21:04:51.085 RIG,SCAN,51,0,20
+21:04:51.085 RIG,SCAN,52,0,20
+21:04:51.085 RIG,SCAN,53,0,20
+21:04:51.085 RIG,SCAN,54,0,20
+21:04:51.085 RIG,SCAN,55,0,20
+21:04:51.085 RIG,SCAN,56,0,20
+21:04:51.092 RIG,SCAN,57,0,20
+21:04:51.092 RIG,SCAN,58,0,20
+21:04:51.092 RIG,SCAN,59,0,20
+21:04:51.092 RIG,SCAN,60,0,20
+21:04:51.092 RIG,SCAN,61,0,20
+21:04:51.092 RIG,SCAN,62,0,20
+21:04:51.092 RIG,SCAN,63,0,20
+21:04:51.092 RIG,SCAN,64,0,20
+21:04:51.092 RIG,SCAN,65,0,20
+21:04:51.092 RIG,SCAN,66,0,20
+21:04:51.092 RIG,SCAN,67,0,20
+21:04:51.092 RIG,SCAN,68,0,20
+21:04:51.092 RIG,SCAN,69,0,20
+21:04:51.092 RIG,SCAN,70,0,20
+21:04:51.092 RIG,SCAN,71,0,20
+21:04:51.092 RIG,SCAN,72,0,20
+21:04:51.092 RIG,SCAN,73,0,20
+21:04:51.092 RIG,SCAN,74,0,20
+21:04:51.093 RIG,SCAN,75,0,20
+21:04:51.093 RIG,SCAN,76,0,20
+21:04:51.093 RIG,SCAN,77,0,20
+21:04:51.093 RIG,SCAN,78,0,20
+21:04:51.093 RIG,SCAN,79,0,20
+21:04:51.093 RIG,SCAN,80,0,20
+21:04:51.093 RIG,SCAN,81,0,20
+21:04:51.093 RIG,SCAN,82,0,20
+21:04:51.093 RIG,SCAN,83,0,20
+21:04:51.093 RIG,SCAN,84,0,20
+21:04:51.100 RIG,SCAN,85,0,20
+21:04:51.100 RIG,SCAN,86,0,20
+21:04:51.100 RIG,SCAN,87,0,20
+21:04:51.100 RIG,SCAN,88,0,20
+21:04:51.100 RIG,SCAN,89,0,20
+21:04:51.100 RIG,SCAN,90,0,20
+21:04:51.100 RIG,SCAN,91,0,20
+21:04:51.100 RIG,SCAN,92,0,20
+21:04:51.100 RIG,SCAN,93,0,20
+21:04:51.100 RIG,SCAN,94,0,20
+21:04:51.100 RIG,SCAN,95,0,20
+21:04:51.100 RIG,SCAN,96,0,20
+21:04:51.100 RIG,SCAN,97,0,20
+21:04:51.100 RIG,SCAN,98,0,20
+21:04:51.100 RIG,SCAN,99,0,20
+21:04:51.100 RIG,SCAN,100,0,20
+21:04:51.100 RIG,SCAN,101,0,20
+21:04:51.100 RIG,SCAN,102,0,20
+21:04:51.100 RIG,SCAN,103,0,20
+21:04:51.100 RIG,SCAN,104,0,20
+21:04:51.100 RIG,SCAN,105,0,20
+21:04:51.100 RIG,SCAN,106,0,20
+21:04:51.100 RIG,SCAN,107,0,20
+21:04:51.100 RIG,SCAN,108,0,20
+21:04:51.100 RIG,SCAN,109,0,20
+21:04:51.100 RIG,SCAN,110,0,20
+21:04:51.100 RIG,SCAN,111,0,20
+21:04:51.100 RIG,SCAN,112,0,20
+21:04:51.162 RIG,SCAN,113,0,20
+21:04:51.162 RIG,SCAN,114,0,20
+21:04:51.162 RIG,SCAN,115,0,20
+21:04:51.162 RIG,SCAN,116,0,20
+21:04:51.162 RIG,SCAN,117,0,20
+21:04:51.162 RIG,SCAN,118,0,20
+21:04:51.162 RIG,SCAN,119,0,20
+21:04:51.162 RIG,SCAN,120,0,20
+21:04:51.162 RIG,SCAN,121,0,20
+21:04:51.162 RIG,SCAN,122,0,20
+21:04:51.162 RIG,SCAN,123,0,20
+21:04:51.162 RIG,SCAN,124,0,20
+21:04:51.162 RIG,SCAN,125,0,20
+21:04:51.162 RIG,SCAN_END,0,0
+21:04:51.162 OK,SCAN
+21:04:51.164 >>> CARRIER 3000
+21:04:51.224 RIG,CARRIER,ON,ch=77,ms=3000,pa=MAX
+21:04:53.694 I (102208) main: AHT20: 26.52 degC, 32.24 %RH
+21:04:54.202 RIG,CARRIER,OFF
+21:04:54.202 OK,CARRIER
+21:04:54.202 RIG,HB,up=102,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=STATIC,mode=APP,ch=77,pa=LOW,status=0E,fifo=11,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:54.452 >>> RPD 2000
+21:04:54.579 I (103080) main: ADS1220 AIN0: 0.0035 V
+21:04:56.470 RIG,RPD,0,3555
+21:04:56.470 OK,RPD
+21:04:56.978 RIG,HB,up=105,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=STATIC,mode=APP,ch=77,pa=LOW,status=0E,fifo=11,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:57.473 >>> MODE APP
+21:04:57.487 RIG,LINK,profile=STATIC,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=static32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:04:57.488 OK,MODE,APP,cfg_errors=0
+21:04:57.489 >>> PROFILE ICD
+21:04:57.550 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:04:57.550 OK,PROFILE,ICD,cfg_errors=0
+21:04:57.554 >>> PA LOW
+21:04:57.612 OK,PA,LOW,cfg_errors=0
+21:04:57.613 >>> LOG 1
+21:04:57.674 OK,LOG,1
+21:04:57.678 >>> CLEAR
+21:04:57.737 OK,CLEAR
+21:04:57.880 >>> STATS
+21:04:57.926 RIG,STATS,up=106,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:04:57.926 OK,STATS
+21:04:58.809 I (107292) main: AHT20: 26.55 degC, 32.24 %RH
+21:05:00.653 I (109124) main: ADS1220 AIN0: 0.0035 V
+21:05:01.985 RIG,HB,up=110,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:05:03.891 I (112376) main: AHT20: 26.56 degC, 32.19 %RH
+21:05:06.692 I (115165) main: ADS1220 AIN0: 0.0036 V
+21:05:07.009 RIG,HB,up=115,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:05:08.974 I (117460) main: AHT20: 26.60 degC, 32.16 %RH
+21:05:12.013 RIG,HB,up=120,frames=0,pings=0,moves=0,bad=0,dups=0,period_frames=0,link=LOST,profile=ICD,mode=APP,ch=77,pa=LOW,status=0E,fifo=01,config=0F,ce_j7_10=1,ce_j3_3=1,reinit=0
+21:05:12.207 >>> PROFILE ICD
+21:05:12.266 RIG,LINK,profile=ICD,mode=APP,ch=77,rate=2M,pa=LOW(-12dBm),arc=5,ard_us=500,crc=16,aw=5,payload=dyn32+ackpl32,listen=REII2,ce_paths=J3.3(MCP GPA0)+J7.10(GPIO10),ce_j7_10=1,ce_j3_3=1,cfg_errors=0
+21:05:12.266 OK,PROFILE,ICD,cfg_errors=0
+21:05:12.271 >>> PA LOW
+21:05:12.330 OK,PA,LOW,cfg_errors=0

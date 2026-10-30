@@ -1,6 +1,4 @@
-// REII Dashboard Frontend — WebSocket client for Flask/SocketIO backend
-// Architecture A1 (decision D-10)
-
+// REII Dashboard Frontend — WebSocket client
 (function () {
   const socket = io();
 
@@ -14,7 +12,7 @@
   const hoistVelEl = document.getElementById("hoistVel");
   const loadEl = document.getElementById("load");
   const vfdCurrentEl = document.getElementById("vfdCurrent");
-  const tempEl = document.getElementById("temp");
+  const magnetCurrentEl = document.getElementById("magnetCurrent");
   const seqAckEl = document.getElementById("seqAck");
   const magnetStatEl = document.getElementById("magnetStat");
   const errorCodeEl = document.getElementById("errorCode");
@@ -36,6 +34,7 @@
   let manualMode = true;
   let magnetOn = false;
   let lastTelemetryTs = null;
+  let wsConnected = false;
 
   function log(msg, type = "info") {
     const entry = document.createElement("div");
@@ -46,14 +45,9 @@
     logContainer.scrollTop = logContainer.scrollHeight;
   }
 
-  function setConnected(connected) {
-    if (connected) {
-      connIndicator.className = "indicator online";
-      connText.textContent = "Connected";
-    } else {
-      connIndicator.className = "indicator offline";
-      connText.textContent = "Disconnected";
-    }
+  function setStatus(online, text) {
+    connIndicator.className = online ? "indicator online" : "indicator offline";
+    connText.textContent = text;
   }
 
   function updateTelemetry(frame) {
@@ -64,108 +58,86 @@
     hoistVelEl.textContent = frame.hoist_vel_m_s !== undefined ? frame.hoist_vel_m_s.toFixed(3) : "--";
     loadEl.textContent = frame.load_kg !== undefined ? frame.load_kg.toFixed(1) : "--";
     vfdCurrentEl.textContent = frame.vfd_current_A !== undefined ? frame.vfd_current_A.toFixed(1) : "--";
-    tempEl.textContent = frame.temp_c !== undefined ? frame.temp_c : "--";
+    magnetCurrentEl.textContent = frame.magnet_current_A !== undefined ? frame.magnet_current_A.toFixed(1) : "--";
     seqAckEl.textContent = frame.seq_ack !== undefined ? frame.seq_ack : "--";
-    magnetStatEl.textContent = frame.magnet_status !== undefined ? (frame.magnet_status ? "ON" : "OFF") : "--";
+    magnetStatEl.textContent = frame.magnet_status === 1 ? "HOLDING" : (frame.magnet_status === 2 ? "FAULT" : "OFF");
     errorCodeEl.textContent = frame.error_code !== undefined ? frame.error_code : "--";
-    faultFlagsEl.textContent = frame.fault_flags !== undefined ? frame.fault_flags : "--";
-    sysHealthEl.textContent = frame.system_health !== undefined ? frame.system_health : "--";
+    faultFlagsEl.textContent = frame.fault_flags !== undefined ? `0x${frame.fault_flags.toString(16).padStart(2, '0').toUpperCase()}` : "--";
+    sysHealthEl.textContent = frame.system_health !== undefined ? `0x${frame.system_health.toString(16).padStart(2, '0').toUpperCase()}` : "--";
+
     lastTelemetryTs = Date.now();
-    updateLastUpdate();
+    setStatus(true, "Crane Link Active (ch77)");
   }
 
-  function updateLastUpdate() {
-    if (!lastTelemetryTs) { lastUpdateEl.textContent = "--"; return; }
-    const secs = Math.floor((Date.now() - lastTelemetryTs) / 1000);
-    lastUpdateEl.textContent = secs === 0 ? "just now" : `${secs}s`;
+  function checkWatchdog() {
+    if (!wsConnected) {
+      setStatus(false, "Server Disconnected");
+      return;
+    }
+    if (!lastTelemetryTs || Date.now() - lastTelemetryTs > 2000) {
+      setStatus(false, "RF Link Offline (No ACKs)");
+      lastUpdateEl.textContent = lastTelemetryTs ? `${Math.floor((Date.now() - lastTelemetryTs)/1000)}s ago` : "--";
+    } else {
+      const secs = Math.floor((Date.now() - lastTelemetryTs) / 1000);
+      lastUpdateEl.textContent = secs === 0 ? "just now" : `${secs}s ago`;
+    }
   }
 
-  setInterval(updateLastUpdate, 1000);
-
-  function setManualMode(manual) {
-    manualMode = manual;
-    btnManual.classList.toggle("active", manual);
-    btnAuto.classList.toggle("active", !manual);
-  }
-
-  function setMagnet(on) {
-    magnetOn = on;
-    btnMagnet.textContent = on ? "On" : "Off";
-    btnMagnet.classList.toggle("active", on);
-  }
+  setInterval(checkWatchdog, 1000);
 
   socket.on("connect", () => {
-    setConnected(true);
-    log("WebSocket connected", "info");
+    wsConnected = true;
+    setStatus(true, "Waiting for Crane Link...");
+    log("WebSocket connected to backend", "info");
   });
 
   socket.on("disconnect", () => {
-    setConnected(false);
+    wsConnected = false;
+    setStatus(false, "Disconnected");
     log("WebSocket disconnected", "warn");
-  });
-
-  socket.on("connected", (data) => {
-    log(`Server ready — port ${data.port}`, "info");
   });
 
   socket.on("telemetry", (frame) => {
     updateTelemetry(frame);
-    log(`Telemetry: seq=${frame.seq_ack ?? "?"} load=${frame.load_kg ?? "?"}kg trolley=${frame.trolley_pos_m ?? "?"}m`, "telemetry");
   });
 
-  socket.on("pong", (data) => {
-    log(`PONG ok=${data.ok} rtt=${data.rtt_ms}ms`, "info");
-  });
-
-  socket.on("echo", (data) => {
-    log(`ECHO: ${data.text}`, "info");
-  });
-
-  socket.on("banner", (data) => {
-    log(data.text, "info");
-  });
-
-  socket.on("status", (data) => {
-    if (data.status === "ready") {
-      log("Groundstation READY", "info");
-    } else if (data.status === "error") {
-      log(`Error: ${data.detail}`, "error");
-    } else {
-      log(`Status: ${data.detail || data.status}`, "info");
+  socket.on("link_status", (data) => {
+    if (!data.link_ok) {
+      setStatus(false, "RF Link Lost");
     }
   });
 
-  socket.on("command_sent", (data) => {
-    if (data.ok) {
-      log(`Command sent: seq=${data.seq} hex=${data.hex}`, "command");
-      cmdSentEl.textContent = `Last command: seq=${data.seq} hex=${data.hex}`;
-    } else {
-      log(`Command failed: ${data.error}`, "error");
-      cmdSentEl.textContent = `Last command: FAILED (${data.error})`;
-    }
+  function sendCommand(overrides = {}) {
+    const trolley = parseInt(trolleyCtrl.value, 10);
+    const hoist = parseInt(hoistCtrl.value, 10);
+    socket.emit("command", {
+      estop: overrides.estop ?? false,
+      reset: overrides.reset ?? false,
+      manual: manualMode,
+      trolley: overrides.trolley ?? trolley,
+      hoist: overrides.hoist ?? hoist,
+      magnet: magnetOn ? 1 : 0,
+    });
+  }
+
+  btnManual.addEventListener("click", () => {
+    manualMode = true;
+    btnManual.classList.add("active");
+    btnAuto.classList.remove("active");
+    sendCommand();
   });
 
-  socket.on("reader_started", (data) => {
-    log(`Serial reader started on ${data.port}`, "info");
+  btnAuto.addEventListener("click", () => {
+    manualMode = false;
+    btnAuto.classList.add("active");
+    btnManual.classList.remove("active");
+    sendCommand();
   });
-
-  socket.on("reader_stopped", () => {
-    log("Serial reader stopped", "warn");
-  });
-
-  trolleyCtrl.addEventListener("input", () => {
-    trolleyValEl.textContent = trolleyCtrl.value;
-  });
-
-  hoistCtrl.addEventListener("input", () => {
-    hoistValEl.textContent = hoistCtrl.value;
-  });
-
-  btnManual.addEventListener("click", () => setManualMode(true));
-  btnAuto.addEventListener("click", () => setManualMode(false));
 
   btnMagnet.addEventListener("click", () => {
-    setMagnet(!magnetOn);
+    magnetOn = !magnetOn;
+    btnMagnet.textContent = magnetOn ? "On" : "Off";
+    btnMagnet.classList.toggle("active", magnetOn);
     sendCommand();
   });
 
@@ -179,29 +151,15 @@
     log("RESET triggered", "warn");
   });
 
-  function sendCommand(overrides = {}) {
-    const trolley = parseInt(trolleyCtrl.value, 10);
-    const hoist = parseInt(hoistCtrl.value, 10);
-    const payload = {
-      estop: overrides.estop ?? false,
-      reset: overrides.reset ?? false,
-      manual: manualMode,
-      trolley: overrides.trolley ?? trolley,
-      hoist: overrides.hoist ?? hoist,
-      magnet: magnetOn ? 1 : 0,
-    };
-    socket.emit("command", payload);
-  }
-
   let sendTimeout;
   [trolleyCtrl, hoistCtrl].forEach((ctrl) => {
     ctrl.addEventListener("input", () => {
+      trolleyValEl.textContent = trolleyCtrl.value;
+      hoistValEl.textContent = hoistCtrl.value;
       clearTimeout(sendTimeout);
-      sendTimeout = setTimeout(() => sendCommand(), 100);
+      sendTimeout = setTimeout(() => sendCommand(), 50);
     });
   });
 
-  setManualMode(true);
-  setMagnet(false);
-  setConnected(false);
+  setStatus(false, "Connecting...");
 })();

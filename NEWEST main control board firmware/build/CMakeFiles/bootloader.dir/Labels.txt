@@ -1,13 +1,13 @@
 # Target labels
  bootloader
 # Source files and their labels
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/CMakeFiles/bootloader
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/CMakeFiles/bootloader.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/CMakeFiles/bootloader-complete.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
-D:/DESIGN GIT/REII_Cline_Project_Context_Verified_New/NEWEST_EngDes26_start main rig micro/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/CMakeFiles/bootloader
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/CMakeFiles/bootloader.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/CMakeFiles/bootloader-complete.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+D:/DESIGN GIT/Design-Material/NEWEST main control board firmware/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
