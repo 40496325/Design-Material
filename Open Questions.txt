@@ -1,0 +1,35 @@
+2. What to ask each group member (firmware only)
+
+MCTR 1, AR Cronje (by Wed 18 Nov)
+
+Is the encoder output push-pull 5 V or open collector? Which input circuit is fitted?
+HW-095: is ENB jumpered to ENA? Are IN3/IN4 wired to J4.6/J4.7, or jumpered to IN1/IN2?
+With IN1 HIGH and IN2 LOW, which end does the trolley move towards?
+Can we count 10 wheel turns together? The ICD gives 1050 counts per wheel turn; their note implies about 467.
+What is the usable rail length? If they don’t know, we measure it on 24 Nov.
+
+MCTR 2, VA King (by Thu 19 Nov)
+
+Spool radius and total gear ratio.
+Hoist motor poles and rated speed at 50 Hz.
+Brake on J4.8: is it wired, does HIGH release it, and is a 50 ms lead before the drive starts enough?
+Load-cell rated capacity, and 2–3 known masses for 25 Nov.
+Is the stroke still 1.6 m? Is there a top or bottom limit switch the MCU should read?
+
+EEII 1, MM Van Rooyen (by Fri 20 Nov)
+
+Is 10 kHz confirmed as the carrier for all three phases?
+Does the 4N25 opto stage invert the signal? What minimum and maximum duty does the board need?
+What does DRV_EN drive (the IR2104 /SD pins?), and should it be LOW at boot?
+DRV_FAULT on J3.5: does it exist, is it active HIGH or LOW, and does it latch?
+Current signal: their scope of work says analog below 2.048 V on the shared ADC, but on 29 Oct they said digital. Which is it, on which pin, and what scale?
+Start frequency, maximum frequency, V/f and ramp rate.
+May the firmware swap phases B and C while running, or must it stop first?
+When is the board signed off, and is Thu 26 Nov OK for the joint hook-up?
+
+EEII 2, F Prinsloo (by Thu 19 Nov)
+
+Current sensor on J6.8: volts per amp and the output at 0 A. It must stay at or below 3.3 V at 7.5 A.
+Holding threshold. I’ve put 6.0 A as the default if they don’t answer.
+MAG_LOGIC on J3.6: an enable, a status signal back, or unused?
+Can their switch handle 20 kHz at 8.33 % duty (4.2 µs pulses)?

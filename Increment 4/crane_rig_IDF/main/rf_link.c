@@ -38,6 +38,10 @@
 #include "rig_telemetry.h"
 #include "loadcell.h"
 #include "status_led.h"
+#include "mcp_shared.h"      // DRIVE: one owner for the MCP23017 latches (CE shares port A with DRV_EN)
+#if RIG_ENABLE_DRIVE
+#include "drive_control.h"   // DRIVE: hoist drive (main/drive_electronics/)
+#endif
 
 static const char *TAG = "rf_link";
 
@@ -72,7 +76,6 @@ static nrf24_t s_radio;
 static link_state_t s;
 static QueueHandle_t s_lines;
 static mcp23017_handle_t *s_mcp;
-__attribute__((unused)) static uint8_t s_mcp_olat_a;   // shadow of OLATA (CE on GPA0)
 
 static const uint8_t ADDR_CRANE[5] = RIG_ADDR_CRANE;
 static const uint8_t ADDR_GS[5] = RIG_ADDR_GS;
@@ -90,9 +93,8 @@ static void ce_write(void *ctx, int level)
 #endif
 #if RIG_CE_PATHS & RIG_CE_PATH_MCP_J3_3
     if (s_mcp) {
-        uint8_t bit = (uint8_t)(1u << RIG_NRF_CE_MCP_BIT);
-        s_mcp_olat_a = level ? (uint8_t)(s_mcp_olat_a | bit) : (uint8_t)(s_mcp_olat_a & ~bit);
-        if (mcp23017_write_port(s_mcp, MCP23017_PORT_A, s_mcp_olat_a) != ESP_OK) {
+        // DRIVE: read-modify-write through mcp_shared so DRV_EN (GPA1) on the same port is kept.
+        if (mcp_shared_write(MCP23017_PORT_A, RIG_NRF_CE_MCP_BIT, level) != ESP_OK) {
             printf("RIG,WARN,MCP23017 write failed - CE on J3.3 may be stale\n");
         }
     }
@@ -318,8 +320,10 @@ static void handle_frame(const uint8_t *buf, int len, int pipe)
         memset(&s.last_cmd, 0, sizeof(s.last_cmd));
         memcpy(&s.last_cmd, buf, len < (int)sizeof(s.last_cmd) ? (size_t)len : sizeof(s.last_cmd));
         cmd_changed = memcmp(&prev.mode_flags, &s.last_cmd.mode_flags, 5) != 0;   // bytes 3..7
-        // No actuation in this firmware: the command feeds the telemetry model only.
         rig_tlm_on_move(&s.last_cmd, s.last_rx_us);
+#if RIG_ENABLE_DRIVE
+        drive_on_move(&s.last_cmd, s.last_rx_us);   // DRIVE: hoist_cmd -> SPWM / DRV_EN / brake
+#endif
     } else {
         s.bad++;
     }
@@ -471,12 +475,16 @@ static void print_heartbeat(const char *tag)
            rig_tlm_is_model() ? "MODEL" : "ZERO");
     rig_tlm_print();
     loadcell_print("LOAD");
+#if RIG_ENABLE_DRIVE
+    drive_print("DRIVE");
+#endif
 }
 
 static void print_help(void)
 {
     printf("RIG,HELP,HELP INFO STATS CLEAR PROFILE <ICD|STATIC> MODE <APP|CTRL> PA <MIN|LOW|HIGH|MAX> "
-           "CH <0-125> LOG <0|1> TLM <MODEL|ZERO> LOAD [TARE|CAL <kg>|WATCH [s]|RESET] SCAN [passes] RPD [ms] CARRIER [ms] [ch] CE <0|1> REINIT SELFTEST\n");
+           "CH <0-125> LOG <0|1> TLM <MODEL|ZERO> LOAD [TARE|CAL <kg>|WATCH [s]|RESET] SCAN [passes] RPD [ms] CARRIER [ms] [ch] CE <0|1> REINIT SELFTEST "
+           "DRIVE [STATUS|SQUARE|SINE|EN|BRAKE|STOP|RESET|HELP]\n");
     printf("OK,HELP\n");
 }
 
@@ -513,8 +521,11 @@ static void handle_line(char *line)
     }
     char *a1 = strtok_r(NULL, " \t", &save);
     char *a2 = strtok_r(NULL, " \t", &save);
+    char *a3 = strtok_r(NULL, " \t", &save);   // DRIVE needs a third word (DRIVE SQUARE B 30)
+    (void)a3;
 
-    if (!s.radio_ok && strcmp(cmd, "HELP") && strcmp(cmd, "INFO") && strcmp(cmd, "REINIT") && strcmp(cmd, "LOAD")) {
+    if (!s.radio_ok && strcmp(cmd, "HELP") && strcmp(cmd, "INFO") && strcmp(cmd, "REINIT") && strcmp(cmd, "LOAD") &&
+        strcmp(cmd, "DRIVE")) {   // DRIVE test modes work without the radio
         printf("ERR,radio not responding on SPI (probe=%s) - check J1 wiring / 3.3VP, then REINIT\n",
                esp_err_to_name(s.probe_err));
         return;
@@ -582,6 +593,10 @@ static void handle_line(char *line)
         printf("OK,LOG,%d\n", s.log_frames ? 1 : 0);
     } else if (!strcmp(cmd, "LOAD")) {
         loadcell_command(a1, a2);
+#if RIG_ENABLE_DRIVE
+    } else if (!strcmp(cmd, "DRIVE")) {
+        drive_command(a1, a2, a3);
+#endif
     } else if (!strcmp(cmd, "TLM")) {
         if (a1 && (!strcmp(a1, "MODEL") || !strcmp(a1, "ZERO"))) {
             rig_tlm_set_model(!strcmp(a1, "MODEL"));
@@ -686,7 +701,7 @@ static void radio_task(void *arg)
                 ce_readback(&g, &m);
                 if (m != s_radio.ce_level) {
                     printf("RIG,WARN,CE on J3.3 reads %d, expected %d - re-driving the MCP23017\n", m, s_radio.ce_level);
-                    mcp23017_set_direction(s_mcp, MCP23017_PORT_A, (uint8_t)~(1u << RIG_NRF_CE_MCP_BIT));
+                    mcp_shared_reapply();   // DRIVE: restores every MCP pin (CE, DRV_EN, brake, inputs)
                     nrf24_ce(&s_radio, s_radio.ce_level);
                 }
             }
@@ -745,9 +760,8 @@ esp_err_t rf_link_start(mcp23017_handle_t *mcp)
 #endif
 #if RIG_CE_PATHS & RIG_CE_PATH_MCP_J3_3
     if (s_mcp) {
-        s_mcp_olat_a = 0x00;
-        mcp23017_write_port(s_mcp, MCP23017_PORT_A, s_mcp_olat_a);                      // latch LOW first
-        mcp23017_set_direction(s_mcp, MCP23017_PORT_A, (uint8_t)~(1u << RIG_NRF_CE_MCP_BIT)); // GPA0 output
+        // DRIVE: GPA0 output, latched LOW first; the other port-A pins are left to their owners.
+        mcp_shared_config_output(MCP23017_PORT_A, RIG_NRF_CE_MCP_BIT, 0);
     } else {
 #if RIG_CE_PATHS == RIG_CE_PATH_MCP_J3_3
         ESP_LOGE(TAG, "MCP23017 (I2C 0x20) not available - CE on J3.3 CANNOT be driven, so the radio "

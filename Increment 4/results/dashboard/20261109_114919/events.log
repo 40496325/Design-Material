@@ -1,0 +1,8 @@
+11:49:19.494 [warn] Crane console COM12 not available (could not open port 'COM12': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)) - continuing without it
+11:49:19.497 [info] Link connecting: checking ground station on COM9
+11:49:20.113 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+11:49:20.113 [info] Link running
+11:49:20.174 [fault] Fault raised: Wireless timeout (error code 8)
+11:49:20.297 [info] Fault cleared: Wireless timeout
+11:49:30.272 [fault] Fault raised: Wireless timeout (error code 8)
+11:49:53.663 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

@@ -1,0 +1,5 @@
+10:41:13.134 [info] Link connecting: checking ground station on COM10
+10:41:13.849 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+10:41:13.849 [info] Link running
+10:41:14.490 [warn] Link lost: 10 commands in a row without an ACK - check the crane
+10:43:57.170 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

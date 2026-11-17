@@ -1,0 +1,2 @@
+19:34:54.501 [warn] Crane console COM12 not available (could not open port 'COM12': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)) - continuing without it
+19:34:54.501 [warn] Link port_error: cannot open COM10: could not open port 'COM10': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)

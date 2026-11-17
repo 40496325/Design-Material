@@ -54,6 +54,9 @@ void rig_tlm_build(icd_uplink_t *out, uint8_t seq_ack, bool link_ok);
 /** Latest load-cell reading (called from the load-cell task, loadcell.c). */
 void rig_tlm_set_load(float kg, bool valid, bool saturated);
 
+/** True while the load cell reads > 20.0 kg or is saturated (hoist-up inhibit). */
+bool rig_tlm_overloaded(void);
+
 /** One machine-readable line: RIG,TLM,... */
 void rig_tlm_print(void);
 

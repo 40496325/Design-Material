@@ -1,0 +1,19 @@
+16:10:47.932 [warn] Crane console COM12 not available (could not open port 'COM12': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)) - continuing without it
+16:10:47.937 [info] Link connecting: checking ground station on COM9
+16:10:48.566 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+16:10:48.567 [info] Link running
+16:10:48.630 [fault] Fault raised: Wireless timeout (error code 8)
+16:10:48.694 [info] Fault cleared: Wireless timeout
+16:14:52.217 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+16:14:52.225 [info] Dashboard page is back - controls re-enabled
+16:14:54.217 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+16:14:54.221 [info] Dashboard page is back - controls re-enabled
+16:15:20.215 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+16:15:20.221 [info] Dashboard page is back - controls re-enabled
+16:15:33.279 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+16:15:52.212 [info] Dashboard page is back - controls re-enabled
+16:15:53.225 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+16:16:52.211 [info] Dashboard page is back - controls re-enabled
+16:16:53.247 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+16:17:06.440 [info] Dashboard page is back - controls re-enabled
+16:18:01.073 [warn] Link port_error: COM9 disconnected: reader stopped

@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#define RIG_FW_VERSION "4.4.1"
+#define RIG_FW_VERSION "4.5.0"   // 4.5.0 = drive electronics (EEII 1, IF6.0) added, 17 Nov 2026
 #define RIG_FW_NAME    "REII crane rig (Increment 4)"
 
 // -----------------------------------------------------------------------------
@@ -95,7 +95,8 @@
 
 // Lost-link threshold for the telemetry flags (Table 34 fault_flags b7 /
 // system_health b0). The ICD leaves the freshness value TBD (Q10); 500 ms is a
-// placeholder used for flags only - this firmware drives no actuators.
+// placeholder used for flags only. Since v4.5.0 the hoist drive also stops on it
+// (drive_cfg_t.link_timeout_ms in main.c is set from this value).
 #define RIG_LINK_TIMEOUT_MS 500
 
 // Status heartbeat on the console
@@ -166,5 +167,14 @@
 #define RIG_ENABLE_AHT20    1       // I2C temp/humidity, logged every RIG_SENSOR_LOG_MS
 #define RIG_ENABLE_ADS1220  1       // on-board SPI ADC (load cell on J6 if RIG_LOADCELL_ADS1220)
 #define RIG_ENABLE_SDCARD   0       // no card fitted on the bench -> only a timeout
-#define RIG_ENABLE_SPWM     0       // 3-phase PWM on J7.6-J7.8; off until EEII 1 needs it
+#define RIG_ENABLE_SPWM     0       // starter 3-phase PWM (20 kHz, free-running). Keep 0: replaced by the drive below
+
+// Drive electronics (EEII 1 VFD, ICD IF6.0) - main/drive_electronics/, added v4.5.0.
+// Owns J7.8/J7.7/J7.6 (SPWM A/B/C, 10 kHz), J3.4 DRV_EN, J4.8 brake, J3.5 / J3.8 inputs.
+// Every assumed value is in main.c, start_drive_electronics().
+#define RIG_ENABLE_DRIVE    1
+
+#if RIG_ENABLE_SPWM && RIG_ENABLE_DRIVE
+#error "RIG_ENABLE_SPWM and RIG_ENABLE_DRIVE both drive GPIO38-40 - enable only one"
+#endif
 #define RIG_SENSOR_LOG_MS   5000

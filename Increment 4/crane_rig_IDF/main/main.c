@@ -83,6 +83,10 @@
 #include "rig_console.h"
 #include "rig_telemetry.h"
 #include "loadcell.h"
+#include "mcp_shared.h"      // DRIVE: shared MCP23017 owner (main/drive_electronics/)
+#if RIG_ENABLE_DRIVE
+#include "drive_control.h"   // DRIVE: hoist drive (main/drive_electronics/)
+#endif
 
 // -----------------------------------------------------------------------------
 // OLED support - OFF by default
@@ -145,6 +149,7 @@
 
 #define MMC_CS_GPIO RIG_MMC_CS_GPIO
 
+// Starter SPWM (spwm.c, RIG_ENABLE_SPWM) - superseded by the drive electronics below.
 #define SPWM_PHASE_A_GPIO 38
 #define SPWM_PHASE_B_GPIO 39
 #define SPWM_PHASE_C_GPIO 40
@@ -435,6 +440,83 @@ __attribute__((unused)) static void ads1220_poll_task(void *arg)
     }
 }
 
+// =============================================================================
+// DRIVE ELECTRONICS (EEII 1 VFD, ICD IF6.0) - added v4.5.0, 17 Nov 2026
+// =============================================================================
+// Code: main/drive_electronics/ (drive_control.c, drive_spwm.c, mcp_shared.c).
+// This block is the ONE place to adjust the drive. Every value is tagged:
+//   CONFIRMED - stated in ICD-001 Rev A or by EEII 1 / MCTR 2
+//   ASSUMED   - not given anywhere yet; chosen here, change it when known
+//
+// Signal chain per phase: GPIO -> R -> 4N25 LED | 4N25 transistor + pull-up
+// -> IR2104 IN (HO/LO with 520 ns built-in dead time) -> IGBT half bridge.
+// "IN duty" below = fraction of each carrier period that IR2104 IN is HIGH
+// (high-side IGBT on). The pin itself is the inverse (the opto inverts).
+// =============================================================================
+#if RIG_ENABLE_DRIVE
+static void start_drive_electronics(void)
+{
+    const drive_cfg_t cfg = {
+        // ---- SPWM outputs ---------------------------------------------------
+        .spwm_gpio_a = 38,          // CONFIRMED J7.8 VFD_SPWM_A (ICD Table 19)
+        .spwm_gpio_b = 39,          // CONFIRMED J7.7 VFD_SPWM_B
+        .spwm_gpio_c = 40,          // CONFIRMED J7.6 VFD_SPWM_C
+        .carrier_hz = 10000,        // CONFIRMED EEII 1, 17 Nov (ICD Rev A said 20 kHz -> ICD Rev B)
+        .opto_inverts = true,       // CONFIRMED EEII 1, 17 Nov (4N25 output falls when the MCU pin is HIGH)
+        .idle_in_level = 0,         // ASSUMED: stopped = IR2104 IN LOW on all legs (low-side IGBTs on,
+                                    //   bootstrap caps charged). Pin is then HIGH (opto LED on).
+        .duty_min = 0.15f,          // ASSUMED: shortest IN pulse 15 % of 100 us = 15 us. The opto output
+        .duty_max = 0.85f,          //   rises slowly (EEII 1 scope photo, 10 Nov), so pulses much shorter
+                                    //   than ~15 us may not reach the IR2104 threshold. Measure the opto
+                                    //   output at 15 % and 85 % (DRIVE SQUARE A 15 / 85) and adjust.
+
+        // ---- DRV_EN output --------------------------------------------------
+        .drv_en_bit = 1,            // CONFIRMED J3.4 = MCP23017 GPA1 (ICD Table 19)
+        .drv_en_active_high = true, // CONFIRMED EEII 1, 29 Oct: HIGH = DC-bus IGBT (via its opto) on
+
+        // ---- Hoist brake output (MCTR 2, IF15.0) ----------------------------
+        .brake_enabled = true,      // CONFIRMED pin J4.8 = MCP23017 GPB5 (ICD Table 38)
+        .brake_bit = 5,
+        .brake_release_high = true, // ASSUMED from ICD (HIGH = release); MCTR 2 to confirm
+        .brake_delay_ms = 50,       // ASSUMED 50 ms (README D12). Order used: motor energised at f_start
+                                    //   -> 50 ms -> brake released; on stop: brake clamped at f_start
+                                    //   -> 50 ms -> SPWM off, DRV_EN off. MCTR 2 to confirm.
+
+        // ---- Inputs (less strict for now) ------------------------------------
+        .fault_enabled = true,      // J3.5 DRV_FAULT_IN = MCP23017 GPA2 (ICD Table 19)
+        .fault_bit = 2,
+        .fault_active_level = 0,    // ASSUMED active LOW (opto / open collector pulls low on a fault).
+        .fault_pullup = true,       //   With the 100 k pull-up an unconnected pin reads "no fault".
+        .oc_enabled = true,         // ASSUMED: EEII 1's current sensor sends a digital 10 A trip flag
+        .oc_bit = 5,                //   into J3.8 = MCP23017 GPA5 (spare), active LOW, pull-up on.
+        .oc_active_level = 0,       //   Pin and format still to be agreed (ICD Rev B). The ICD's
+        .oc_pullup = true,          //   analog J6.7 path is not used (EEII 1: digital).
+
+        // ---- Motion profile (ICD Table 20: 0-50 Hz, amplitude + frequency set speed)
+        .f_max_hz = 50.0f,          // CONFIRMED ICD Table 20: |hoist_cmd| 100 % = 50 Hz
+        .f_start_hz = 5.0f,         // ASSUMED: lowest running frequency (start and stop point)
+        .f_base_hz = 50.0f,         // ASSUMED: V/f base frequency = motor rated 50 Hz
+        .m_max = 0.70f,             // ASSUMED: modulation index at 50 Hz. 0.70 keeps the sine inside the
+                                    //   15-85 % duty limits (0.5 +/- 0.35) so it is never clipped.
+        .m_boost = 0.15f,           // ASSUMED: low-speed voltage boost (linear V/f would give m = 0.07 at 5 Hz)
+        .ramp_hz_s = 25.0f,         // ASSUMED: 0 -> 50 Hz in 2 s (the dashboard S-curve ramps as well)
+        .stop_ramp_hz_s = 100.0f,   // ASSUMED: lost link / soft stop: 50 -> 5 Hz in 0.45 s
+        .reverse_dwell_ms = 500,    // ASSUMED: at rest this long before running the other way
+                                    //   (EEII 1, 17 Nov: stop first, then swap phases)
+        .cmd_deadband_pct = 2,      // ASSUMED: |hoist_cmd| < 2 % = stop
+        .up_is_abc = true,          // ASSUMED: UP = phase order A-B-C, DOWN = A-C-B (B and C swapped).
+                                    //   If the hoist lowers on an UP command, set false.
+        .link_timeout_ms = RIG_LINK_TIMEOUT_MS,       // CONFIRMED ICD: 500 ms lost link -> safe hold
+        .hoist_mm_s_at_fmax = RIG_MODEL_HOIST_MAX_MM_S, // ASSUMED: 80 mm/s at 50 Hz (SysRS PT2, 1.6 m in 20 s)
+                                                        //   until MCTR 2 gives spool radius / gear ratio
+    };
+    esp_err_t err = drive_start(&cfg);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "drive electronics NOT running (%s)", esp_err_to_name(err));
+    }
+}
+#endif
+
 #if OLED_ENABLED
 // Mirrors the latest sensor readings (and the current SPWM frequency) onto
 // the OLED. There's no WiFi/IP address to show in this starter project, so
@@ -511,6 +593,12 @@ void app_main(void)
     } else {
         ESP_LOGE(TAG, "MCP23017 probe failed (%s) - nRF CE on J3.3 will NOT be driven", esp_err_to_name(mcp23017_err));
     }
+    // DRIVE: from here on every MCP23017 pin (CE, DRV_EN, brake, inputs) goes through mcp_shared.
+    mcp_shared_init(mcp23017_err == ESP_OK ? &mcp23017 : NULL);
+#if RIG_ENABLE_DRIVE
+    // DRIVE: as early as possible, so DRV_EN is held LOW and the brake clamped from boot.
+    start_drive_electronics();
+#endif
 
 #if OLED_ENABLED
     esp_err_t oled_err = oled_init(i2c_bus, &s_u8g2);

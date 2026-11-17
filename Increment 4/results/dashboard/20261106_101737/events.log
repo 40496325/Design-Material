@@ -1,0 +1,26 @@
+10:17:37.637 [info] Link connecting: checking ground station on COM10
+10:17:38.300 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+10:17:38.300 [info] Link running
+10:17:38.939 [warn] Link lost: 10 commands in a row without an ACK - check the crane
+10:21:06.640 [info] Link running: ACKs are coming back
+10:21:06.641 [fault] Fault raised: Wireless timeout (error code 8)
+10:21:06.691 [info] Fault cleared: Wireless timeout
+10:21:11.341 [fault] Fault raised: Wireless timeout (error code 8)
+10:22:20.245 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+10:22:21.897 [info] Soft stop released
+10:22:41.825 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+10:22:42.503 [info] Soft stop released
+10:22:43.057 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+10:22:43.462 [info] Soft stop released
+10:22:48.447 [info] Soft stop sent - speeds zeroed (the red E-stop button is the real safety stop)
+10:22:50.141 [info] Soft stop released
+10:26:01.154 [info] Radio power change to HIGH queued
+10:26:01.206 [info] Radio power HIGH (-6 dBm): ground station set, crane unchanged (no --rig-port, so its replies stay at the old power)
+10:26:08.122 [fault] Fault raised: Rail limit (error code 4)
+10:26:13.322 [info] Fault cleared: Rail limit
+10:28:55.455 [info] Radio power change to LOW queued
+10:28:55.557 [info] Radio power LOW (-12 dBm): ground station set, crane unchanged (no --rig-port, so its replies stay at the old power)
+10:35:48.065 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0
+10:38:35.267 [info] Dashboard page is back - controls re-enabled
+10:38:46.973 [warn] Link lost: 10 commands in a row without an ACK - check the crane
+10:39:40.167 [warn] Deadman: no heartbeat from the dashboard page for 1 s - speeds ramped to 0

@@ -7,6 +7,9 @@
 #include <string.h>
 
 #include "rig_config.h"
+#if RIG_ENABLE_DRIVE
+#include "drive_control.h"   // DRIVE: real hoist drive state (main/drive_electronics/)
+#endif
 
 typedef struct {
     bool model;
@@ -64,6 +67,8 @@ static bool overloaded(void)
     return s_load_saturated || load_x10() > RIG_OVERLOAD_X10;
 }
 
+bool rig_tlm_overloaded(void) { return overloaded(); }
+
 void rig_tlm_on_move(const icd_downlink_t *cmd, int64_t now_us)
 {
     t.cmd = *cmd;
@@ -111,10 +116,24 @@ void rig_tlm_tick(int64_t now_us, bool link_ok)
     t.brake_clamped = (t.cmd.mode_flags & ICD_MODE_HOLD_BRAKE) || t.hoist_eff == 0;
     if (t.brake_clamped) t.hoist_eff = 0;
     t.vfd_enabled = t.hoist_eff != 0;
+#if RIG_ENABLE_DRIVE
+    // DRIVE: the hoist now follows the real drive (frequency ramp, brake, DRV_EN),
+    // not the raw command. Speed is ESTIMATED from the drive frequency (main.c).
+    drive_status_t ds;
+    drive_get_status(&ds);
+    if (ds.present) {
+        t.hoist_eff = clamp_pct((int)lroundf(ds.speed_pct));
+        t.brake_clamped = !ds.brake_released;
+        t.vfd_enabled = ds.drv_en;
+    }
+#endif
     if (t.have_cmd) t.magnet_on = t.cmd.magnet_state != 0;   // kept on through a lost link
 
     t.trolley_vel_mm_s = (float)t.trolley_eff * (float)RIG_MODEL_TROLLEY_MAX_MM_S / 100.0f;
     t.hoist_vel_mm_s = (float)t.hoist_eff * (float)RIG_MODEL_HOIST_MAX_MM_S / 100.0f;
+#if RIG_ENABLE_DRIVE
+    if (ds.present) t.hoist_vel_mm_s = ds.hoist_vel_mm_s;
+#endif
     t.trolley_pos_mm += t.trolley_vel_mm_s * dt;
     t.hoist_pos_mm += t.hoist_vel_mm_s * dt;
 
@@ -168,6 +187,18 @@ void rig_tlm_build(icd_uplink_t *out, uint8_t seq_ack, bool link_ok)
         if (t.brake_clamped) health |= ICD_HEALTH_BRAKE_CLAMP;
         if (t.vfd_enabled) health |= ICD_HEALTH_VFD_ENABLED;
     }
+#if RIG_ENABLE_DRIVE
+    // DRIVE: the drive's own state is real in MODEL and ZERO alike.
+    drive_status_t ds;
+    drive_get_status(&ds);
+    if (ds.present) {
+        faults |= ds.fault_flags;                           // b0 VFD overcurrent, b6 VFD fault
+        health &= (uint8_t)~(ICD_HEALTH_VFD_ENABLED | ICD_HEALTH_BRAKE_CLAMP);
+        if (ds.drv_en) health |= ICD_HEALTH_VFD_ENABLED;
+        if (!ds.brake_released) health |= ICD_HEALTH_BRAKE_CLAMP;
+        if (!t.model) out->hoist_vel = (int16_t)lroundf(ds.hoist_vel_mm_s);
+    }
+#endif
     // Load cell: a real measurement, so it is sent (and interlocked) in MODEL and ZERO alike.
     out->load_cell = load_x10();
     if (overloaded()) faults |= ICD_FAULT_OVERLOAD;

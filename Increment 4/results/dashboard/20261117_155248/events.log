@@ -1,0 +1,8 @@
+15:52:48.810 [warn] Crane console COM12 not available (could not open port 'COM12': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)) - continuing without it
+15:52:48.814 [info] Link connecting: checking ground station on COM9
+15:52:49.454 [info] Ground station ready: ch 77, 2Mbps, PA LOW, profile ICD
+15:52:49.454 [info] Link running
+15:52:49.515 [fault] Fault raised: Wireless timeout (error code 8)
+15:52:49.580 [info] Fault cleared: Wireless timeout
+15:53:49.838 [warn] Link lost: 10 commands in a row without an ACK - check the crane
+15:57:25.201 [warn] Link port_error: COM9 disconnected: reader stopped

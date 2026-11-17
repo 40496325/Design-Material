@@ -1,6 +1,16 @@
 # REII Increment 4 — Remote Control Dashboard, RF Ground Station and Crane MCU (Group 13)
 
-This folder holds everything REII needs for the final demonstration (Fri 13 Nov 2026):
+This folder holds everything REII needs for the final deliverables:
+
+| Event | Date |
+|---|---|
+| **Demonstrations** | **Wed 2 Dec 2026** |
+| **Presentations** | **Thu 3 Dec 2026** |
+| **Final documentation** on eFundi | **Fri 4 Dec 2026, 08:00** |
+
+(These replace the 13 Nov demo / report and 16 Nov presentation dates. Previous version: `REII Progress/archive/Increment4_README_2026-10-29.md`.)
+
+Contents:
 
 * **Ground station:** NodeMCU-32S + nRF24L01+, on the operator PC's USB.
 * **Crane MCU firmware:** ESP32-S3 main board. Per ICD-001 the MCU side of every package's interface is REII's.
@@ -17,14 +27,16 @@ Everything here follows, in order of authority:
 
 ---
 
-## Status at a glance (29 Oct 2026)
+## Status at a glance (17 Nov 2026)
+
+No crane-side package code has been added since 29 Oct (`crane_rig_IDF` is still v4.4.1). A spare ESP32-C3 ground station was prepared on 9 Nov (`groundstation_C3/`). All remaining dates below are re-planned for the 2 Dec demonstration.
 
 | Part | Done | Still to do (section) |
 |---|---|---|
-| **Ground station** | Firmware v4.1.0: ICD Normal mode + diagnostic mode, both payload profiles, raw-frame bridge for the dashboard, RF diagnostics. Bench link verified | Rail hardware fit-out (G1–G2); OTA channel change only if time allows (G3) |
+| **Ground station** | Firmware v4.1.0: ICD Normal mode + diagnostic mode, both payload profiles, raw-frame bridge for the dashboard, RF diagnostics. Bench link verified | Rail hardware fit-out (G1–G2); spare C3 ground station build + smoke test; OTA channel change only if time allows (G3) |
 | **RF link IF10.0** | 200/200 PINGs, 0.0 % PER, max RTT 0.84 ms, 200/200 ACKs with valid Table 34 telemetry, **CE on J3.3** (run `results/i4_bench/20261028_230328`) | Full-power test at 5–10 m on the rail with drives running |
-| **Crane MCU** | Firmware v4.4.1: radio on J1 + CE J3.3, ICD start-up sequence, Table 33 decode, Table 34 ACK payload, load cell on J6 (real), console + self-tests | **All actuator and sensor interfaces**: lateral, brake, magnet, hoist SPWM, currents, encoder, plus the safety state machine (C1–C8) |
-| **Load cell IF13.0** | ADS1220 on J6, gain 128, tare at boot, `LOAD CAL`, > 20 kg overload fault + lift inhibit, live on the dashboard | Calibration with known masses on the real hoist (6 Nov) |
+| **Crane MCU** | Firmware v4.5.0: radio on J1 + CE J3.3, ICD start-up sequence, Table 33 decode, Table 34 ACK payload, load cell on J6 (real), console + self-tests. **v4.5.0 (17 Nov): drive electronics (C5 + hoist brake, `main/drive_electronics/`)** — 10 kHz SPWM on J7.8/7.7/7.6, DRV_EN J3.4, brake J4.8, DRV_FAULT J3.5 / overcurrent J3.8 inputs, dashboard hoist up/down, `DRIVE` test commands. Host-checked; first board build and scope check still to do | Lateral (C1), magnet (C3), shared ADC (C4), full safety state machine for the other outputs (C6), C7–C8 |
+| **Load cell IF13.0** | ADS1220 on J6, gain 128, tare at boot, `LOAD CAL`, > 20 kg overload fault + lift inhibit, live on the dashboard | Calibration with known masses on the real hoist (25 Nov) |
 | **Dashboard** | v4: 20 Hz Table 33 loop, every Table 34 field shown, faults / health lamps, S-curve ramps, deadman, soft stop, live load with tare / calibrate, PA and channel switching, CSV evidence — see `dashboard/README.md` | Background-tab heartbeat fix, telemetry source badges, PA MAX in the UI, auto mode + obstacle planner, ZV anti-sway (B1–B6) |
 | **Anti-sway (SoW 4)** | Jerk-limited S-curve baseline (`dashboard/ramp.py`) | Pendulum period from rope length, ZV shaper, flat-vs-shaped test on the rail |
 | **Obstacle avoidance (SoW 5)** | — | Auto-mode planner (B4) + crane segment execution |
@@ -75,7 +87,7 @@ These replace every open question in the older Increment 3 / REII Progress markd
 | D9 | Load cell on **J6 (AIN0–AIN1) through the on-board ADS1220**, gain 128, AVDD (excitation) as reference. The HX711 option is retired: J3.7 / J3.8 stay free per the wiring doc, and the HX711 alternative clashed with ENC_B on GPIO4 | ICD Table 38 primary path, wiring doc J3 | ADS1220 vs HX711 (SysRS 5.3) |
 | D10 | **One ADS1220 shared by two inputs.** Load cell (AIN0–1, gain 128) and magnet current (AIN3 single-ended, PGA bypassed), both with the AVDD reference so the ICD's 0–3.3 V range fits. 90 SPS, sequence L, L, M → load cell ≈ 60 S/s (averaged over 100 ms), magnet current ≈ 30 S/s. The **VFD current is not read on J6.7 (AIN2)**: EEII 1 confirmed on 29 Oct that their current sensor has a DAC and needs a **digital input**. Pin and signal format to be agreed (ICD Rev B) | ICD Tables 19, 26, 39 (20–50 Hz); EEII 1 29 Oct | ADC channel sharing |
 | D11 | **Lateral (IF1.0).** **One HW-095 drives both motors** from one set of MCU signals, as in the ICD: LEDC PWM on **J7.9 = GPIO18 at 5 kHz** to ENA (ENB jumpered to ENA on the driver); IN1 / IN2 on **J4.4 / J4.5**; the firmware drives IN3 / IN4 (J4.6 / J4.7) as a copy of IN1 / IN2, so MCTR 1 can either wire them there or jumper IN3/IN4 to IN1/IN2 on the driver. Both driver channels are used, one motor each, which keeps each channel within its current rating. Duty = \|`trolley_cmd`\| %. **Encoder ENC_A on J7.12 = GPIO21** (one encoder, channel A only, on the motor shaft) counted by PCNT; direction from the commanded direction. **Wheel 60 mm** (MCTR 1, 29 Oct). **Scale: 1050 counts per wheel turn** (ICD Table 15: 700 counts per motor turn, 1.5:1) → 0.180 mm per count. MCTR 1 wrote on 29 Oct that the wheel turns 1.5 times per motor turn, which would be ≈ 467 counts per wheel turn (0.404 mm per count). **The ICD value stays the default until the C1 test counts 10 wheel turns** and settles it (ICD Rev B note if it changes). `trolley_pos` is int16 mm, so it covers up to 32.7 m | ICD Tables 12–15, MCTR 1 note; MCTR 1 29 Oct | gear ratio direction |
-| D12 | **Hoist (IF6.0 + IF15.0).** SPWM 20 kHz carrier on **J7.8 / J7.7 / J7.6 (phase A / B / C = GPIO38 / 39 / 40)**, sine frequency ∝ \|`hoist_cmd`\| up to 50 Hz, direction by swapping two phases. **DRV_EN J3.4** HIGH only while hoisting (**HIGH = enable** confirmed by EEII 1: IGBT on the DC bus with a driver and opto). **DRV_FAULT J3.5** → fault b6. **Overcurrent: 10 A stops the drive** (fault b0, EEII 1). **Brake J4.8**: HIGH = release, released 50 ms before the drive starts, clamped as soon as the speed reaches 0, on any fault and on lost link. `hoist_pos` / `hoist_vel` are **estimated** from the drive frequency and spool geometry | ICD Tables 19–20, 37–39, Table 34 | — |
+| D12 | **Hoist (IF6.0 + IF15.0).** SPWM 20 kHz carrier on **J7.8 / J7.7 / J7.6 (phase A / B / C = GPIO38 / 39 / 40)**, sine frequency ∝ \|`hoist_cmd`\| up to 50 Hz, direction by swapping two phases. **DRV_EN J3.4** HIGH only while hoisting (**HIGH = enable** confirmed by EEII 1: IGBT on the DC bus with a driver and opto). **DRV_FAULT J3.5** → fault b6. **Overcurrent: 10 A stops the drive** (fault b0, EEII 1). **Brake J4.8**: HIGH = release, released 50 ms before the drive starts, clamped as soon as the speed reaches 0, on any fault and on lost link. `hoist_pos` / `hoist_vel` are **estimated** from the drive frequency and spool geometry | ICD Tables 19–20, 37–39, Table 34; **EEII 1 asked on 17 Nov for a 10 kHz carrier instead of 20 kHz → ICD Rev B, applied in C5** | — |
 | D13 | **Magnet (IF12.0).** PWM on **J7.5 = GPIO41, 20 kHz, 8.33 % duty** while `magnet_state` = 1; **MAG_LOGIC J3.6** HIGH while energised. `magnet_status` from J6.8: 1 = holding (current ≥ threshold within 2 s), 2 = fault. Only an explicit `magnet_state` = 0 turns it off; lost link and soft stop never do | ICD Tables 26–27, 32, 34; general requirement 2 (2 s) | — |
 | D14 | **Overload.** Load > 20.0 kg (or ADC over-range) → fault b1 and **no hoisting up**. Lowering is still allowed | ICD Tables 35, 37 | — |
 | D15 | **Soft stop** (Table 33 b0) is a software stop only. **The red hardware E-stop (PHY2) cuts HV by itself.** ICD Rev A gives the MCU no E-stop input, so `system_health` b1 stays 0. *Proposal for ICD Rev B:* E-stop auxiliary NC contact into J3.7 (GPA4, free) | ICD 3.5.6, SysRS PHY2, wiring doc J3.7 | dashboard-E-stop vs PHY2 wording |
@@ -127,10 +139,10 @@ The firmware already meets everything the ICD asks of the ground station. What r
 
 | # | Change | Why | When |
 |---|---|---|---|
-| G1 | **Rail fit-out:** USB cable ≤ 2 m, antenna vertical, module and capacitors fixed in a small enclosure or strain-relieved, ground station placed next to the PC | ICD Table 29 | before 5 Nov |
-| G2 | **Rail RF evidence:** at the rail run `SCAN` (channel survey at the operator position), then `smoke_test.py --sweep` at 5–10 m with PA MAX, and again with the crane at the far end of the rail (up to ~30 m) | ICD Table 43 stage 2, D6 | 5 Nov |
+| G1 | **Rail fit-out:** USB cable ≤ 2 m, antenna vertical, module and capacitors fixed in a small enclosure or strain-relieved, ground station placed next to the PC | ICD Table 29 | before 24 Nov |
+| G2 | **Rail RF evidence:** at the rail run `SCAN` (channel survey at the operator position), then `smoke_test.py --sweep` at 5–10 m with PA MAX, and again with the crane at the far end of the rail (up to ~30 m) | ICD Table 43 stage 2, D6 | 24 Nov |
 | G3 | *Optional, only if time allows:* over-the-air channel change (new `msg_type 3`, both ends switch at an agreed sequence number and fall back to 77 after 1 s of silence) | D19; needs ICD Rev B | after the demo |
-| G4 | Freeze and tag as **v5.0** with the crane and dashboard | Portfolio | 12 Nov |
+| G4 | Freeze and tag as **v5.0** with the crane and dashboard (NodeMCU and C3 builds) | Portfolio | 28 Nov |
 
 ---
 
@@ -176,19 +188,19 @@ These turn the bench model into the real crane, one interface at a time. Each it
 
 | # | Change | Details | Done when | Date |
 |---|---|---|---|---|
-| C1 | **Lateral drive + encoder (IF1.0)** | D11. `lateral.c`: LEDC timer 5 kHz / 10-bit on GPIO18; IN1–IN4 through the MCP port-B shadow register (IN3 / IN4 = IN1 / IN2); both IN low (coast) at 0 %. PCNT on GPIO21; mm = counts × π × 60 / `RIG_LAT_COUNTS_PER_WHEEL` (1050 default); `trolley_vel` over a 100 ms window; rail limits from position vs `RIG_MODEL_RAIL_MM` (fault b3); encoder fault b5 if ≥ 20 % is commanded for 0.5 s with no counts | Driver turns both ways from the dashboard; **count 10 wheel turns by hand: ≈ 10 500 (ICD) or ≈ 4 670 (MCTR 1 message)**, set the constant to the measured value; `trolley_pos` matches a tape | 30 Oct (LEDs / scope); MCTR 1 driver and motors after their own motor test on Mon 2 Nov |
-| C2 | **Hoist brake (IF15.0)** | D12. Brake output on GPB5: LOW at boot. Release (HIGH) 50 ms before the drive starts; clamp at zero speed, any fault, soft stop, lost link, or when Hold Brake (b4) is set. `system_health` b3 = clamped | Brake module / LED follows the hoist slider with the 50 ms lead | 31 Oct |
-| C3 | **Magnet (IF12.0)** | D13. `magnet.c`: LEDC 20 kHz on GPIO41 at 8.33 %, MAG_LOGIC GPA3. `magnet_status` and fault b4 from the AIN3 current; the threshold comes from EEII 2 | 8.33 % / 20 kHz measured on J7.5; status follows the coil current | 31 Oct |
-| C4 | **Shared ADC (D10)** | `adc_sched.c` owns the ADS1220: 90 SPS, sequence L, L, M, gain 128 for the load cell and PGA bypass for the magnet current, AVDD reference. `loadcell.c` takes its samples from the scheduler. Magnet current in A × 10 with the EEII 2 scale (`rig_config.h`). VFD current comes from EEII 1's digital signal instead (C5) | `LOAD WATCH` noise no worse than now; magnet current reads 0.0 A with nothing connected | 1 Nov |
-| C5 | **Hoist drive (IF6.0)** | D12. Enable the starter `spwm.c` (MCPWM, 20 kHz) on GPIO38 / 39 / 40. Sine frequency = \|`hoist_cmd`\| % × 50 Hz with the EEII 1 start frequency / V/f limits; up / down by swapping B and C; DRV_EN GPA1 HIGH (= enable) only while running; DRV_FAULT GPA2 → fault b6 + stop. VFD current from EEII 1's digital signal (format TBD); **overcurrent b0 at 10 A**, drive stopped. Hoist position / speed estimated from frequency × motor slip-free speed / gear ratio × spool circumference (MCTR 2 values) | Scope shows A / B / C 120° apart and the phase swap **before** any IGBT is powered; DRV_FAULT trips the drive. The EEII 1 board is soldered and tested 9–13 Nov with a 50 % duty signal generator, so the MCU SPWM is first verified on the scope only and connected to the VFD once EEII 1 signs off | 2 Nov (scope); with the VFD 12–13 Nov |
-| C6 | **Safety state machine** | One owner for all outputs: `IDLE → RUN → SAFE_HOLD` (lost link, D8) / `FAULT` (VFD fault, overcurrent) / `SOFT_STOP` (b0). Outputs are always recomputed from state + latest command, never left half-set. Overload blocks hoist-up only (D14). Magnet untouched by every state except an explicit off (D13). Reset (b1) clears latched faults; Zero (b3) zeroes positions | Unplug the GS mid-move → motion stops ≤ 500 ms, brake clamps, magnet stays on; log line `RIG,SAFE_HOLD` | 1 Nov |
-| C7 | **Real telemetry** | `rig_tlm_build()` takes each field from its driver once C1–C5 land. New mode `TLM REAL` becomes the boot default for the demo; `TLM MODEL` stays for bench work; `INFO` / heartbeat list the source of each field so the dashboard can badge it (B2) | Demo boots in `REAL`; heartbeat shows `src=` per field | 3 Nov |
-| C8 | **Pin test for Table 43 stage 4** | Console `PINTEST`, run **with HV off**: steps each output (J7.9 PWM 25 %, J4.4–J4.7, J4.8, J7.5, J3.6, J3.4, the three SPWM phases at 1 Hz) for 2 s each and prints what it set. Also prints every input (J3.5, encoder counts, AIN2 / AIN3). Version → **v5.0** | `handshake.csv` with a ✔ per pin, signed off by each package owner | 4 Nov |
+| C1 | **Lateral drive + encoder (IF1.0)** | D11. `lateral.c`: LEDC timer 5 kHz / 10-bit on GPIO18; IN1–IN4 through the MCP port-B shadow register (IN3 / IN4 = IN1 / IN2); both IN low (coast) at 0 %. PCNT on GPIO21; mm = counts × π × 60 / `RIG_LAT_COUNTS_PER_WHEEL` (1050 default); `trolley_vel` over a 100 ms window; rail limits from position vs `RIG_MODEL_RAIL_MM` (fault b3); encoder fault b5 if ≥ 20 % is commanded for 0.5 s with no counts | Driver turns both ways from the dashboard; **count 10 wheel turns by hand: ≈ 10 500 (ICD) or ≈ 4 670 (MCTR 1 message)**, set the constant to the measured value; `trolley_pos` matches a tape | 18 Nov (LEDs / scope first, then the MCTR 1 driver and motors) |
+| C2 | **Hoist brake (IF15.0)** | D12. Brake output on GPB5: LOW at boot. Release (HIGH) 50 ms before the drive starts; clamp at zero speed, any fault, soft stop, lost link, or when Hold Brake (b4) is set. `system_health` b3 = clamped | Brake module / LED follows the hoist slider with the 50 ms lead | 19 Nov |
+| C3 | **Magnet (IF12.0)** | D13. `magnet.c`: LEDC 20 kHz on GPIO41 at 8.33 %, MAG_LOGIC GPA3. `magnet_status` and fault b4 from the AIN3 current; the threshold comes from EEII 2 | 8.33 % / 20 kHz measured on J7.5; status follows the coil current | 19 Nov |
+| C4 | **Shared ADC (D10)** | `adc_sched.c` owns the ADS1220: 90 SPS, sequence L, L, M, gain 128 for the load cell and PGA bypass for the magnet current, AVDD reference. `loadcell.c` takes its samples from the scheduler. Magnet current in A × 10 with the EEII 2 scale (`rig_config.h`). VFD current comes from EEII 1's digital signal instead (C5) | `LOAD WATCH` noise no worse than now; magnet current reads 0.0 A with nothing connected | 20 Nov |
+| C5 | **Hoist drive (IF6.0)** | D12. Enable the starter `spwm.c` (MCPWM) on GPIO38 / 39 / 40 with the carrier changed to **10 kHz** (EEII 1, 17 Nov: `SPWM_CARRIER_HZ` 20000 → 10000, ICD Rev B). Add start / stop (outputs idle and DRV_EN LOW at boot; the starter driver free-runs at 50 Hz as soon as it is initialised) and amplitude control for V/f; move the pins into `rig_config.h`. Sine frequency = \|`hoist_cmd`\| % × 50 Hz with the EEII 1 start frequency / V/f limits; up / down by swapping B and C; DRV_EN GPA1 HIGH (= enable) only while running; DRV_FAULT GPA2 → fault b6 + stop. VFD current from EEII 1's digital signal (format TBD); **overcurrent b0 at 10 A**, drive stopped. Hoist position / speed estimated from frequency × motor slip-free speed / gear ratio × spool circumference (MCTR 2 values) | Scope shows A / B / C 120° apart and the phase swap **before** any IGBT is powered; DRV_FAULT trips the drive. The EEII 1 board is tested with a 50 % duty signal generator, so the MCU SPWM is first verified on the scope only and connected to the VFD once EEII 1 signs off | **Firmware done 17 Nov (v4.5.0, see `crane_rig_IDF/main/drive_electronics/README.md`)**; scope check; VFD hook-up with EEII 1 on 19 Nov |
+| C6 | **Safety state machine** | One owner for all outputs: `IDLE → RUN → SAFE_HOLD` (lost link, D8) / `FAULT` (VFD fault, overcurrent) / `SOFT_STOP` (b0). Outputs are always recomputed from state + latest command, never left half-set. Overload blocks hoist-up only (D14). Magnet untouched by every state except an explicit off (D13). Reset (b1) clears latched faults; Zero (b3) zeroes positions | Unplug the GS mid-move → motion stops ≤ 500 ms, brake clamps, magnet stays on; log line `RIG,SAFE_HOLD` | 20 Nov |
+| C7 | **Real telemetry** | `rig_tlm_build()` takes each field from its driver once C1–C5 land. New mode `TLM REAL` becomes the boot default for the demo; `TLM MODEL` stays for bench work; `INFO` / heartbeat list the source of each field so the dashboard can badge it (B2) | Demo boots in `REAL`; heartbeat shows `src=` per field | 22 Nov |
+| C8 | **Pin test for Table 43 stage 4** | Console `PINTEST`, run **with HV off**: steps each output (J7.9 PWM 25 %, J4.4–J4.7, J4.8, J7.5, J3.6, J3.4, the three SPWM phases at 1 Hz) for 2 s each and prints what it set. Also prints every input (J3.5, encoder counts, AIN2 / AIN3). Version → **v5.0** | `handshake.csv` with a ✔ per pin, signed off by each package owner | 22 Nov (run with the group 23 Nov) |
 
 **Values each package must give REII** (placeholders in `rig_config.h` until then):
-* MCTR 1: exact rail length (measure it at rail session 1); encoder output type (push-pull or open collector) so the right input circuit is fitted; their motor test result (Mon 2 Nov). *(Received 29 Oct: 60 mm wheel; encoder on the motor shaft; one HW-095 driving both motors; rail ≈ 20–30 m; rail session Wed 4 or Thu 5 Nov. Gear-ratio direction is settled by the C1 count.)*
+* MCTR 1: exact rail length (measure it at rail session 1, 24 Nov); encoder output type (push-pull or open collector) so the right input circuit is fitted (still open); which direction is "+". *(HW-095 IN3 / IN4 / ENB wiring: closed 17 Nov per D11: IN3 / IN4 are copied on J4.6 / J4.7, ENB jumpered to ENA, one encoder on J7.12.)* *(Received 29 Oct: 60 mm wheel; encoder on the motor shaft; one HW-095 driving both motors; rail ≈ 20–30 m; rail session then proposed for 4 or 5 Nov, now 24 Nov. Gear-ratio direction is settled by the C1 count.)*
 * MCTR 2: spool radius, gear ratio, brake module wired to J4.8. *(Load cell: 2.002 mV/V, already wired to J6 — received 29 Oct.)*
-* EEII 1: DRV_FAULT polarity, the current sensor's digital signal (pin, format, scale), start frequency, V/f limits, dead time. *(Received 29 Oct: DRV_EN HIGH = enable; 10 A overcurrent stops the drive; board ready 9–13 Nov.)*
+* EEII 1: DRV_FAULT polarity, the current signal (analog per SoW or digital: pin, format, scale), start frequency, V/f limits, duty limits, whether the opto stage inverts. *(Received 29 Oct: DRV_EN HIGH = enable; 10 A overcurrent stops the drive. Received 17 Nov: 10 kHz SPWM carrier wanted.)*
 * EEII 2: current-sensor V/A on J6.8, holding-current threshold.
 
 ### Flash
@@ -255,12 +267,12 @@ python server.py --port COM10 --rig-port COM12 --open
 
 | # | Change | Why | Date |
 |---|---|---|---|
-| B1 | **Fix the deadman flapping in background tabs.** The page sends its heartbeat with `setInterval(…, 200)`. Browsers throttle that to once a minute in a hidden tab, so the session of 28 Oct logged *Deadman … ramped to 0* / *page is back* every 60 s from 22:25 to 22:32. Fix: send the heartbeat from a Web Worker and tie liveness to the `/events` stream. When the tab is hidden, stop motion on purpose and require a click to resume (no silent re-enable) | OQ3 usability; a deadman that flaps can't be trusted | 3 Nov |
-| B2 | **Show where each value comes from:** "measured" / "modelled" / "estimated" badges per readout, taken from the crane's `INFO` (C7). Hoist position labelled *estimated from drive frequency* | Avoids misreading bench-model values at the demo | 3 Nov |
-| B3 | **PA MAX for the rail in the UI** (now command-line only), behind a confirm, with a reminder that it is for 5–10 m | D6, rail test | 3 Nov |
-| B4 | **Auto mode + obstacle planner** (D18). Panel with an obstacle list (x from–to, height), a target position and height, and a plan preview drawn on the gantry. **Execute** sets Auto (b2) and steps `segment_idx`: up to clearance → across → down. Each segment ends on telemetry position (trolley encoder, hoist estimate) or a time-out. **Abort** = soft stop | SoW 5, FR13 | 3 Nov |
-| B5 | **Anti-sway tuning** (D17). Ramp mode Off / S-curve / S-curve + ZV. ZV uses T = 2π√(L/g), with L = rope length from the hook height. Settings saved per session; sway test runs logged with the mode used | SoW 4, sway < 5° | 7 Nov |
-| B6 | **Session summary for the report.** On Ctrl+C write `summary.json` (commands, PER, RTT min / avg / max, faults raised / cleared, time in each state) next to `telemetry.csv` | Verification chapter | 10 Nov |
+| B1 | **Fix the deadman flapping in background tabs.** The page sends its heartbeat with `setInterval(…, 200)`. Browsers throttle that to once a minute in a hidden tab, so the session of 28 Oct logged *Deadman … ramped to 0* / *page is back* every 60 s from 22:25 to 22:32. Fix: send the heartbeat from a Web Worker and tie liveness to the `/events` stream. When the tab is hidden, stop motion on purpose and require a click to resume (no silent re-enable) | OQ3 usability; a deadman that flaps can't be trusted | 23 Nov |
+| B2 | **Show where each value comes from:** "measured" / "modelled" / "estimated" badges per readout, taken from the crane's `INFO` (C7). Hoist position labelled *estimated from drive frequency* | Avoids misreading bench-model values at the demo | 23 Nov |
+| B3 | **PA MAX for the rail in the UI** (now command-line only), behind a confirm, with a reminder that it is for 5–10 m | D6, rail test | 23 Nov |
+| B4 | **Auto mode + obstacle planner** (D18). Panel with an obstacle list (x from–to, height), a target position and height, and a plan preview drawn on the gantry. **Execute** sets Auto (b2) and steps `segment_idx`: up to clearance → across → down. Each segment ends on telemetry position (trolley encoder, hoist estimate) or a time-out. **Abort** = soft stop | SoW 5, FR13 | 25 Nov |
+| B5 | **Anti-sway tuning** (D17). Ramp mode Off / S-curve / S-curve + ZV. ZV uses T = 2π√(L/g), with L = rope length from the hook height. Settings saved per session; sway test runs logged with the mode used | SoW 4, sway < 5° | 27 Nov |
+| B6 | **Session summary for the report.** On Ctrl+C write `summary.json` (commands, PER, RTT min / avg / max, faults raised / cleared, time in each state) next to `telemetry.csv` | Verification chapter | 28 Nov |
 
 ---
 
@@ -302,18 +314,18 @@ Output goes to `results/i4_bench/<run>/`: `smoke.csv` (per round, with `rig_rx` 
 |---|---|---|---|
 | Stage 1: PC ↔ GS USB | `ECHO` / `INFO` OK, dashboard runs on simulated values | dashboard session | ✔ 28 Oct |
 | Stage 2: air link, bench | < 5 % PER, < 4.15 ms | `results/i4_bench/20261028_230328` | ✔ 28 Oct |
-| Stage 2: air link, rail 5–10 m, PA MAX, drives running | same | smoke `--sweep` on the rail | 5 Nov |
+| Stage 2: air link, rail 5–10 m, PA MAX, drives running | same | smoke `--sweep` on the rail | 24 Nov |
 | Stage 3: J1 + J3.3 | `probe OK`, `ce_j3_3=1` | G1 gate | ✔ 28 Oct |
-| Stage 4: full-group signal handshake, HV off | every pin follows `PINTEST` / dashboard | `handshake.csv` (C8) | 4 Nov |
-| Load cell vs known masses | within 0.1 kg | dashboard CSV + photo | 6 Nov |
-| Encoder position vs tape | error recorded | dashboard CSV | 5 Nov |
-| Lost link mid-move | stop ≤ 500 ms, brake clamps, magnet stays on | video + `events.log` | 9 Nov |
-| Hardware E-stop | HV removed independent of software (PHY2) | video | 9 Nov |
-| Overload > 20 kg | hoist-up inhibited, fault b1 | dashboard CSV | 6 Nov |
-| Anti-sway flat vs shaped | sway reduced, < 5° target | video + CSV | 7 Nov |
-| Obstacle-avoidance path | clears the obstacle, ends at the target | video + CSV | 9 Nov |
+| Stage 4: full-group signal handshake, HV off | every pin follows `PINTEST` / dashboard | `handshake.csv` (C8) | 23 Nov |
+| Load cell vs known masses | within 0.1 kg | dashboard CSV + photo | 25 Nov |
+| Encoder position vs tape | error recorded | dashboard CSV | 24 Nov |
+| Lost link mid-move | stop ≤ 500 ms, brake clamps, magnet stays on | video + `events.log` | 27 Nov |
+| Hardware E-stop | HV removed independent of software (PHY2) | video | 27 Nov |
+| Overload > 20 kg | hoist-up inhibited, fault b1 | dashboard CSV | 25 Nov |
+| Anti-sway flat vs shaped | sway reduced, < 5° target | video + CSV | 27 Nov |
+| Obstacle-avoidance path | clears the obstacle, ends at the target | video + CSV | 27 Nov |
 
-### Demo checklist (13 Nov)
+### Demo checklist (Wed 2 Dec; dry run Mon 30 Nov)
 
 1. Before power-on: antennas fitted, 10 µF + 100 nF at both radios, J1.8 = 3.3 V.
 2. Crane boots: `cfg_errors=0`, `ce_j3_3=1`, tare done with the hook empty.
@@ -321,7 +333,7 @@ Output goes to `results/i4_bench/<run>/`: `smoke.csv` (per round, with `rig_rx` 
 4. Show each package from the dashboard: lateral move with position → hoist up / down with brake → magnet on, current shown → load reading.
 5. Show the anti-sway ramp, then an auto obstacle path.
 6. Show the safety behaviour: soft stop, lost link (unplug the GS USB), hardware E-stop.
-7. Save the session folder (`results/dashboard/<session>`) for the portfolio.
+7. Save the session folder (`results/dashboard/<session>`) for the portfolio (final documentation on eFundi by Fri 4 Dec 08:00).
 
 ---
 
@@ -329,4 +341,4 @@ Output goes to `results/i4_bench/<run>/`: `smoke.csv` (per round, with `rig_rx` 
 
 * **One change at a time.** Re-run the smoke test and a short dashboard session after each, and keep the result folder. If PER rises, the last change is the cause.
 * All pins and limits live in `rig_config.h` (crane), `gs_config.h` (ground station) and `dashboard/radio.py` / command-line options. Don't hard-code them anywhere else.
-* Anything that changes a pin, a byte in Table 33 / 34, or a timing in the ICD goes to the group as an **ICD Rev B** change first (E-stop input D15, OTA channel D19).
+* Anything that changes a pin, a byte in Table 33 / 34, or a timing in the ICD goes to the group as an **ICD Rev B** change first (E-stop input D15, OTA channel D19, 10 kHz SPWM carrier D12, VFD current pin D10, C3 ground station D1).
