@@ -1,5 +1,6 @@
 idf_component_register(SRCS "main.c" "status_led.c" "mcp23017.c" "ads1220.c" "sdcard.c" "spwm.c" "oled.c"
                             "nrf24.c" "rf_link.c" "rig_console.c" "rig_telemetry.c" "loadcell.c"
+                            "pintest.c"   # v5.0 PINTEST (Table 43 stage 4 handshake)
                             # Drive electronics (EEII 1 VFD, ICD IF6.0), added v4.5.0 - kept in its own folder
                             "drive_electronics/mcp_shared.c" "drive_electronics/drive_spwm.c"
                             "drive_electronics/drive_control.c"

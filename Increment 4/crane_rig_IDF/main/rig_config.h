@@ -14,7 +14,8 @@
 
 #include <stdint.h>
 
-#define RIG_FW_VERSION "4.7.0"   // 4.5.0 drive (EEII 1, IF6.0); 4.6.0 trolley (MCTR 1, IF1.0); 4.7.0 magnet (EEII 2, IF12.0), 18 Nov 2026
+#define RIG_FW_VERSION "5.0.0-rc1"   // 4.5.0 drive (EEII 1, IF6.0); 4.6.0 trolley (MCTR 1, IF1.0); 4.7.0 magnet (EEII 2, IF12.0);
+                                     // 5.0.0-rc1 (18 Nov): TLM REAL default, hoist position estimate + limits, PINTEST
 #define RIG_FW_NAME    "REII crane rig (Increment 4)"
 
 // -----------------------------------------------------------------------------
@@ -105,12 +106,19 @@
 // -----------------------------------------------------------------------------
 // Telemetry source for the ICD Table 34 ACK payload (rig_telemetry.c)
 // -----------------------------------------------------------------------------
-// 1 = bench loopback MODEL at boot (commands drive positions/speeds/flags) so the
-//     dashboard can be verified end to end.
-// 0 = ZERO: only link status; unmeasured fields 0.
-// The load cell is always the real measurement in both modes.
-// Switch at runtime on COM12 with: TLM MODEL / TLM ZERO
-#define RIG_TLM_DEFAULT_MODEL 1
+// v5.0: three sources, switch at runtime on COM12 with TLM REAL / TLM MODEL / TLM ZERO.
+//   REAL  (demo default) every field from the crane: encoder, drive estimate,
+//         load cell, magnet sensor, drive / trolley / magnet faults. Fields with
+//         no sensor yet are 0 (VFD current: open with EEII 1). TLM / INFO list
+//         the source of every field.
+//   MODEL bench loopback (commands drive positions / speeds / flags)
+//   ZERO  only link status + the real sensors
+// The load cell, drive, trolley and magnet states are real in all three.
+#define RIG_TLM_REAL  0
+#define RIG_TLM_MODEL 1
+#define RIG_TLM_ZERO  2
+#define RIG_TLM_DEFAULT RIG_TLM_REAL
+#define RIG_TLM_DEFAULT_MODEL (RIG_TLM_DEFAULT == RIG_TLM_MODEL)   // kept for older code
 
 // Model placeholders - replace with the MCTR / EEII values when agreed (D-01)
 #define RIG_MODEL_TROLLEY_MAX_MM_S   1000   // SysRS PT1: lateral >= 1 m/s

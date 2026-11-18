@@ -497,6 +497,14 @@ static void start_drive_electronics(void)
         .oc_bit = 5,                //   is the final pinout - only stated pins are used. The wiring doc
         .oc_active_level = 0,       //   puts EEII 1's VFD current sensor on J6.7 (AN2, ADS1220 analog);
         .oc_pullup = true,          //   reading it needs the shared-ADC work (C4). Still open with EEII 1.
+                                    // OPEN (EEII 1), v5.0: VFD current is NOT read. ICD IF6.0 (Tables 17-20)
+                                    //   and EEII 1's SoW item 7 both say: shunt -> conditioned single-ended
+                                    //   ANALOG voltage, linear with drive current, < 2.048 V, on J6.7 (AN2),
+                                    //   reported as Table 34 bytes 12-13 (A x 10); SoW: the overcurrent fault
+                                    //   is "inferred in firmware from commanded-vs-measured mismatch". EEII 1's
+                                    //   "digital input to his own DAC" most likely means his board digitises
+                                    //   on the HV side and a DAC rebuilds the analog voltage on the LV side.
+                                    //   Until settled: vfd_current = 0 and fault b0 only from J3.5.
 
         // ---- Motion profile (ICD Table 20: 0-50 Hz, amplitude + frequency set speed)
         .f_max_hz = 50.0f,          // CONFIRMED ICD Table 20: |hoist_cmd| 100 % = 50 Hz
@@ -514,7 +522,21 @@ static void start_drive_electronics(void)
                                     //   If the hoist lowers on an UP command, set false.
         .link_timeout_ms = RIG_LINK_TIMEOUT_MS,       // CONFIRMED ICD: 500 ms lost link -> safe hold
         .hoist_mm_s_at_fmax = RIG_MODEL_HOIST_MAX_MM_S, // ASSUMED: 80 mm/s at 50 Hz (SysRS PT2, 1.6 m in 20 s)
-                                                        //   until MCTR 2 gives spool radius / gear ratio
+                                                        //   until MCTR 2 gives spool radius / gear ratio.
+                                    // OPEN (MCTR 2). With their numbers:
+                                    //   motor rpm at 50 Hz  n = 120 x 50 / poles x (1 - slip)   (4-pole, 5 %: 1425 rpm)
+                                    //   hoist_mm_s_at_fmax  = 2 x pi x r_spool_mm x n / 60 / gear_ratio
+                                    //   e.g. r = 20 mm, ratio 40:1 -> 2 x pi x 20 x 1425 / 60 / 40 = 75 mm/s
+                                    //   Then check: DRIVE SINE 50 for 10 s, measure the rope travel / 10 s.
+
+        // ---- Hoist travel limits from the position ESTIMATE (v5.0) ------------
+        .hoist_limits = true,       // ASSUMED: armed only after the dashboard Zero Position (or DRIVE ZERO)
+                                    //   with the hook at the BOTTOM; before that the hoist is not limited.
+        .hoist_stroke_mm = (float)RIG_MODEL_HOIST_STROKE_MM, // ASSUMED: 1.6 m (SysRS PT2) - OPEN (MCTR 2)
+        .hoist_limit_margin_mm = 100.0f, // ASSUMED: stopping distance at full speed with the 25 Hz/s ramp:
+                                    //   (80 + 8) / 2 mm/s x 1.8 s = ~80 mm, so 100 mm margin each end.
+                                    //   The estimate drifts (motor slip, rope layering): Zero Position
+                                    //   again at the bottom whenever possible.
     };
     esp_err_t err = drive_start(&cfg);
     if (err != ESP_OK) {

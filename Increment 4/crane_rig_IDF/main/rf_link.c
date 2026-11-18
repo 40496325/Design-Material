@@ -45,6 +45,7 @@
 #if RIG_ENABLE_TROLLEY
 #include "trolley_control.h" // TROLLEY: lateral drive + encoder (main/trolley/)
 #endif
+#include "pintest.h"          // v5.0: PINTEST handshake command
 #if RIG_ENABLE_MAGNET
 #include "magnet_control.h"  // MAGNET: electromagnet PWM / logic / current (main/magnet/)
 #endif
@@ -484,7 +485,7 @@ static void print_heartbeat(const char *tag)
            s.profile_icd ? "ICD" : "STATIC", mode_name(s.mode), s.channel, nrf24_pa_name(s.pa),
            nrf24_status(&s_radio), nrf24_read_reg(&s_radio, NRF_REG_FIFO_STATUS),
            nrf24_read_reg(&s_radio, NRF_REG_CONFIG), ce_gpio, ce_mcp, s.reinit,
-           rig_tlm_is_model() ? "MODEL" : "ZERO");
+           rig_tlm_mode_name());
     rig_tlm_print();
     loadcell_print("LOAD");
 #if RIG_ENABLE_DRIVE
@@ -501,10 +502,10 @@ static void print_heartbeat(const char *tag)
 static void print_help(void)
 {
     printf("RIG,HELP,HELP INFO STATS CLEAR PROFILE <ICD|STATIC> MODE <APP|CTRL> PA <MIN|LOW|HIGH|MAX> "
-           "CH <0-125> LOG <0|1> TLM <MODEL|ZERO> LOAD [TARE|CAL <kg>|WATCH [s]|RESET] SCAN [passes] RPD [ms] CARRIER [ms] [ch] CE <0|1> REINIT SELFTEST "
+           "CH <0-125> LOG <0|1> TLM <REAL|MODEL|ZERO> LOAD [TARE|CAL <kg>|WATCH [s]|RESET] SCAN [passes] RPD [ms] CARRIER [ms] [ch] CE <0|1> REINIT SELFTEST "
            "DRIVE [STATUS|SQUARE|SINE|EN|BRAKE|STOP|RESET|HELP] "
            "TROLLEY [STATUS|PWM|RUN|IN|STOP|ZERO|LIMITS|RESET|HELP] "
-           "MAGNET [STATUS|PWM|ON|OFF|LOGIC|ZERO|CAL|THRESHOLD|RESET|STOP|HELP]\n");
+           "MAGNET [STATUS|PWM|ON|OFF|LOGIC|ZERO|CAL|THRESHOLD|RESET|STOP|HELP] PINTEST [RUN|STOP]\n");
     printf("OK,HELP\n");
 }
 
@@ -546,7 +547,7 @@ static void handle_line(char *line)
 
     if (!s.radio_ok && strcmp(cmd, "HELP") && strcmp(cmd, "INFO") && strcmp(cmd, "REINIT") && strcmp(cmd, "LOAD") &&
         strcmp(cmd, "DRIVE") && strcmp(cmd, "TROLLEY") &&
-        strcmp(cmd, "MAGNET")) {   // DRIVE / TROLLEY / MAGNET tests work without the radio
+        strcmp(cmd, "MAGNET") && strcmp(cmd, "PINTEST")) {   // module tests work without the radio
         printf("ERR,radio not responding on SPI (probe=%s) - check J1 wiring / 3.3VP, then REINIT\n",
                esp_err_to_name(s.probe_err));
         return;
@@ -626,16 +627,18 @@ static void handle_line(char *line)
     } else if (!strcmp(cmd, "MAGNET")) {
         magnet_command(a1, a2, a3);
 #endif
+    } else if (!strcmp(cmd, "PINTEST")) {
+        pintest_command(a1);
     } else if (!strcmp(cmd, "TLM")) {
-        if (a1 && (!strcmp(a1, "MODEL") || !strcmp(a1, "ZERO"))) {
-            rig_tlm_set_model(!strcmp(a1, "MODEL"));
+        if (a1 && (!strcmp(a1, "REAL") || !strcmp(a1, "MODEL") || !strcmp(a1, "ZERO"))) {
+            rig_tlm_set_mode(!strcmp(a1, "MODEL") ? RIG_TLM_MODEL : (!strcmp(a1, "ZERO") ? RIG_TLM_ZERO : RIG_TLM_REAL));
             load_ack_payload();
         } else if (a1) {
-            printf("ERR,usage: TLM <MODEL|ZERO>\n");
+            printf("ERR,usage: TLM <REAL|MODEL|ZERO>\n");
             return;
         }
         rig_tlm_print();
-        printf("OK,TLM,%s\n", rig_tlm_is_model() ? "MODEL" : "ZERO");
+        printf("OK,TLM,%s\n", rig_tlm_mode_name());
     } else if (!strcmp(cmd, "SCAN")) {
         int passes = a1 ? atoi(a1) : 20;
         if (passes < 1 || passes > 1000) passes = 20;
@@ -776,7 +779,7 @@ esp_err_t rf_link_start(mcp23017_handle_t *mcp)
     s.last_seq = -1;
     s.last_rx_us = -(int64_t)RIG_LINK_TIMEOUT_MS * 1000 * 10;
     s_mcp = mcp;
-    rig_tlm_init(RIG_TLM_DEFAULT_MODEL);
+    rig_tlm_init(RIG_TLM_DEFAULT);
 
     // CE outputs, LOW until the radio is configured.
 #if RIG_CE_PATHS & RIG_CE_PATH_GPIO_J7_10

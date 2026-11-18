@@ -83,6 +83,11 @@ typedef struct {
     bool up_is_abc;                 // true: UP = A-B-C, DOWN = A-C-B
     uint32_t link_timeout_ms;       // no MOVE frame for this long = stop (ICD 500 ms)
     float hoist_mm_s_at_fmax;       // telemetry estimate: hoist speed at f_max
+
+    // --- Hoist travel limits from the position ESTIMATE (v5.0) ---
+    bool hoist_limits;              // armed by Zero Position (hook at the bottom = 0 mm)
+    float hoist_stroke_mm;          // top limit
+    float hoist_limit_margin_mm;    // stop this far before each end (stopping distance)
 } drive_cfg_t;
 
 typedef struct {
@@ -97,6 +102,9 @@ typedef struct {
     float speed_pct;                // signed, freq / f_max * 100
     float hoist_vel_mm_s;           // estimate for Table 34 bytes 8-9
     uint8_t fault_flags;            // ICD_FAULT_VFD_OVERCURRENT / ICD_FAULT_VFD (latched)
+    float hoist_pos_mm;             // ESTIMATE: integrated hoist_vel_mm_s, 0 = Zero Position
+    bool limits_armed;              // hoist limits active (after Zero Position)
+    int at_limit;                   // +1 top limit, -1 bottom limit, 0 none
 } drive_status_t;
 
 /** Configure the pins (all outputs safe: SPWM idle, DRV_EN off, brake clamped)

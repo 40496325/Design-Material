@@ -38,8 +38,11 @@
 extern "C" {
 #endif
 
-void rig_tlm_init(bool model);
-void rig_tlm_set_model(bool model);
+void rig_tlm_init(int mode);            // RIG_TLM_REAL / RIG_TLM_MODEL / RIG_TLM_ZERO (rig_config.h)
+void rig_tlm_set_mode(int mode);
+int rig_tlm_mode(void);
+const char *rig_tlm_mode_name(void);
+void rig_tlm_set_model(bool model);     // kept: true = MODEL, false = ZERO
 bool rig_tlm_is_model(void);
 
 /** A Table 33 MOVE frame arrived (call from the radio task). */

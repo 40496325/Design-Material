@@ -18,7 +18,8 @@
 #endif
 
 typedef struct {
-    bool model;
+    int mode;                          // RIG_TLM_REAL / MODEL / ZERO
+    bool model;                        // mode == RIG_TLM_MODEL
     // last MOVE command
     icd_downlink_t cmd;
     int64_t cmd_us;
@@ -38,14 +39,26 @@ static volatile float s_load_kg;
 static volatile bool s_load_valid;
 static volatile bool s_load_saturated;
 
-void rig_tlm_init(bool model)
+void rig_tlm_set_mode(int mode)
 {
-    memset(&t, 0, sizeof(t));
-    t.model = model;
-    t.brake_clamped = true;
+    if (mode != RIG_TLM_MODEL && mode != RIG_TLM_ZERO) mode = RIG_TLM_REAL;
+    t.mode = mode;
+    t.model = mode == RIG_TLM_MODEL;
 }
 
-void rig_tlm_set_model(bool model) { t.model = model; }
+void rig_tlm_init(int mode)
+{
+    memset(&t, 0, sizeof(t));
+    t.brake_clamped = true;
+    rig_tlm_set_mode(mode);
+}
+
+int rig_tlm_mode(void) { return t.mode; }
+const char *rig_tlm_mode_name(void)
+{
+    return t.mode == RIG_TLM_MODEL ? "MODEL" : (t.mode == RIG_TLM_ZERO ? "ZERO" : "REAL");
+}
+void rig_tlm_set_model(bool model) { rig_tlm_set_mode(model ? RIG_TLM_MODEL : RIG_TLM_ZERO); }
 bool rig_tlm_is_model(void) { return t.model; }
 
 void rig_tlm_set_load(float kg, bool valid, bool saturated)
@@ -203,6 +216,11 @@ void rig_tlm_build(icd_uplink_t *out, uint8_t seq_ack, bool link_ok)
         if (t.auto_mode) health |= ICD_HEALTH_AUTO_MODE;
         if (t.brake_clamped) health |= ICD_HEALTH_BRAKE_CLAMP;
         if (t.vfd_enabled) health |= ICD_HEALTH_VFD_ENABLED;
+    } else if (t.mode == RIG_TLM_REAL) {
+        // REAL: hoist position = the drive's estimate (below), trolley / load / magnet
+        // from their sensors (below). VFD current: no sensor yet (OPEN, EEII 1) -> 0.
+        out->vfd_current = 0;
+        if (t.auto_mode) health |= ICD_HEALTH_AUTO_MODE;   // echo of the dashboard's auto flag
     }
 #if RIG_ENABLE_DRIVE
     // DRIVE: the drive's own state is real in MODEL and ZERO alike.
@@ -214,6 +232,7 @@ void rig_tlm_build(icd_uplink_t *out, uint8_t seq_ack, bool link_ok)
         if (ds.drv_en) health |= ICD_HEALTH_VFD_ENABLED;
         if (!ds.brake_released) health |= ICD_HEALTH_BRAKE_CLAMP;
         if (!t.model) out->hoist_vel = (int16_t)lroundf(ds.hoist_vel_mm_s);
+        if (t.mode == RIG_TLM_REAL) out->hoist_pos = (int16_t)lroundf(ds.hoist_pos_mm);   // ESTIMATE
     }
 #endif
 #if RIG_ENABLE_TROLLEY
@@ -251,9 +270,22 @@ void rig_tlm_build(icd_uplink_t *out, uint8_t seq_ack, bool link_ok)
 
 void rig_tlm_print(void)
 {
+    // Where every Table 34 field comes from in this mode (dashboard badges, B2).
+    const bool real = t.mode == RIG_TLM_REAL;
+    printf("RIG,TLM,SRC,trolley_pos=%s,trolley_vel=%s,hoist_pos=%s,hoist_vel=%s,load=%s,vfd_current=%s,"
+           "magnet_current=%s,magnet_status=%s,faults=%s\n",
+           RIG_ENABLE_TROLLEY ? "ENCODER" : (t.model ? "MODEL" : "NONE"),
+           RIG_ENABLE_TROLLEY ? "ENCODER" : (t.model ? "MODEL" : "NONE"),
+           real && RIG_ENABLE_DRIVE ? "DRIVE_ESTIMATE" : (t.model ? "MODEL" : "NONE"),
+           RIG_ENABLE_DRIVE ? "DRIVE_ESTIMATE" : (t.model ? "MODEL" : "NONE"),
+           s_load_valid ? "LOADCELL" : "NONE",
+           t.model ? "MODEL" : "NONE_OPEN_EEII1",
+           RIG_ENABLE_MAGNET ? "SENSOR" : (t.model ? "MODEL" : "NONE"),
+           RIG_ENABLE_MAGNET ? "MEASURED" : (t.model ? "MODEL" : "NONE"),
+           "DRIVE_J3.5+TROLLEY+MAGNET+LOADCELL+LINK");
     printf("RIG,TLM,source=%s,load_src=%s,load_kg=%.2f,load_x10=%u,trolley_pos=%d,hoist_pos=%d,trolley_vel=%d,"
            "hoist_vel=%d,magnet=%d,brake=%d,vfd=%d,overload=%d,rail_limit=%d,timeout_latched=%d\n",
-           t.model ? "MODEL" : "ZERO", s_load_valid ? (s_load_saturated ? "CELL_SATURATED" : "CELL") : "NONE",
+           rig_tlm_mode_name(), s_load_valid ? (s_load_saturated ? "CELL_SATURATED" : "CELL") : "NONE",
            s_load_valid ? s_load_kg : 0.0f, load_x10(), (int)lroundf(t.trolley_pos_mm), (int)lroundf(t.hoist_pos_mm),
            (int)lroundf(t.trolley_vel_mm_s), (int)lroundf(t.hoist_vel_mm_s), t.magnet_on,
            t.brake_clamped, t.vfd_enabled, overloaded(), t.rail_limit, t.timeout_latched);

@@ -42,7 +42,7 @@ static struct {
     icd_downlink_t cmd;
     int64_t cmd_us;
     bool have_cmd;
-    bool reset_req;
+    bool reset_req, zero_req;
     req_t req[4];            // console requests, FIFO
     uint8_t req_head, req_count;
 
@@ -61,6 +61,9 @@ static struct {
     uint8_t cnt_fault, cnt_oc;
     int in_fault, in_oc;     // last raw input levels, -1 = not read
     bool mcp_err_reported;
+    float pos_mm;            // hoist position ESTIMATE (mm, 0 = Zero Position, + = up)
+    bool limits_armed;
+    int at_limit;            // +1 top, -1 bottom, 0 none
 } d;
 
 static int64_t now_ms(void) { return esp_timer_get_time() / 1000; }
@@ -266,7 +269,7 @@ static void drive_task(void *arg)
         // Snapshot the latest command / requests.
         icd_downlink_t cmd;
         int64_t cmd_us;
-        bool have_cmd, reset_req;
+        bool have_cmd, reset_req, zero_req;
         req_t reqs[4];
         int nreq = 0;
         xSemaphoreTake(d.lock, portMAX_DELAY);
@@ -274,7 +277,8 @@ static void drive_task(void *arg)
         cmd_us = d.cmd_us;
         have_cmd = d.have_cmd;
         reset_req = d.reset_req;
-        d.reset_req = false;
+        zero_req = d.zero_req;
+        d.reset_req = d.zero_req = false;
         while (d.req_count) {                 // every queued console request, in order
             reqs[nreq++] = d.req[d.req_head];
             d.req_head = (uint8_t)((d.req_head + 1) % 4);
@@ -291,6 +295,17 @@ static void drive_task(void *arg)
             run_request(&reqs[i]);
         }
 
+        // Hoist position ESTIMATE: integrate the speed the drive is actually producing.
+        if (zero_req) {
+            d.pos_mm = 0.0f;
+            d.limits_armed = d.cfg.hoist_limits;
+            printf("RIG,DRIVE,ZERO,hoist position = 0 mm (hook at the bottom)%s\n",
+                   d.limits_armed ? ", travel limits armed" : "");
+        }
+        if (drive_spwm_mode() == DRIVE_SPWM_SINE && d.st != ST_TEST) {
+            d.pos_mm += (float)d.dir * drive_spwm_freq() / d.cfg.f_max_hz * d.cfg.hoist_mm_s_at_fmax * dt;
+        }
+
         // Faults stop everything immediately, in every state including TEST.
         if (d.faults && d.st != ST_FAULT) {
             all_off_now();
@@ -304,6 +319,18 @@ static void drive_task(void *arg)
         int pct = (fresh && !soft_stop && !hold_brake) ? cmd.hoist_cmd : 0;
         if (pct > 0 && rig_tlm_overloaded()) pct = 0;                  // ICD IF13.0 overload inhibit: no lifting
         if (abs(pct) < d.cfg.cmd_deadband_pct) pct = 0;
+        // Hoist travel limits (estimate, armed by Zero Position): no further motion past an end.
+        int lim = 0;
+        if (d.limits_armed) {
+            if (d.pos_mm >= d.cfg.hoist_stroke_mm - d.cfg.hoist_limit_margin_mm) lim = 1;
+            else if (d.pos_mm <= d.cfg.hoist_limit_margin_mm) lim = -1;
+        }
+        if (lim != d.at_limit && lim) {
+            printf("RIG,DRIVE,LIMIT,%s limit reached (estimate %.0f mm) - no further %s until the hoist is reversed\n",
+                   lim > 0 ? "top" : "bottom", d.pos_mm, lim > 0 ? "lifting" : "lowering");
+        }
+        d.at_limit = lim;
+        if ((lim > 0 && pct > 0) || (lim < 0 && pct < 0)) pct = 0;
         const int tgt_dir = pct > 0 ? 1 : (pct < 0 ? -1 : 0);
         float tgt_f = (float)abs(pct) / 100.0f * d.cfg.f_max_hz;
         if (tgt_dir && tgt_f < d.cfg.f_start_hz) tgt_f = d.cfg.f_start_hz;
@@ -454,6 +481,7 @@ void drive_on_move(const icd_downlink_t *cmd, int64_t now_us)
     d.cmd_us = now_us;
     d.have_cmd = true;
     if (cmd->mode_flags & ICD_MODE_RESET) d.reset_req = true;
+    if (cmd->mode_flags & ICD_MODE_ZERO_POS) d.zero_req = true;
     xSemaphoreGive(d.lock);
 }
 
@@ -481,7 +509,7 @@ static bool is_number(const char *s)
 static void print_drive_help(void)
 {
     printf("RIG,DRIVE,HELP,DRIVE [STATUS] | DRIVE SQUARE [A|B|C|AB..|ALL] [duty%%=50] | DRIVE SINE <Hz> [UP|DOWN] | "
-           "DRIVE EN <0|1> | DRIVE BRAKE <CLAMP|RELEASE> | DRIVE STOP | DRIVE RESET\n");
+           "DRIVE EN <0|1> | DRIVE BRAKE <CLAMP|RELEASE> | DRIVE STOP | DRIVE RESET | DRIVE ZERO\n");
     printf("RIG,DRIVE,HELP,SQUARE = fixed-duty %u Hz square at the MCU pin (the signal-generator test); "
            "SINE = 3-phase SPWM at a fixed frequency; both ignore the dashboard until DRIVE STOP\n",
            (unsigned)d.cfg.carrier_hz);
@@ -548,6 +576,12 @@ void drive_command(const char *sub, const char *a1, const char *a2)
         r.type = REQ_STOP;
     } else if (!strcmp(sub, "RESET")) {
         r.type = REQ_RESET;
+    } else if (!strcmp(sub, "ZERO")) {
+        xSemaphoreTake(d.lock, portMAX_DELAY);
+        d.zero_req = true;               // same as the dashboard Zero Position button
+        xSemaphoreGive(d.lock);
+        printf("OK,DRIVE,ZERO\n");
+        return;
     } else {
         print_drive_help();
         printf("ERR,unknown DRIVE command '%s'\n", sub);
@@ -583,6 +617,9 @@ void drive_get_status(drive_status_t *out)
     out->speed_pct = (float)out->dir * out->freq_hz / d.cfg.f_max_hz * 100.0f;
     out->hoist_vel_mm_s = (float)out->dir * out->freq_hz / d.cfg.f_max_hz * d.cfg.hoist_mm_s_at_fmax;
     out->fault_flags = d.faults;
+    out->hoist_pos_mm = d.pos_mm;
+    out->limits_armed = d.limits_armed;
+    out->at_limit = d.at_limit;
 }
 
 void drive_print(const char *tag)
@@ -592,11 +629,11 @@ void drive_print(const char *tag)
     const drive_spwm_mode_t mode = drive_spwm_mode();
     const uint8_t mask = drive_spwm_phase_mask();
     printf("RIG,%s,state=%s,spwm=%s,carrier=%uHz,f=%.1f,m=%.2f,dir=%s,phases=%s%s%s,pin_duty=%.1f,drv_en=%d,"
-           "brake=%s,faults=%02X,in_fault_j3_5=%d,in_oc_j3_8=%d,isr=%u\n",
+           "brake=%s,faults=%02X,in_fault_j3_5=%d,in_oc_j3_8=%d,isr=%u,hoist_pos_est=%.0f,limits=%d,at_limit=%d\n",
            tag, s.state, mode == DRIVE_SPWM_SINE ? "SINE" : (mode == DRIVE_SPWM_FIXED ? "SQUARE" : "IDLE"),
            (unsigned)d.cfg.carrier_hz, s.freq_hz, s.m, s.dir > 0 ? "UP" : (s.dir < 0 ? "DOWN" : "-"),
            (mask & DRIVE_PHASE_A) ? "A" : "", (mask & DRIVE_PHASE_B) ? "B" : "", (mask & DRIVE_PHASE_C) ? "C" : "",
            mode == DRIVE_SPWM_FIXED ? drive_spwm_fixed_duty() * 100.0f : 0.0f, s.drv_en,
            s.brake_released ? "RELEASED" : "CLAMPED", s.fault_flags, d.in_fault, d.in_oc,
-           (unsigned)drive_spwm_isr_count());
+           (unsigned)drive_spwm_isr_count(), s.hoist_pos_mm, s.limits_armed, s.at_limit);
 }
