@@ -10,6 +10,12 @@
 #if RIG_ENABLE_DRIVE
 #include "drive_control.h"   // DRIVE: real hoist drive state (main/drive_electronics/)
 #endif
+#if RIG_ENABLE_TROLLEY
+#include "trolley_control.h" // TROLLEY: real trolley state + encoder (main/trolley/)
+#endif
+#if RIG_ENABLE_MAGNET
+#include "magnet_control.h"  // MAGNET: real magnet state + coil current (main/magnet/)
+#endif
 
 typedef struct {
     bool model;
@@ -146,6 +152,17 @@ void rig_tlm_tick(int64_t now_us, bool link_ok)
         if (t.trolley_eff > 0) t.rail_limit = true;
     }
     if (t.rail_limit) t.trolley_vel_mm_s = 0.0f;
+#if RIG_ENABLE_TROLLEY
+    // TROLLEY: position / speed come from the real encoder, the applied duty from the trolley task.
+    trolley_status_t ts;
+    trolley_get_status(&ts);
+    if (ts.present) {
+        t.trolley_eff = clamp_pct((int)lroundf(ts.speed_pct));
+        t.trolley_pos_mm = ts.pos_mm;
+        t.trolley_vel_mm_s = ts.vel_mm_s;
+        t.rail_limit = ts.rail_limit;
+    }
+#endif
     if (t.hoist_pos_mm <= 0.0f) {
         t.hoist_pos_mm = 0.0f;
         if (t.hoist_vel_mm_s < 0) t.hoist_vel_mm_s = 0.0f;
@@ -197,6 +214,31 @@ void rig_tlm_build(icd_uplink_t *out, uint8_t seq_ack, bool link_ok)
         if (ds.drv_en) health |= ICD_HEALTH_VFD_ENABLED;
         if (!ds.brake_released) health |= ICD_HEALTH_BRAKE_CLAMP;
         if (!t.model) out->hoist_vel = (int16_t)lroundf(ds.hoist_vel_mm_s);
+    }
+#endif
+#if RIG_ENABLE_TROLLEY
+    // TROLLEY: encoder position / speed and the trolley faults are real in MODEL and ZERO alike.
+    trolley_status_t ts;
+    trolley_get_status(&ts);
+    if (ts.present) {
+        out->trolley_pos = (int16_t)lroundf(ts.pos_mm);
+        out->trolley_vel = (int16_t)lroundf(ts.vel_mm_s);
+        faults &= (uint8_t)~ICD_FAULT_RAIL_LIMIT;
+        if (ts.rail_limit) faults |= ICD_FAULT_RAIL_LIMIT;          // b3
+        if (ts.encoder_fault) faults |= ICD_FAULT_ENCODER;          // b5
+    }
+#endif
+#if RIG_ENABLE_MAGNET
+    // MAGNET: command state, measured coil current and holding status are real in MODEL and ZERO alike.
+    magnet_status_t ms;
+    magnet_get_status(&ms);
+    if (ms.present) {
+        const float amps = ms.current_valid ? fabsf(ms.current_a) : 0.0f;
+        const long x10 = lroundf(amps * 10.0f);
+        out->magnet_current = (uint8_t)(x10 > 255 ? 255 : x10);   // Table 34 byte 14, A x 10
+        out->magnet_status = ms.status;                            // byte 15: 0 off, 1 holding, 2 fault
+        faults &= (uint8_t)~ICD_FAULT_MAGNET;
+        if (ms.fault) faults |= ICD_FAULT_MAGNET;                  // b4
     }
 #endif
     // Load cell: a real measurement, so it is sent (and interlocked) in MODEL and ZERO alike.

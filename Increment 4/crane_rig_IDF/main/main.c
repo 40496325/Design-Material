@@ -87,6 +87,12 @@
 #if RIG_ENABLE_DRIVE
 #include "drive_control.h"   // DRIVE: hoist drive (main/drive_electronics/)
 #endif
+#if RIG_ENABLE_TROLLEY
+#include "trolley_control.h" // TROLLEY: lateral drive + encoder (main/trolley/)
+#endif
+#if RIG_ENABLE_MAGNET
+#include "magnet_control.h"  // MAGNET: electromagnet (main/magnet/)
+#endif
 
 // -----------------------------------------------------------------------------
 // OLED support - OFF by default
@@ -487,10 +493,10 @@ static void start_drive_electronics(void)
         .fault_bit = 2,
         .fault_active_level = 0,    // ASSUMED active LOW (opto / open collector pulls low on a fault).
         .fault_pullup = true,       //   With the 100 k pull-up an unconnected pin reads "no fault".
-        .oc_enabled = true,         // ASSUMED: EEII 1's current sensor sends a digital 10 A trip flag
-        .oc_bit = 5,                //   into J3.8 = MCP23017 GPA5 (spare), active LOW, pull-up on.
-        .oc_active_level = 0,       //   Pin and format still to be agreed (ICD Rev B). The ICD's
-        .oc_pullup = true,          //   analog J6.7 path is not used (EEII 1: digital).
+        .oc_enabled = false,        // OFF (v4.6.0): J3.8 is "Free (Spare)" in the wiring document, which
+        .oc_bit = 5,                //   is the final pinout - only stated pins are used. The wiring doc
+        .oc_active_level = 0,       //   puts EEII 1's VFD current sensor on J6.7 (AN2, ADS1220 analog);
+        .oc_pullup = true,          //   reading it needs the shared-ADC work (C4). Still open with EEII 1.
 
         // ---- Motion profile (ICD Table 20: 0-50 Hz, amplitude + frequency set speed)
         .f_max_hz = 50.0f,          // CONFIRMED ICD Table 20: |hoist_cmd| 100 % = 50 Hz
@@ -513,6 +519,147 @@ static void start_drive_electronics(void)
     esp_err_t err = drive_start(&cfg);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "drive electronics NOT running (%s)", esp_err_to_name(err));
+    }
+}
+#endif
+
+// =============================================================================
+// TROLLEY (MCTR 1 lateral movement, ICD IF1.0) - added v4.6.0, 17 Nov 2026
+// =============================================================================
+// Code: main/trolley/ (trolley_control.c, trolley_io.c).
+// Pins: ONLY "MCU_Wiring_Diagram_and_Header_Pin_Allocation (1).docx" (final
+// pinout). Header-pin -> GPIO from the board schematic: J7.9 = IO_A = GPIO18,
+// J7.12 = IO_D = GPIO21.
+// Tags: CONFIRMED (ICD / wiring doc / MCTR 1 / REII decision) or ASSUMED.
+// =============================================================================
+#if RIG_ENABLE_TROLLEY
+static void start_trolley(void)
+{
+    const trolley_cfg_t cfg = {
+        // ---- Pins (wiring document, MCTR 1) ---------------------------------
+        .pwm_gpio = 18,             // CONFIRMED J7.9 (IO_A) LAT_PWM_ENA -> HW-095 ENA
+        .pwm_hz = 5000,             // ASSUMED 5 kHz (wiring doc / ICD allow 1-10 kHz)
+        .in1_bit = 1,               // CONFIRMED J4.4 = MCP23017 GPB1 MOT_IN1
+        .in2_bit = 2,               // CONFIRMED J4.5 = MCP23017 GPB2 MOT_IN2
+        .mirror_in34 = true,        // CONFIRMED (REII 17 Nov, D11): IN3 / IN4 copy IN1 / IN2, so it works
+        .in3_bit = 3,               //   whether MCTR 1 wires J4.6 / J4.7 (GPB3 / GPB4) or jumpers
+        .in4_bit = 4,               //   IN3 / IN4 to IN1 / IN2 on the HW-095 (ENB jumpered to ENA)
+        .enc_gpio = 21,             // CONFIRMED J7.12 (IO_D) ENC_A, one encoder, channel A only
+        .enc_pullup = false,        // ASSUMED: encoder output arrives already stepped down to 3.3 V
+                                    //   (wiring doc: "3.3 V level-shifted"). OPEN with MCTR 1: if the
+                                    //   encoder is open collector, fit 4.7 k to 3.3 V (or set true).
+        .enc_glitch_ns = 1000,      // ASSUMED: ignore pulses < 1 us (real edges are >= ~50 us apart)
+
+        // ---- Mechanics --------------------------------------------------------
+        .wheel_diameter_mm = 60.0f,       // CONFIRMED MCTR 1, 29 Oct
+        .counts_per_wheel_rev = 1050.0f,  // CONFIRMED ICD Table 15 / wiring doc (rising edges per wheel turn).
+                                          //   MCTR 1's note implied ~467; closed 17 Nov ("doesn't matter").
+                                          //   -> pi * 60 / 1050 = 0.1795 mm per count
+        .rail_length_mm = 20000.0f,       // CONFIRMED 20 m (17 Nov)
+        .limit_margin_mm = 200.0f,        // ASSUMED: stop 0.2 m before each end
+        .slow_zone_mm = 1000.0f,          // ASSUMED: last 1 m before an armed limit ...
+        .slow_zone_duty_pct = 30,         //   ... at most 30 % duty, so it can stop inside the 0.2 m margin
+        .soft_limits = true,              // ASSUMED: armed only after Zero Position with the trolley at the
+                                          //   end it reaches on a "-" (REV) command. Which end is "+" does
+                                          //   not matter (closed 17 Nov). TROLLEY LIMITS 0 disables.
+
+        // ---- Motion profile ---------------------------------------------------
+        .slew_pct_s = 100.0f,       // ASSUMED: ENA duty 0 -> 100 % in 1 s (the dashboard S-curve ramps too)
+        .stop_slew_pct_s = 250.0f,  // ASSUMED: lost link / soft stop / rail limit: 100 -> 0 % in 0.4 s
+        .min_run_duty_pct = 0,      // CONFIRMED ICD: duty = |trolley_cmd| %. Raise if the motors stall at
+                                    //   low duty (test with TROLLEY RUN 10 FWD, 15, 20 ...)
+        .max_duty_pct = 100,        // ASSUMED: no cap
+        .cmd_deadband_pct = 2,      // ASSUMED: |trolley_cmd| < 2 % = stop
+        .reverse_dwell_ms = 300,    // ASSUMED: coast >= 0.3 s at zero duty before reversing ...
+        .standstill_ms = 100,       //   ... and until the encoder shows no counts for 0.1 s (stopped)
+        .reverse_max_wait_ms = 3000,//   ... but never wait longer than 3 s (encoder missing)
+        .link_timeout_ms = RIG_LINK_TIMEOUT_MS,   // CONFIRMED ICD: 500 ms lost link -> stop
+
+        // ---- Encoder check ------------------------------------------------------
+        .enc_check = true,          // ASSUMED: no counts for 1 s while driving at >= 20 % -> fault b5
+        .enc_check_min_duty_pct = 20,
+        .enc_check_ms = 1000,
+    };
+    esp_err_t err = trolley_start(&cfg);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "trolley NOT running (%s)", esp_err_to_name(err));
+    }
+}
+#endif
+
+// =============================================================================
+// MAGNET (EEII 2 load attachment, ICD IF12.0) - added v4.7.0, 18 Nov 2026
+// =============================================================================
+// Code: main/magnet/ (magnet_control.c). Current sensor read through the shared
+// ADS1220 in loadcell.c (loadcell_set_aux).
+// Pins: ONLY "MCU_Wiring_Diagram_and_Header_Pin_Allocation (1).docx". J7.5 is
+// silkscreen "IO4" = GPIO41 (board map: J7.3-J7.8 = GPIO 1, 42, 41, 40, 39, 38),
+// NOT GPIO4 (GPIO4 is J7.11 / IO_C).
+// Tags: CONFIRMED (ICD / wiring doc / EEII 2 18 Nov) or ASSUMED.
+//
+// EEII 2 bench test 18 Nov (video): 15 kHz, 99 % duty, 5 V supply CURRENT-LIMITED at
+// 2.53 A, sensor 2.32 V; at 10 % duty -> 0.00 A, sensor 2.57 V.
+// EEII 2, 18 Nov (final): magnet supply = 12 V, 99 % stays on 12 V, holding = 7.5 A,
+// coil resistance ~1 ohm -> on 12 V at 99 %: ~11.9 V / ~1 ohm = up to ~11.9 A (less
+// with MOSFET + wiring resistance), ~140 W in the coils.
+// FINAL PASS 18 Nov: later changes are made only in this block.
+// =============================================================================
+#if RIG_ENABLE_MAGNET
+static void start_magnet(void)
+{
+    const magnet_cfg_t cfg = {
+        // ---- Outputs -------------------------------------------------------------
+        .pwm_gpio = 41,              // CONFIRMED J7.5 (silkscreen IO4) MAG_PWM
+        .pwm_hz = 15000,             // CONFIRMED EEII 2, 18 Nov (wiring doc / ICD: up to 20 kHz)
+        .on_duty_pct = 99.0f,        // CONFIRMED EEII 2, 18 Nov: 99 % on the 12 V supply. With ~1 ohm coils this
+                                     //   is up to ~11.9 A / ~140 W (above the ICD 7.5 A). If the coils get hot
+                                     //   or over_current_warn_a trips: ~65 % gives ~7.7 A (12 x 0.65 / 1 ohm).
+        .release_duty_pct = 10.0f,   // CONFIRMED EEII 2, 18 Nov: 10 % disengages (0.00 A measured - but on a
+                                     //   current-limited 5 V supply). On 12 V, 10 % = ~1.2 V -> up to ~1.2 A
+                                     //   through ~1 ohm: may keep a light plate stuck. If MAGNET shows
+                                     //   release_i_high=1 or the load won't drop: set 0.0f here.
+        .boot_duty_pct = 0.0f,       // ASSUMED: 0 % until the first command (definitely off)
+        .logic_bit = 3,              // CONFIRMED J3.6 = MCP23017 GPA3 MAG_LOGIC
+        .logic_on_high = true,       // CONFIRMED EEII 2, 18 Nov: enable, HIGH while engaging
+        .logic_lead_ms = 5,          // ASSUMED: MAG_LOGIC HIGH 5 ms before the PWM goes to the ON duty
+
+        // ---- Current sensor: J6.8 (AN3) -> ADS1220 AIN3, shared with the load cell
+        .sense_enabled = true,       // CONFIRMED EEII 2: no divider needed. The output FALLS with current
+                                     //   (2.57 V at 0 A -> 2.32 V at 2.53 A): 7.5 A -> ~1.83 V, 11.9 A -> ~1.39 V,
+                                     //   all inside the 0-3.3 V range of J6.8.
+        .adc_channel = 3,            // CONFIRMED J6.8 = AN3 = ADS1220 AIN3
+        .aux_period_ms = 500,        // ASSUMED: current read every 0.5 s; load cell drops from 20 to ~12-14 SPS (1000 = ~16 SPS)
+        .avdd_v = 3.30f,             // ASSUMED: ADS1220 reference = AVDD = +3.3VP. Measure J6.1 to J6.2/GND
+        .zero_v = 2.57f,             // CONFIRMED EEII 2: 2.57 V at 0 A (10 % duty). Start value only:
+        .auto_zero = true,           //   re-measured automatically after the magnet has been off
+        .auto_zero_after_ms = 2000,  //   for 2 s (ASSUMED), or by hand with MAGNET ZERO
+        .auto_zero_window_v = 0.05f, // ASSUMED: auto-zero follows only drift < 0.05 V (~0.5 A), so a real
+                                     //   current at the 10 % release duty is shown, not zeroed away
+        .sens_v_per_a = -0.0988f,    // CONFIRMED from EEII 2's measurement: (2.32 - 2.57) V / 2.53 A.
+                                     //   ~100 mV/A = an ACS712-20A-type (+-20 A) sensor, fitted with current
+                                     //   entering the "-" side (hence negative). The graph EEII 2 sent
+                                     //   (~185 mV/A) is the +-5 A version: if THAT part is fitted it clips
+                                     //   near 5 A and 7.5 A is never seen. Only calibrated at 2.53 A (bench
+                                     //   current limit): re-check at full current with MAGNET CAL <amps>.
+        .sensor_min_v = 0.30f,       // ASSUMED: outside 0.3-3.2 V = sensor unplugged / unpowered ->
+        .sensor_max_v = 3.20f,       //   fault b4 while engaged (instead of a false "holding")
+
+        // ---- Holding check -------------------------------------------------------
+        .hold_check = true,
+        .hold_threshold_a = 7.5f,    // CONFIRMED EEII 2, 18 Nov (final): holding = 7.5 A. On 12 V with ~1 ohm
+                                     //   coils ~11.9 A is expected, so 7.5 A is reached. On a current-limited
+                                     //   bench supply (2.53 A) use MAGNET THRESHOLD 2.
+        .hold_timeout_ms = 2000,     // ASSUMED: below the threshold 2 s after engaging = fault b4 (indication only,
+                                     //   the magnet is never switched off by the firmware)
+
+        // ---- Warnings (console + status flags only) --------------------------------
+        .release_warn_a = 0.5f,      // ASSUMED: > 0.5 A while released = load may not let go (see release_duty_pct)
+        .over_current_warn_a = 10.0f,// ASSUMED: > 10 A while engaged = above the ICD 7.5 A by a margin; check
+                                     //   coil heating / supply (12 V supply must deliver ~12 A)
+    };
+    esp_err_t err = magnet_start(&cfg);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "magnet NOT fully running (%s)", esp_err_to_name(err));
     }
 }
 #endif
@@ -598,6 +745,14 @@ void app_main(void)
 #if RIG_ENABLE_DRIVE
     // DRIVE: as early as possible, so DRV_EN is held LOW and the brake clamped from boot.
     start_drive_electronics();
+#endif
+#if RIG_ENABLE_TROLLEY
+    // TROLLEY: IN1-IN4 LOW (coast) and ENA 0 % from boot.
+    start_trolley();
+#endif
+#if RIG_ENABLE_MAGNET
+    // MAGNET: MAG_LOGIC LOW and MAG_PWM 0 % from boot; current read via the load-cell task once it runs.
+    start_magnet();
 #endif
 
 #if OLED_ENABLED

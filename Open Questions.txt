@@ -32,4 +32,4 @@ EEII 2, F Prinsloo (by Thu 19 Nov)
 Current sensor on J6.8: volts per amp and the output at 0 A. It must stay at or below 3.3 V at 7.5 A.
 Holding threshold. I’ve put 6.0 A as the default if they don’t answer.
 MAG_LOGIC on J3.6: an enable, a status signal back, or unused?
-Can their switch handle 20 kHz at 8.33 % duty (4.2 µs pulses)?
+Can their switch handle 20 kHz at 8.33 % duty (4.2 µs pulses)? 15khz switches

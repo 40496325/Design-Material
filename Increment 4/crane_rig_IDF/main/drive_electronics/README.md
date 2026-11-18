@@ -18,7 +18,7 @@ Added 17 Nov 2026. Everything new lives in this folder. Every assumed value is i
 | J3.4 | DRV_EN_LOGIC | MCP GPA1 | out | HIGH = DC-bus IGBT on. LOW at boot, LOW whenever stopped |
 | J4.8 | HOIST_BRAKE | MCP GPB5 | out | HIGH = release (assumed). LOW (clamped) at boot |
 | J3.5 | DRV_FAULT_IN | MCP GPA2 | in | **assumed** active LOW, pull-up on → fault b6 |
-| J3.8 | VFD_OC_IN | MCP GPA5 | in | **assumed** 10 A trip flag, active LOW, pull-up on → fault b0 |
+| J6.7 (AN2) | VFD_CURR_IN | ADS1220 AIN2 | in | VFD current sensor per the wiring document (analog). **Not read yet**: needs the shared-ADC work (C4). The earlier assumed digital input on J3.8 is **off** (v4.6.0): J3.8 is a spare pin in the wiring document |
 
 While stopped, all three SPWM pins sit **HIGH** (IR2104 IN LOW = low-side IGBTs on). An unconnected input reads "no fault" because of the pull-up.
 
@@ -33,12 +33,12 @@ The hoist slider sends `hoist_cmd` −100…+100 % (+ = up) at 20 Hz.
 5. **Lost link** (no frame for 500 ms) or **Soft stop**: the same stop, but ramping at 100 Hz/s.
 6. **Hold brake** flag → treated as hoist 0.
 7. **Overload** (> 20 kg) → UP blocked, DOWN still allowed.
-8. **DRV_FAULT / overcurrent input:** everything off at once (SPWM idle, DRV_EN LOW, brake clamped). The fault latches until the dashboard **Reset** button (Table 33 b1) or `DRIVE RESET`. After a reset the hoist must go back to 0 before it will start again.
+8. **DRV_FAULT input:** everything off at once (SPWM idle, DRV_EN LOW, brake clamped). The fault latches until the dashboard **Reset** button (Table 33 b1) or `DRIVE RESET`. After a reset the hoist must go back to 0 before it will start again.
 
 **Telemetry back to the dashboard:**
 - `hoist_vel` / `hoist_pos`: estimated from the drive frequency (80 mm/s at 50 Hz until MCTR 2 gives spool and gear data).
 - `system_health`: b4 VFD enabled = DRV_EN; b3 brake clamped.
-- `fault_flags`: b0 / b6.
+- `fault_flags`: b6 (b0 VFD overcurrent once J6.7 is read).
 
 ## Console test commands (COM12) — for measuring one phase at a time
 

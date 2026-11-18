@@ -11,7 +11,8 @@
 //       J4.8 (MCP GPB5)     HOIST_BRAKE      HIGH = release (ICD Table 38)
 //   * Reads the drive's inputs:
 //       J3.5 (MCP GPA2)     DRV_FAULT_IN     -> Table 34 fault b6 (VFD fault)
-//       J3.8 (MCP GPA5)     VFD_OC_IN        -> Table 34 fault b0 (VFD overcurrent, 10 A)
+//       (VFD current: wiring doc J6.7 = AN2 analog, not read yet - C4. The optional
+//        digital overcurrent input below is OFF: J3.8 is a spare pin in the wiring doc.)
 //   * Runs the start / stop / reverse sequence in its own 100 Hz task:
 //
 //       IDLE --cmd!=0--> STARTING: DRV_EN on, SPWM at f_start, wait brake delay
@@ -65,7 +66,7 @@ typedef struct {
     int fault_active_level;
     bool fault_pullup;
     bool oc_enabled;
-    int oc_bit;                     // GPA5 = J3.8
+    int oc_bit;                     // optional digital overcurrent input (off by default)
     int oc_active_level;
     bool oc_pullup;
 

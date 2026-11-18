@@ -58,6 +58,22 @@ void loadcell_command(const char *a1, const char *a2);
 /** One machine-readable line: RIG,LOAD,... */
 void loadcell_print(const char *tag);
 
+/**
+ * MAGNET (v4.7.0) - shared ADS1220 side channel (README C4, decision D10).
+ * The load cell owns the ADS1220 (AIN0-AIN1 bridge, continuous). With a side
+ * channel set, every period_ms the load-cell task takes TWO single-ended
+ * conversions of AINx against AVSS (gain 1, PGA bypassed, VREF = AVDD; the
+ * first is discarded in case it holds a stale bridge result), restores the
+ * bridge configuration and discards the next bridge sample. Cost: ~3 of the
+ * 20 load-cell samples per side reading. channel 0xFF = off.
+ * ADS1220 load-cell source only (no-op with the HX711).
+ */
+void loadcell_set_aux(uint8_t channel, uint32_t period_ms);
+
+/** Latest side-channel result: raw 24-bit code (full scale = VREF = AVDD)
+ *  and when it was taken. Returns false if no valid reading yet. */
+bool loadcell_get_aux(int32_t *code, int64_t *when_us, uint32_t *count);
+
 #ifdef __cplusplus
 }
 #endif

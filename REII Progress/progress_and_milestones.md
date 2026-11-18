@@ -14,7 +14,7 @@
 Authority used for every decision and plan in this file:
 
 1. **ICD-001 Rev A** (Group 13 report, 23/24 Oct 2026): `Increment 3/Interface Control Documentation/(ICD v1) Engineering Design 2026 Group 13 Report.pdf`
-2. **MCU wiring and header pin allocation**: `NEWEST main control board firmware/MCU_Wiring_Diagram_and_Header_Pin_Allocation (1).docx`
+2. **MCU wiring and header pin allocation**: `NEWEST main control board firmware/MCU_Wiring_Diagram_and_Header_Pin_Allocation (1).docx`, **the final pinout for every package's connection to the MCU. Only pins stated there are used** (rule set 17 Nov)
 3. **SysRS v1.0** and the **REII SoW**: `Eng Package Requirements/`
 4. **Final dates** (above): announced to the group, 17 Nov 2026. They replace the 13 / 16 Nov dates from `Lecture Slides/7.1 EngDes26 - Checkpoint Breakdown.pptx`
 
@@ -30,7 +30,7 @@ Authority used for every decision and plan in this file:
 | Spare ground station (ESP32-C3) | **Firmware prepared 9 Nov** (v4.1.0-c3, same protocol, C3 pins). The README says it was not compile-checked when written; the build, smoke test and ICD Rev B note are still to do | `Increment 4/groundstation_C3/README.md` |
 | Dashboard (FR12 / FR13) | **Working**: 20 Hz control loop, live telemetry, faults, S-curve ramps, deadman, CSV capture, PA / channel switching | `Increment 4/dashboard/`, sessions in `Increment 4/results/dashboard/` |
 | Load cell (IF13.0) | **Real readings on the dashboard**: ADS1220 on J6, tare and calibration, overload fault | `crane_rig_IDF/main/loadcell.c`, dashboard sessions 28–29 Oct |
-| Crane MCU outputs and sensors for MCTR 1, MCTR 2 brake, EEII 1, EEII 2 (MCU side is REII's per the ICD) | **EEII 1 drive + hoist brake done in firmware (v4.5.0, 17 Nov)**: 10 kHz SPWM, DRV_EN, brake, fault / overcurrent inputs, dashboard up/down, `DRIVE` test commands. Host-checked only; first board build + scope check next. MCTR 1 lateral, EEII 2 magnet and the shared ADC are **not started** | `crane_rig_IDF/main/drive_electronics/` |
+| Crane MCU outputs and sensors for MCTR 1, MCTR 2 brake, EEII 1, EEII 2 (MCU side is REII's per the ICD) | **EEII 1 drive + hoist brake (v4.5.0, 17 Nov)**: 10 kHz SPWM, DRV_EN, brake, DRV_FAULT input, dashboard up/down, `DRIVE` test commands; v4.5.0 **built and booted on the board 17 Nov** (10 kHz ISR confirmed). **MCTR 1 trolley (v4.6.0, 17 Nov)**: ENA PWM J7.9, IN1–IN4 J4.4–J4.7, encoder J7.12, 20 m rail limits, dashboard left/right, `TROLLEY` test commands; host-checked, board build next. **EEII 2 magnet (v4.7.0, 18 Nov)**: MAG_PWM J7.5 (GPIO41) 15 kHz ON 99 % / release 10 %, MAG_LOGIC J3.6, coil current J6.8 via the shared ADS1220 (C4 for the magnet), holding status + fault b4, `MAGNET` test commands; host-checked, board build next. **Final pass 18 Nov:** 12 V supply, 99 %, holding 7.5 A, coil ≈ 1 Ω → ≈ 11.4 A / ≈ 140 W expected; release-current (> 0.5 A) and over-current (> 10 A) warnings added; later changes only in `main.c`. To check on the rig: CAL at full current, the 10 % release on 12 V, coil heating. VFD current J6.7 is still not read | `crane_rig_IDF/main/drive_electronics/`, `crane_rig_IDF/main/trolley/`, `crane_rig_IDF/main/magnet/` |
 | Anti-sway (SoW item 4) | **Baseline done** (jerk-limited S-curve on the dashboard); model, shaper and rail validation still to do | `dashboard/ramp.py` |
 | Obstacle avoidance (SoW item 5) | **Not started** | — |
 | Rail integration and validation (SoW item 6) | **Not started** | — |
@@ -126,9 +126,10 @@ Teammate inputs each day depends on are in §7. Section labels C1–C8, G1–G4 
 | Date | REII work | Done when | Needs |
 |---|---|---|---|
 | Tue 17 Nov | Re-baseline documentation to the new dates; send each teammate their firmware questions (§7) | Files updated; questions sent | — |
-| Wed 18 Nov | **Build + flash v4.5.0; scope each SPWM phase** (`DRIVE SQUARE A/B/C`, `DRIVE SINE`), DRV_EN, brake. Then **Crane C1: lateral (IF1.0).** LEDC PWM on J7.9, IN1–IN4 on J4.4–J4.7, PCNT encoder on J7.12 → real `trolley_pos` / `trolley_vel` | Firmware on LEDs / scope first; then the MCTR 1 driver turns both ways from the dashboard; 10 wheel turns counted (ICD 1050 per turn vs ≈ 467 from MCTR 1's note) | MCTR 1: encoder output type and input circuit; driver + motors |
-| Thu 19 Nov | **Joint MCU → VFD hook-up with EEII 1** (their board is ready; slot 19 Nov): low DC bus first, then the motor; hoist up / down from the dashboard. **Crane C3: magnet (IF12.0)** (brake C2 already in v4.5.0). J4.8 timing, J7.5 PWM at 8.33 %, J3.6 logic | Brake LED / module follows the hoist command; magnet PWM measured on a scope | MCTR 2 brake answers; EEII 2 switch module, PWM frequency, MAG_LOGIC role |
-| Fri 20 Nov | **Crane C4 + C6: ADC sharing (D10) and the safety state machine.** Load cell + AN3 (magnet current); lost-link safe hold, overload inhibit, soft stop | Unplug the GS → speeds 0, brake clamps, magnet stays on; log shows it | EEII 2 current-sensor scale and holding threshold |
+| ~~Wed 18 Nov~~ **Tue 17 Nov ✔** | **Crane C1: lateral (IF1.0)** written (v4.6.0): ENA PWM J7.9, IN1–IN4 J4.4–J4.7, encoder J7.12 → real `trolley_pos` / `trolley_vel`, 20 m rail limits, `TROLLEY` test commands | Host check + simulation pass | — |
+| Wed 18 Nov | **Build + flash v4.6.0; scope every drive and trolley output** (`DRIVE SQUARE A/B/C`, `DRIVE SINE`, `TROLLEY PWM`, `TROLLEY IN FWD/REV`); measure the encoder output **before** connecting J7.12; then the MCTR 1 driver turns both ways from the dashboard | Each output on the scope / meter; wheels turn both ways | MCTR 1: encoder output type (open); driver + motors |
+| Thu 19 Nov | **Joint MCU → VFD hook-up with EEII 1** (their board is ready; slot 19 Nov): low DC bus first, then the motor; hoist up / down from the dashboard. Build + flash **v4.7.0**; scope J7.5 (`MAGNET PWM`), J3.6 (`MAGNET LOGIC`); `MAGNET CAL` on the 5 V bench (magnet C3 written 18 Nov) | Brake follows the hoist command; magnet PWM / logic measured; current calibrated | MCTR 2 brake answers; clamp meter for MAGNET CAL at ≈ 11 A; 12 V supply ≥ 12 A |
+| Fri 20 Nov | **Crane C6: the safety state machine** (ADC sharing for the magnet current done in v4.7.0, 18 Nov); lost-link safe hold, overload inhibit, soft stop | Unplug the GS → speeds 0, brake clamps, magnet stays on; log shows it | EEII 2 current-sensor scale and holding threshold |
 | ~~Sat 21 Nov~~ **Tue 17 Nov ✔** | **Crane C5: hoist drive (IF6.0)** written: 10 kHz SPWM, DRV_EN, brake, inputs, V/f, stop-then-swap reverse, test commands (v4.5.0) | Host check + simulation pass; scope check on the board still to do | MCTR 2 spool radius, gear ratio, motor nameplate (estimate only) |
 | Sun 22 Nov | **Crane C7 + C8:** `TLM REAL` with per-field source, `PINTEST`; version v5.0-rc | Demo build boots in `REAL`; `PINTEST` steps every pin | — |
 | Mon 23 Nov | **Integration stage 4 (unpowered)** with all packages, run with `PINTEST`; **dashboard B1–B3** | `handshake.csv` with every pin checked | All packages' connectors on the board |
@@ -175,11 +176,11 @@ Cut down on 17 Nov to only what the crane firmware still needs. The full list, w
 
 | From | Needed | For | By |
 |---|---|---|---|
-| MCTR 1 (AR Cronje) | Encoder output type (push-pull 5 V or open collector) and which input circuit is fitted (**left open**); which direction is "+" (IN1 HIGH / IN2 LOW moves towards which end); usable rail length | C1, rail limit | Wed 18 Nov |
+| MCTR 1 (AR Cronje) | Encoder output type (push-pull 5 V or open collector) and which input circuit is fitted (**left open**; measure before connecting J7.12). *Closed 17 Nov: HW-095 wiring, "+" direction, counts per wheel turn, rail length (20 m).* | C1 encoder input | Wed 18 Nov |
 | MCTR 2 (VA King) | Spool radius and total gear ratio; hoist motor poles and rated speed; brake on J4.8 (wired, HIGH = release, 50 ms lead OK); load-cell rated capacity; 2–3 known masses | C2, C5 hoist estimate, calibration | Thu 19 Nov |
-| EEII 1 (MM Van Rooyen) | *Answered 17 Nov, see below.* Still open: DRV_FAULT existence / polarity; what the current sensor's "digital input to his DAC" means for the MCU (assumed: 10 A trip flag into J3.8); the amplitude of his 10 kHz test signal (the MCU gives 3.3 V). Was: 10 kHz confirmed as the carrier; whether the opto stage inverts; minimum / maximum duty; where DRV_EN goes and its idle level; DRV_FAULT (exists? polarity? latched?); current signal (analog per the SoW, or digital: pin, format, scale); start / max frequency, V/f, ramp; direction change on the fly or stop first; sign-off date | C5, `vfd_current`, ICD Rev B | Fri 20 Nov |
-| EEII 2 (F Prinsloo) | Current sensor on J6.8 (V/A and 0 A offset, ≤ 3.3 V at 7.5 A); holding-current threshold; MAG_LOGIC J3.6 role; PWM frequency their switch handles at 8.33 % | C3, C4, `magnet_status` | Thu 19 Nov |
-| Group | ICD Rev B items (10 kHz SPWM, VFD current pin, E-stop input on J3.7, C3 ground station); rail slots 24, 25 and 27 Nov; VFD hook-up 26 Nov; dry run 30 Nov; presentation template | M11–M19 | Fri 20 Nov |
+| EEII 1 (MM Van Rooyen) | *Answered 17 Nov, see below.* Still open: DRV_FAULT existence / polarity; the VFD current signal: the wiring document (final pinout) gives only **J6.7 (AN2, analog)**, but EEII 1 said "digital input to his own DAC" — can it be an analog voltage on J6.7, and what scale? (The J3.8 assumption is removed: J3.8 is spare); the amplitude of his 10 kHz test signal (the MCU gives 3.3 V). Was: 10 kHz confirmed as the carrier; whether the opto stage inverts; minimum / maximum duty; where DRV_EN goes and its idle level; DRV_FAULT (exists? polarity? latched?); current signal (analog per the SoW, or digital: pin, format, scale); start / max frequency, V/f, ramp; direction change on the fly or stop first; sign-off date | C5, `vfd_current`, ICD Rev B | Fri 20 Nov |
+| EEII 2 (F Prinsloo) | *Answered 18 Nov (see below).* Still to confirm on the rig: freewheel diode across the coil; 12 V supply rated ≥ 12 A; coil heating at ≈ 140 W; which sensor part (measured −0.0988 V/A vs datasheet graph ~0.185 V/A) | C3, `magnet_status` | Wed 25 Nov rail session |
+| Group | ICD Rev B items (10 kHz SPWM, VFD current signal on J6.7, C3 ground station; *no E-stop input: not in the final pinout, E-stop stays HV-only*); rail slots 24, 25 and 27 Nov; VFD hook-up 26 Nov; dry run 30 Nov; presentation template | M11–M19 | Fri 20 Nov |
 
 **Answers received (29 Oct)** — still valid
 
@@ -195,7 +196,19 @@ Cut down on 17 Nov to only what the crane firmware still needs. The full list, w
 | MCTR 1 | **One HW-095 drives both motors** from one set of MCU signals, as planned | ENB jumpered to ENA; IN3 / IN4 copy IN1 / IN2 (J4.6 / J4.7 or jumpered on the driver); one motor per driver channel |
 | MCTR 1 | Asked whether the MCU has 5 V inputs | No: 3.3 V only. Push-pull encoder → 2.2 kΩ / 3.9 kΩ divider (3.2 V); open collector → 4.7 kΩ pull-up to 3.3 V, no divider (README, pin map) |
 
+**Closed 17 Nov (MCTR 1, direction / counts / rail length)**: which end "+" goes to does not matter (perspective) — "+" = IN1 HIGH / IN2 LOW, and the rail limits are armed by zeroing at the end a "−" command reaches; counts per wheel turn stay at **1050** (ICD / wiring doc); usable rail **20 m**.
+
 **Closed 17 Nov (MCTR 1, HW-095 wiring)**: closed by REII so it no longer blocks the firmware. One HW-095 drives both motors as in the ICD (ENB jumpered to ENA). The firmware drives IN1 / IN2 on J4.4 / J4.5 and copies them to IN3 / IN4 on J4.6 / J4.7 (D11), so either wiring of IN3 / IN4 works. One encoder only, channel A on J7.12.
+
+**Answers received (18 Nov, EEII 2)** — bench test video, 5 V supply
+
+| Question | Answer | Effect (firmware v4.7.0) |
+|---|---|---|
+| Current sensor on J6.8 | 2.57 V at 0 A (10 % duty, 0.00 A); 2.32 V at 2.53 A (99 %); no divider needed | Zero 2.57 V (auto-zero), slope −0.0988 V/A; output falls with current → 1.83 V at 7.5 A, inside 0–3.3 V |
+| Holding threshold | 7.5 A | `hold_threshold_a = 7.5` (bench: `MAGNET THRESHOLD 2`) |
+| MAG_LOGIC J3.6 | Enable, HIGH when engaging | Output, HIGH while engaged |
+| PWM | 15 kHz; 99 % engages, 10 % disengages | 15 kHz on J7.5 (GPIO41); ON 99 %, release 10 %, boot 0 % |
+| Supply / coil (final, 18 Nov evening) | 12 V supply, 99 % stays, coil ≈ 1 Ω, bench supply was current-limited | ≈ 11.4 A on 12 V (> 7.5 A, holding reached); warnings for release current > 0.5 A and over-current > 10 A |
 
 **Answers received (17 Nov, EEII 1)**
 
@@ -205,7 +218,7 @@ Cut down on 17 Nov to only what the crane firmware still needs. The full list, w
 | Does the 4N25 stage invert? Duty limits? | **Inverts**; limits unknown | Pins inverted in the GPIO matrix; IN duty clamped to 15–85 % (assumed) |
 | What does DRV_EN drive? | An IGBT with its opto that switches the circuit on and off | HIGH = on, LOW at boot and whenever stopped |
 | DRV_FAULT on J3.5? | Unconfirmed | Assumed active LOW with pull-up (unconnected = no fault) |
-| Current signal? | Current sensor needs a digital input to his own DAC | Assumed: digital 10 A trip flag into J3.8 (GPA5), active LOW → fault b0. To confirm |
+| Current signal? | Current sensor needs a digital input to his own DAC | Wiring document (final pinout): VFD current = J6.7 (AN2, analog). Not read yet (shared ADC, C4). The J3.8 digital assumption was removed in v4.6.0 (J3.8 is spare). To reconcile with EEII 1 |
 | Frequencies, V/f, ramp? | Assume from the ICD, note in `main.c` | 5–50 Hz, V/f m = 0.70 at 50 Hz (boost 0.15), 25 Hz/s, all marked ASSUMED in `main.c` |
 | Swap B/C while running? | **First stop, then swap** | Full stop, ≥ 500 ms at rest, then reverse |
 | Sign-off / hook-up | Board ready 18 Nov; **hook-up scheduled 19 Nov** | Plan moved from 26 Nov to 19 Nov |

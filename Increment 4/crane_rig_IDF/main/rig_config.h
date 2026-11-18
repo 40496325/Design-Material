@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#define RIG_FW_VERSION "4.5.0"   // 4.5.0 = drive electronics (EEII 1, IF6.0) added, 17 Nov 2026
+#define RIG_FW_VERSION "4.7.0"   // 4.5.0 drive (EEII 1, IF6.0); 4.6.0 trolley (MCTR 1, IF1.0); 4.7.0 magnet (EEII 2, IF12.0), 18 Nov 2026
 #define RIG_FW_NAME    "REII crane rig (Increment 4)"
 
 // -----------------------------------------------------------------------------
@@ -173,6 +173,16 @@
 // Owns J7.8/J7.7/J7.6 (SPWM A/B/C, 10 kHz), J3.4 DRV_EN, J4.8 brake, J3.5 / J3.8 inputs.
 // Every assumed value is in main.c, start_drive_electronics().
 #define RIG_ENABLE_DRIVE    1
+
+// Trolley (MCTR 1 lateral, ICD IF1.0) - main/trolley/, added v4.6.0.
+// Owns J7.9 (ENA PWM), J7.12 (ENC_A), J4.4-J4.7 (IN1-IN4). Pins: wiring document only.
+// Every assumed value is in main.c, start_trolley().
+#define RIG_ENABLE_TROLLEY  1
+
+// Magnet (EEII 2 load attachment, ICD IF12.0) - main/magnet/, added v4.7.0.
+// Owns J7.5 (MAG_PWM, GPIO41), J3.6 (MAG_LOGIC, GPA3), J6.8 (current sensor, ADS1220 AIN3
+// shared with the load cell). Pins: wiring document only. Assumptions: main.c, start_magnet().
+#define RIG_ENABLE_MAGNET   1
 
 #if RIG_ENABLE_SPWM && RIG_ENABLE_DRIVE
 #error "RIG_ENABLE_SPWM and RIG_ENABLE_DRIVE both drive GPIO38-40 - enable only one"

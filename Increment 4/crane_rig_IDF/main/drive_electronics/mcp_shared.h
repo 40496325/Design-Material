@@ -52,6 +52,11 @@ esp_err_t mcp_shared_config_input(mcp23017_port_t port, int bit, bool pullup);
 /** Drive one output pin; the other 7 bits of the port keep their shadow value. */
 esp_err_t mcp_shared_write(mcp23017_port_t port, int bit, int level);
 
+/** Drive several output pins of one port in ONE register write (e.g. IN1-IN4
+ *  of the trolley H-bridge together, so they never pass through a mixed state).
+ *  Bits outside mask keep their shadow value. */
+esp_err_t mcp_shared_write_mask(mcp23017_port_t port, uint8_t mask, uint8_t levels);
+
 /** Read the actual pin levels of a port (GPIOx). */
 esp_err_t mcp_shared_read_port(mcp23017_port_t port, uint8_t *out_levels);
 

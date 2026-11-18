@@ -84,6 +84,16 @@ esp_err_t mcp_shared_write(mcp23017_port_t port, int bit, int level)
     return err;
 }
 
+esp_err_t mcp_shared_write_mask(mcp23017_port_t port, uint8_t mask, uint8_t levels)
+{
+    if (!valid(port, 0)) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_olat[port] = (uint8_t)((s_olat[port] & ~mask) | (levels & mask));
+    esp_err_t err = wr(REG_OLAT(port), s_olat[port]);
+    xSemaphoreGive(s_lock);
+    return err;
+}
+
 esp_err_t mcp_shared_read_port(mcp23017_port_t port, uint8_t *out_levels)
 {
     if (!valid(port, 0)) return ESP_ERR_INVALID_STATE;

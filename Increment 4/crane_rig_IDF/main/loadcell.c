@@ -94,6 +94,56 @@ static esp_err_t adc_read(int timeout_ms, int32_t *code)
 }
 static loadcell_status_t st;
 static SemaphoreHandle_t s_lock;
+
+// MAGNET: shared-ADC side channel (see loadcell.h)
+static volatile uint8_t s_aux_ch = 0xFF;
+static volatile uint32_t s_aux_period_ms;
+static volatile int32_t s_aux_code;
+static volatile int64_t s_aux_us;
+static volatile uint32_t s_aux_count;
+static volatile bool s_aux_valid;
+static int64_t s_aux_next_us;
+static int s_discard_bridge;
+
+void loadcell_set_aux(uint8_t channel, uint32_t period_ms)
+{
+    s_aux_period_ms = period_ms < 100 ? 100 : period_ms;
+    s_aux_ch = channel;
+}
+
+bool loadcell_get_aux(int32_t *code, int64_t *when_us, uint32_t *count)
+{
+    if (code) *code = s_aux_code;
+    if (when_us) *when_us = s_aux_us;
+    if (count) *count = s_aux_count;
+    return s_aux_valid;
+}
+
+#if RIG_LOADCELL_SOURCE != RIG_LOADCELL_HX711
+static void aux_read_if_due(void)
+{
+    const uint8_t ch = s_aux_ch;
+    if (ch > 3 || !s_adc) return;
+    const int64_t now = esp_timer_get_time();
+    if (now < s_aux_next_us) return;
+    s_aux_next_us = now + (int64_t)s_aux_period_ms * 1000;
+
+    int32_t first, code;
+    esp_err_t err = ads1220_read_single_ended(s_adc, ch, &first);          // may be stale: discard
+    if (err == ESP_OK) err = ads1220_read_single_ended(s_adc, ch, &code);  // settled conversion
+    esp_err_t berr = ads1220_configure_bridge(s_adc, RIG_LOADCELL_GAIN_LOG2);
+    s_discard_bridge = 1;                                                   // first bridge result after the switch
+    if (err == ESP_OK) {
+        s_aux_code = code;
+        s_aux_us = esp_timer_get_time();
+        s_aux_count++;
+        s_aux_valid = true;
+    } else {
+        s_aux_valid = false;
+    }
+    if (berr != ESP_OK) printf("RIG,WARN,load cell bridge re-config after AIN%u read failed (%s)\n", ch, esp_err_to_name(berr));
+}
+#endif
 static volatile req_t s_req;
 static volatile float s_req_kg;
 static volatile uint32_t s_watch_until_ms;
@@ -262,8 +312,15 @@ static void loadcell_task(void *arg)
         handle_request();
         if (st.valid == false && filled >= RIG_LOADCELL_AVG) filled = 0;   // restart after tare/cal
 
+#if RIG_LOADCELL_SOURCE != RIG_LOADCELL_HX711
+        aux_read_if_due();   // MAGNET: shared-ADC side channel (magnet current on AIN3)
+#endif
         int32_t code;
         esp_err_t err = adc_read(300, &code);
+        if (err == ESP_OK && s_discard_bridge) {   // MAGNET: first bridge result after an AINx read
+            s_discard_bridge = 0;
+            continue;
+        }
         if (err != ESP_OK) {
             xSemaphoreTake(s_lock, portMAX_DELAY);
             st.errors++;

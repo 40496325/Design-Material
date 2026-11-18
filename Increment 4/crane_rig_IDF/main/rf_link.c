@@ -42,6 +42,12 @@
 #if RIG_ENABLE_DRIVE
 #include "drive_control.h"   // DRIVE: hoist drive (main/drive_electronics/)
 #endif
+#if RIG_ENABLE_TROLLEY
+#include "trolley_control.h" // TROLLEY: lateral drive + encoder (main/trolley/)
+#endif
+#if RIG_ENABLE_MAGNET
+#include "magnet_control.h"  // MAGNET: electromagnet PWM / logic / current (main/magnet/)
+#endif
 
 static const char *TAG = "rf_link";
 
@@ -324,6 +330,12 @@ static void handle_frame(const uint8_t *buf, int len, int pipe)
 #if RIG_ENABLE_DRIVE
         drive_on_move(&s.last_cmd, s.last_rx_us);   // DRIVE: hoist_cmd -> SPWM / DRV_EN / brake
 #endif
+#if RIG_ENABLE_TROLLEY
+        trolley_on_move(&s.last_cmd, s.last_rx_us); // TROLLEY: trolley_cmd -> ENA PWM / IN1-IN4
+#endif
+#if RIG_ENABLE_MAGNET
+        magnet_on_move(&s.last_cmd, s.last_rx_us);  // MAGNET: magnet_state -> MAG_PWM / MAG_LOGIC
+#endif
     } else {
         s.bad++;
     }
@@ -478,13 +490,21 @@ static void print_heartbeat(const char *tag)
 #if RIG_ENABLE_DRIVE
     drive_print("DRIVE");
 #endif
+#if RIG_ENABLE_TROLLEY
+    trolley_print("TROLLEY");
+#endif
+#if RIG_ENABLE_MAGNET
+    magnet_print("MAGNET");
+#endif
 }
 
 static void print_help(void)
 {
     printf("RIG,HELP,HELP INFO STATS CLEAR PROFILE <ICD|STATIC> MODE <APP|CTRL> PA <MIN|LOW|HIGH|MAX> "
            "CH <0-125> LOG <0|1> TLM <MODEL|ZERO> LOAD [TARE|CAL <kg>|WATCH [s]|RESET] SCAN [passes] RPD [ms] CARRIER [ms] [ch] CE <0|1> REINIT SELFTEST "
-           "DRIVE [STATUS|SQUARE|SINE|EN|BRAKE|STOP|RESET|HELP]\n");
+           "DRIVE [STATUS|SQUARE|SINE|EN|BRAKE|STOP|RESET|HELP] "
+           "TROLLEY [STATUS|PWM|RUN|IN|STOP|ZERO|LIMITS|RESET|HELP] "
+           "MAGNET [STATUS|PWM|ON|OFF|LOGIC|ZERO|CAL|THRESHOLD|RESET|STOP|HELP]\n");
     printf("OK,HELP\n");
 }
 
@@ -525,7 +545,8 @@ static void handle_line(char *line)
     (void)a3;
 
     if (!s.radio_ok && strcmp(cmd, "HELP") && strcmp(cmd, "INFO") && strcmp(cmd, "REINIT") && strcmp(cmd, "LOAD") &&
-        strcmp(cmd, "DRIVE")) {   // DRIVE test modes work without the radio
+        strcmp(cmd, "DRIVE") && strcmp(cmd, "TROLLEY") &&
+        strcmp(cmd, "MAGNET")) {   // DRIVE / TROLLEY / MAGNET tests work without the radio
         printf("ERR,radio not responding on SPI (probe=%s) - check J1 wiring / 3.3VP, then REINIT\n",
                esp_err_to_name(s.probe_err));
         return;
@@ -596,6 +617,14 @@ static void handle_line(char *line)
 #if RIG_ENABLE_DRIVE
     } else if (!strcmp(cmd, "DRIVE")) {
         drive_command(a1, a2, a3);
+#endif
+#if RIG_ENABLE_TROLLEY
+    } else if (!strcmp(cmd, "TROLLEY")) {
+        trolley_command(a1, a2, a3);
+#endif
+#if RIG_ENABLE_MAGNET
+    } else if (!strcmp(cmd, "MAGNET")) {
+        magnet_command(a1, a2, a3);
 #endif
     } else if (!strcmp(cmd, "TLM")) {
         if (a1 && (!strcmp(a1, "MODEL") || !strcmp(a1, "ZERO"))) {
